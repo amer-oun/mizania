@@ -1,6 +1,7 @@
 // Today's spendable amount (PLAN.md §4). All amounts are integer millimes.
 
 import { cycleWeeks, daysBetween, daysLeft, type IsoDate, weekIndexFor } from "./cycle";
+import { mulDivFloor } from "./integer-math";
 import { assertMillimes } from "./money";
 
 export interface TodayBudgetInput {
@@ -64,13 +65,6 @@ function assertSpending(value: number, name: string): void {
   }
 }
 
-/** floor(amount × part / whole) without the multiplication growing past the safe range. */
-function shareOf(amount: number, part: number, whole: number): number {
-  const perDay = Math.floor(amount / whole);
-  const rest = amount % whole; // < whole, so rest × part stays small
-  return perDay * part + Math.floor((rest * part) / whole);
-}
-
 /**
  * Weekly mode: the week's amount is its fair share of the money it started
  * with, pool × (days in this week) / (days from week start to transfer).
@@ -89,7 +83,7 @@ function weeklyBudget(input: TodayBudgetInput, days: number, poolThisMorning: nu
   if (!week) throw new RangeError(`No week found for ${today}.`); // unreachable: index is valid
 
   const poolAtWeekStart = poolThisMorning + spentThisWeekBeforeToday;
-  const weekAllowance = shareOf(
+  const weekAllowance = mulDivFloor(
     Math.max(0, poolAtWeekStart),
     week.days,
     daysBetween(week.start, nextTransferOn),

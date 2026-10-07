@@ -257,12 +257,12 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 1: Core logic, no UI (1 week)
 
-- [ ] `packages/core/money`: parse, format per locale, add, split (property-based tests)
-- [ ] `packages/core/cycle`: days left, weekly portions, late transfer extension
-- [ ] `packages/core/daily`: daily spendable amount (normal + weekly mode, rollover)
-- [ ] `packages/core/checkin`: unlogged spending calculation
-- [ ] `packages/core/warnings`: run-out date and fix-per-day amount
-- [ ] Write the formulas from §4 as tests first, then implement
+- [x] `packages/core/money`: parse, format per locale, add, split (property-based tests)
+- [x] `packages/core/cycle`: days left, weekly portions, late transfer extension
+- [x] `packages/core/daily`: daily spendable amount (normal + weekly mode, rollover)
+- [x] `packages/core/checkin`: unlogged spending calculation
+- [x] `packages/core/warnings`: run-out date and fix-per-day amount
+- [x] Write the formulas from §4 as tests first, then implement
 - **Done when:** core logic has ~100% coverage and you can explain every formula.
 
 ### Phase 2: Auth, onboarding, wallets (1 week)
@@ -282,6 +282,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Mark fixed costs as paid
 - [ ] This month by category vs last month
 - [ ] Store a snapshot of the week's allowance at week start (see ADR 003).
+- [ ] Word big warnings kindly and link them to the 'ask for money' feature.
 - **Done when:** you use it yourself for a full week and the daily number feels right.
 
 ### Phase 4: Offline-first + pilot (1.5 weeks)

@@ -4,7 +4,7 @@ Mizania is an offline-first budgeting PWA for Tunisian students who receive mone
 
 ## Current phase
 
-Phase 1: Core logic <!-- update as you progress -->
+Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 
 ## Architecture
 
