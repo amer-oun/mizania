@@ -1,6 +1,7 @@
 // Pure business logic. No I/O, no framework imports: this runs in the
 // browser (offline) and on the server.
 
+export { checkIn, type CheckInKind, type CheckInResult, expectedBalance } from "./checkin";
 export { APP_TIME_ZONE, MILLIMES_PER_DINAR } from "./constants";
 export {
   addDays,
@@ -23,3 +24,4 @@ export {
   type WeekBudget,
 } from "./daily";
 export { assertMillimes, formatTND, type Locale, parseTND, splitEven } from "./money";
+export { type RunOutForecast, runOutForecast, type RunOutInput } from "./warnings";
