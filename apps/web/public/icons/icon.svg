@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Placeholder icon: a coin with a rising bar. Replace with the real logo later. -->
+  <rect width="512" height="512" rx="112" fill="#0f8a65"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-width="28"/>
+  <rect x="186" y="266" width="36" height="70" rx="10" fill="#ffffff"/>
+  <rect x="238" y="226" width="36" height="110" rx="10" fill="#ffffff"/>
+  <rect x="290" y="186" width="36" height="150" rx="10" fill="#ffffff"/>
+</svg>
