@@ -281,6 +281,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Evening check-in
 - [ ] Mark fixed costs as paid
 - [ ] This month by category vs last month
+- [ ] Store a snapshot of the week's allowance at week start (see ADR 003).
 - **Done when:** you use it yourself for a full week and the daily number feels right.
 
 ### Phase 4: Offline-first + pilot (1.5 weeks)
