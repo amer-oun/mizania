@@ -42,8 +42,12 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Core runs its tests once, with coverage; its 100% thresholds fail the job.
       - name: Test
-        run: pnpm test
+        run: pnpm exec turbo run test --filter='!@mizania/core'
+
+      - name: Test core with coverage (100% required)
+        run: pnpm --filter @mizania/core test:coverage
 
       - name: Build
         run: pnpm build
