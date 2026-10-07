@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "title": "Mizania",
+    "description": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille."
+  },
+  "Home": {
+    "title": "Mizania",
+    "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille."
+  },
+  "LanguageSwitcher": {
+    "label": "Langue",
+    "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"
+  }
+}

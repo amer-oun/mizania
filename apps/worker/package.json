@@ -1,0 +1,29 @@
+{
+  "name": "@mizania/worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Background jobs: reminders, warnings, expected-transfer checks.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsdown",
+    "start": "node dist/index.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .turbo dist"
+  },
+  "dependencies": {
+    "ioredis": "^6.0.0",
+    "pino": "catalog:"
+  },
+  "devDependencies": {
+    "@mizania/config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "pino-pretty": "catalog:",
+    "rimraf": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

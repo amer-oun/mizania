@@ -1,0 +1,15 @@
+/*
+ * Shared Tailwind v4 design tokens. Import after `@import "tailwindcss";`.
+ * Placeholder palette for Phase 0; the real visual design comes later.
+ */
+@theme {
+  /* --font-latin / --font-arabic are set by next/font in apps/web. The Latin
+     face has no Arabic glyphs, so Arabic text falls through to the Arabic face. */
+  --font-sans: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: oklch(0.97 0.02 165);
+  --color-brand-100: oklch(0.93 0.05 165);
+  --color-brand-500: oklch(0.62 0.13 165);
+  --color-brand-600: oklch(0.54 0.12 165);
+  --color-brand-700: oklch(0.46 0.1 165);
+}

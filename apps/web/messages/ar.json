@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "title": "ميزانية",
+    "description": "قدّاش تنجم تصرف اليوم، حتى توصلك الفلوس الجاية من الدار."
+  },
+  "Home": {
+    "title": "ميزانية",
+    "tagline": "قدّاش تنجم تصرف اليوم، حتى توصلك الفلوس الجاية من الدار."
+  },
+  "LanguageSwitcher": {
+    "label": "اللغة",
+    "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {غير معروفة}}"
+  }
+}

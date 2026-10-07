@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "title": "Mizania",
+    "description": "How much you can spend today, until your next transfer from home."
+  },
+  "Home": {
+    "title": "Mizania",
+    "tagline": "How much you can spend today, until your next transfer from home."
+  },
+  "LanguageSwitcher": {
+    "label": "Language",
+    "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Unknown}}"
+  }
+}

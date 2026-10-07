@@ -9,6 +9,7 @@
 Most Tunisian university students rent near campus, away from home. Their parents send money **once a month** (some also get a bourse). That money has to cover rent, bills, groceries, coffee, transport and going out until the next transfer.
 
 What goes wrong:
+
 - **Front-loading:** money arrives, the first week feels rich, the last week is empty.
 - **Invisible small spending:** coffee, snacks, photocopies and louage trips add up without anyone noticing.
 - **Money is scattered:** cash in the pocket, some in D17, some in Flouci, some on a card.
@@ -24,6 +25,7 @@ Existing budgeting apps aren't built for this: they assume a salary, a bank sync
 The home screen shows one main number:
 
 > ### You can spend **12.500 DT** today
+>
 > 9 days until your next transfer · on track ✓
 
 Everything in the app exists to make that number correct and to keep the student using the app.
@@ -45,10 +47,11 @@ Money arrives ──► Plan it (once, 1 minute) ──► Spend + check in dail
 3. **Spend.** Two ways, the student picks:
    - **Quick log:** "+" → amount → category, or type `9ahwa 2.5`
    - **Evening check-in:** "How much do you have left?" The app calculates what was spent. No need to log every coffee.
-4. **Stay on track.** Unspent daily money rolls into tomorrow. Early, kind warnings: *"At this pace you'll run out on the 22nd, 6 days early. Spending 2 DT less per day fixes it."*
+4. **Stay on track.** Unspent daily money rolls into tomorrow. Early, kind warnings: _"At this pace you'll run out on the 22nd, 6 days early. Spending 2 DT less per day fixes it."_
 5. **Next transfer.** On the expected date, the app asks "Did the money arrive?". If not, it extends the cycle and recalculates the daily amount. Leftover money moves to the next month or to savings.
 
 ### Weekly mode (fixes front-loading)
+
 Because money arrives monthly, the daily money is split into **weekly portions**. Week 1 can't eat into week 4. Unspent money from a week rolls forward. Students can turn this off.
 
 ---
@@ -56,6 +59,7 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 ## 3. Features
 
 ### MVP: the core loop (ship this first, test with real students)
+
 - Sign up / log in (email + Google)
 - Onboarding wizard (under 2 minutes): language, usual monthly amount, usual arrival day, rent share, usual bills, wallets
 - Wallets: Cash, D17, Flouci, Card, Other (manual balances, transfers between them)
@@ -70,6 +74,7 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 - Installable PWA, works offline
 
 ### V1: after the pilot
+
 - Early warnings ("you'll run out on the 22nd")
 - Late transfer handling (extend cycle, recalculate)
 - **Flatmates:** shared household, split rent/bills/groceries (equal, by amount, by share), balances, settle up with the fewest transfers
@@ -80,11 +85,13 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 - Export CSV, delete account
 
 ### Stretch (only after V1 ships)
+
 - End-of-month recap card students can share (no amounts, just "I stayed on budget 3 months in a row")
 - Streaks for daily check-ins
 - AI monthly tips based on aggregates only
 
 ### Deliberately NOT in scope
+
 - **Sending money from the app.** That needs Central Bank licensing and serious security. Transfers happen in D17/Flouci; Mizania only records them.
 - **Reading D17/Flouci balances automatically.** As far as is known, there is no public API for reading a personal account's transactions (verify before deciding). Wallets are tracked manually, and the evening check-in keeps them accurate.
 - **Parent dashboard.** Students won't use an app their parents watch. The student stays in control.
@@ -96,6 +103,7 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 All money is stored as **integer millimes** (1 TND = 1000 millimes).
 
 ### Daily spendable amount
+
 ```
 available        = sum of wallet balances
 reserved         = unpaid fixed costs + envelope remainders + savings for this cycle
@@ -106,47 +114,53 @@ normal mode:     today = daily_pool / days_left
 weekly mode:     week_left  = this week's portion + rollover − spent this week
                  today      = week_left / days left in this week
 ```
+
 - If `daily_pool < 0` → "over budget" state with a recovery suggestion.
 - Rollover is automatic: spending less today raises tomorrow's amount.
 
 ### Evening check-in
+
 ```
 expected_cash = cash at last check-in + cash received − cash logged
 spent_unlogged = expected_cash − reported_cash
 ```
+
 If `spent_unlogged > 0`, the app records one "unlogged spending" transaction in the daily money (the student can categorize it if they want). If negative, it asks whether they forgot to log money they received.
 
 ### Warnings
+
 ```
 avg_daily_spend   = flexible spending over last 7 days / 7
 runs_out_on       = today + daily_pool / avg_daily_spend
 ```
+
 Warn when `runs_out_on` is before the next transfer, and say how much less per day fixes it.
 
 ### Splitting and rounding
+
 Splitting 10.000 DT among 3 people gives 3.334 + 3.333 + 3.333. Remainder millimes are distributed deterministically. Property-based tests prove splits always sum to the total.
 
 ---
 
 ## 5. Tech stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| Monorepo | pnpm workspaces + Turborepo | Shared code between web and api |
-| Language | TypeScript (strict) | |
-| App | Next.js (App Router) as an installable **PWA** | Phone-first, no app store needed |
-| UI | Tailwind + shadcn/ui, next-intl (AR RTL / FR / EN) | |
-| Local DB | IndexedDB via Dexie | Offline-first |
-| Service worker | Serwist | Offline cache, push notifications |
-| API | Fastify | |
-| Validation | Zod (shared) | |
-| DB | PostgreSQL + Drizzle ORM | |
-| Jobs | Redis + BullMQ | Reminders, warnings, cycle checks |
-| Auth | Better Auth | Email + Google |
-| Testing | Vitest, fast-check, Playwright (incl. offline), Testcontainers | |
-| Monitoring | Sentry, pino | |
-| Hosting | Vercel (web), Fly.io or Railway (api + worker), managed Postgres + Redis | |
-| CI/CD | GitHub Actions | |
+| Layer          | Choice                                                                   | Why                               |
+| -------------- | ------------------------------------------------------------------------ | --------------------------------- |
+| Monorepo       | pnpm workspaces + Turborepo                                              | Shared code between web and api   |
+| Language       | TypeScript (strict)                                                      |                                   |
+| App            | Next.js (App Router) as an installable **PWA**                           | Phone-first, no app store needed  |
+| UI             | Tailwind + shadcn/ui, next-intl (AR RTL / FR / EN)                       |                                   |
+| Local DB       | IndexedDB via Dexie                                                      | Offline-first                     |
+| Service worker | Serwist                                                                  | Offline cache, push notifications |
+| API            | Fastify                                                                  |                                   |
+| Validation     | Zod (shared)                                                             |                                   |
+| DB             | PostgreSQL + Drizzle ORM                                                 |                                   |
+| Jobs           | Redis + BullMQ                                                           | Reminders, warnings, cycle checks |
+| Auth           | Better Auth                                                              | Email + Google                    |
+| Testing        | Vitest, fast-check, Playwright (incl. offline), Testcontainers           |                                   |
+| Monitoring     | Sentry, pino                                                             |                                   |
+| Hosting        | Vercel (web), Fly.io or Railway (api + worker), managed Postgres + Redis |                                   |
+| CI/CD          | GitHub Actions                                                           |                                   |
 
 Keep the stack boring. The interesting part is the product logic and offline sync.
 
@@ -232,6 +246,7 @@ Default categories (with AR/FR/EN names): Rent, Electricity (STEG), Water (SONED
 Each phase ends with tests passing, CI green and a deploy. **Real students use the app from Phase 4 onward.**
 
 ### Phase 0: Foundation (3–4 days)
+
 - [ ] Monorepo, strict TS, ESLint, Prettier
 - [ ] docker-compose: Postgres, Redis, Mailpit
 - [ ] Drizzle, first migration, seed default categories
@@ -241,6 +256,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - **Done when:** the empty app installs on your phone and switches to Arabic with an RTL layout.
 
 ### Phase 1: Core logic, no UI (1 week)
+
 - [ ] `packages/core/money`: parse, format per locale, add, split (property-based tests)
 - [ ] `packages/core/cycle`: days left, weekly portions, late transfer extension
 - [ ] `packages/core/daily`: daily spendable amount (normal + weekly mode, rollover)
@@ -250,12 +266,14 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - **Done when:** core logic has ~100% coverage and you can explain every formula.
 
 ### Phase 2: Auth, onboarding, wallets (1 week)
+
 - [ ] Auth (email + Google)
 - [ ] Onboarding wizard: language → monthly amount + arrival day → rent + bills → wallets with starting balances
 - [ ] Wallet list, manual transfers between wallets (e.g. cash withdrawal from card)
 - **Done when:** a new user finishes onboarding in under 2 minutes in any language.
 
 ### Phase 3: The core loop (1.5 weeks)
+
 - [ ] "I received money" flow
 - [ ] Month plan screen with suggestions from the previous cycle
 - [ ] Home screen: today's amount, days left, status, week progress
@@ -266,19 +284,23 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - **Done when:** you use it yourself for a full week and the daily number feels right.
 
 ### Phase 4: Offline-first + pilot (1.5 weeks)
+
 - [ ] Dexie local DB; UI reads and writes locally first
 - [ ] Sync protocol in `packages/sync`: push/pull, client UUIDs, HLC, soft deletes, idempotent
 - [ ] Sync status indicator (synced / pending / offline)
 - [ ] Tests: two devices editing offline, syncing in different orders → same result
 - [ ] ADR: sync design and conflict strategy
+- [ ] Installed app opens offline: start URL must not depend on a server redirect; precache it and test in airplane mode.
 - [ ] **Pilot: 10 students** use it for 2 weeks. Short feedback form + 3 quick interviews.
 - **Done when:** expenses logged in airplane mode appear on another device after reconnecting, and you have real feedback.
 
 ### Phase 5: Fix what the pilot taught you (3–5 days)
+
 - [ ] List the top 3 problems from feedback and fix them
 - [ ] Write down what you learned in `docs/pilot-notes.md` (this goes in your README and interviews)
 
 ### Phase 6: Warnings, late transfers, notifications (1 week)
+
 - [ ] Run-out warnings on the home screen
 - [ ] "Did the money arrive?" on the expected date; extend cycle if not
 - [ ] Cycle close: leftover → next month or savings
@@ -286,6 +308,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Push notifications: check-in reminder, fixed cost due, warnings (all toggleable)
 
 ### Phase 7: Flatmates (1.5 weeks)
+
 - [ ] Create household, invite by link/code, join, leave (blocked if balance ≠ 0)
 - [ ] Shared expenses with equal / exact / shares splits
 - [ ] Your share automatically becomes a plan item or transaction in your own budget
@@ -294,6 +317,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - **Done when:** one real flat tracks a month of shared costs with it.
 
 ### Phase 8: Derja quick entry + "ask for money" (1 week)
+
 - [ ] `packages/parser`: `9ahwa 2.5` → 2500 millimes, Coffee. Handles Latin derja, Arabic script, French, Arabic-Indic digits, `2.5` / `2500` / `2,500`
 - [ ] 100+ table-driven test cases, collected from real students during the pilot
 - [ ] Live preview while typing; user confirms before saving
@@ -301,13 +325,17 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - **Done when:** `قهوة ٢٫٥` and `9ahwa 2.5` both create the right expense.
 
 ### Phase 9: Hardening (1 week)
+
 - [ ] Playwright E2E: onboarding → receive money → plan → offline logging → sync → check-in → warning
 - [ ] Lighthouse on mobile ≥ 90 for performance, accessibility, PWA
 - [ ] Test on a low-end Android phone with throttled 3G
 - [ ] Security: rate-limited auth, data isolation tests, secure headers, CSV export, account deletion
 - [ ] Sentry in all apps
+- [ ] Translate PWA manifest description
+- [ ] Place the language switcher properly on wide screens.
 
 ### Phase 10: Launch (1 week)
+
 - [ ] Production deploy, demo account with a realistic month of data
 - [ ] Share with 50+ students (university groups, student Facebook groups, friends' flats)
 - [ ] Track simple, privacy-friendly metrics: weekly active users, check-in rate, % of users who finish a cycle on budget
@@ -327,6 +355,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 6. Small commits, one PR per checklist item.
 
 ### Example prompts
+
 - **Phase 0:** "Read PLAN.md and CLAUDE.md. Do Phase 0 only. No features. Show me the plan first."
 - **Phase 1:** "Using the formulas in PLAN.md §4, write Vitest tests for packages/core/daily covering normal mode, weekly mode, rollover, over-budget and the last day of a cycle. Don't implement yet."
 - **Phase 1:** "Write fast-check property tests for split(): any amount split among n people sums to the total and no two shares differ by more than 1 millime."
