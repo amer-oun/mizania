@@ -2,6 +2,8 @@
 
 An offline-first budgeting PWA for Tunisian students who get money monthly from home. It shows how much you can spend today until the next transfer. Arabic (RTL), French and English.
 
+**Live:** https://mizania-roan.vercel.app
+
 Full spec and roadmap: [PLAN.md](PLAN.md). Conventions for contributors and Claude Code: [CLAUDE.md](CLAUDE.md). Decisions: [docs/decisions](docs/decisions).
 
 ## Prerequisites

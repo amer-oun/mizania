@@ -17,35 +17,35 @@ export const defaultCategories: readonly DefaultCategory[] = [
   },
   {
     key: "electricity",
-    names: { ar: "الكهرباء (STEG)", fr: "Électricité (STEG)", en: "Electricity (STEG)" },
+    names: { ar: "الضو (الستاغ)", fr: "Électricité (STEG)", en: "Electricity (STEG)" },
     icon: "zap",
     color: "#f59e0b",
     group: "fixed",
   },
   {
     key: "water",
-    names: { ar: "الماء (SONEDE)", fr: "Eau (SONEDE)", en: "Water (SONEDE)" },
+    names: { ar: "الماء (الصوناد)", fr: "Eau (SONEDE)", en: "Water (SONEDE)" },
     icon: "droplet",
     color: "#0ea5e9",
     group: "fixed",
   },
   {
     key: "internet",
-    names: { ar: "الإنترنت", fr: "Internet", en: "Internet" },
+    names: { ar: "الأنترنات", fr: "Internet", en: "Internet" },
     icon: "wifi",
     color: "#8b5cf6",
     group: "fixed",
   },
   {
     key: "phone_recharge",
-    names: { ar: "شحن الهاتف", fr: "Recharge téléphone", en: "Phone recharge" },
+    names: { ar: "شحن التليفون", fr: "Recharge téléphone", en: "Phone recharge" },
     icon: "smartphone",
     color: "#14b8a6",
     group: "fixed",
   },
   {
     key: "groceries",
-    names: { ar: "المواد الغذائية", fr: "Courses", en: "Groceries" },
+    names: { ar: "القضية", fr: "Courses", en: "Groceries" },
     icon: "shopping-basket",
     color: "#22c55e",
     group: "envelope",
@@ -59,7 +59,7 @@ export const defaultCategories: readonly DefaultCategory[] = [
   },
   {
     key: "food_out",
-    names: { ar: "الأكل خارج الدار", fr: "Repas dehors", en: "Food out" },
+    names: { ar: "ماكلة برّا", fr: "Repas dehors", en: "Food out" },
     icon: "utensils",
     color: "#ef4444",
     group: "daily",
@@ -67,7 +67,7 @@ export const defaultCategories: readonly DefaultCategory[] = [
   {
     key: "transport",
     names: {
-      ar: "النقل (لواج، حافلة، مترو، تاكسي)",
+      ar: "التنقل (لواج، كار، مترو، تاكسي)",
       fr: "Transport (louage, bus, métro, taxi)",
       en: "Transport (louage, bus, metro, taxi)",
     },
@@ -77,7 +77,7 @@ export const defaultCategories: readonly DefaultCategory[] = [
   },
   {
     key: "trip_home",
-    names: { ar: "السفر إلى العائلة", fr: "Retour à la maison", en: "Trip home" },
+    names: { ar: "مرواحة للدار", fr: "Retour à la maison", en: "Trip home" },
     icon: "luggage",
     color: "#0891b2",
     group: "fixed",
@@ -85,7 +85,7 @@ export const defaultCategories: readonly DefaultCategory[] = [
   {
     key: "studies",
     names: {
-      ar: "الدراسة (كتب، نسخ)",
+      ar: "القراية (كتب، فوتوكوبي)",
       fr: "Études (livres, photocopies)",
       en: "Studies (books, photocopies)",
     },
@@ -102,21 +102,21 @@ export const defaultCategories: readonly DefaultCategory[] = [
   },
   {
     key: "health",
-    names: { ar: "الصحة", fr: "Santé", en: "Health" },
+    names: { ar: "الصحة والدواء", fr: "Santé", en: "Health" },
     icon: "heart-pulse",
     color: "#dc2626",
     group: "envelope",
   },
   {
     key: "clothes",
-    names: { ar: "الملابس", fr: "Vêtements", en: "Clothes" },
+    names: { ar: "الحوايج", fr: "Vêtements", en: "Clothes" },
     icon: "shirt",
     color: "#d946ef",
     group: "envelope",
   },
   {
     key: "other",
-    names: { ar: "أخرى", fr: "Autre", en: "Other" },
+    names: { ar: "حاجات أخرى", fr: "Autre", en: "Other" },
     icon: "ellipsis",
     color: "#64748b",
     group: "daily",

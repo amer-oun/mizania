@@ -247,12 +247,12 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 0: Foundation (3–4 days)
 
-- [ ] Monorepo, strict TS, ESLint, Prettier
-- [ ] docker-compose: Postgres, Redis, Mailpit
-- [ ] Drizzle, first migration, seed default categories
-- [ ] Next.js PWA (manifest, icons, service worker), next-intl with AR RTL / FR / EN
-- [ ] Skeleton api and worker
-- [ ] GitHub Actions CI
+- [x] Monorepo, strict TS, ESLint, Prettier
+- [x] docker-compose: Postgres, Redis, Mailpit
+- [x] Drizzle, first migration, seed default categories
+- [x] Next.js PWA (manifest, icons, service worker), next-intl with AR RTL / FR / EN
+- [x] Skeleton api and worker
+- [x] GitHub Actions CI
 - **Done when:** the empty app installs on your phone and switches to Arabic with an RTL layout.
 
 ### Phase 1: Core logic, no UI (1 week)
