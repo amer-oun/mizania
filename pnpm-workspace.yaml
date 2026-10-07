@@ -25,5 +25,8 @@ catalog:
 allowBuilds:
   "@parcel/watcher": true # next-intl
   "@swc/core": true # next-intl
+  cpu-features: false # optional native speed-up for ssh2 (Testcontainers); not needed
   esbuild: true # tsx, drizzle-kit, tsdown
+  protobufjs: false # postinstall only checks versions; not needed (Testcontainers)
+  ssh2: false # optional native crypto; only used for Docker over SSH (Testcontainers)
   unrs-resolver: true # eslint-import-resolver-typescript (via eslint-config-next)

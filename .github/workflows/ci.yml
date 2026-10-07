@@ -6,7 +6,8 @@ on:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a run on main: it may be migrating the production database.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -51,3 +52,58 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # Applies migrations and the idempotent seed to a Neon database once CI is
+  # green. Migrations only add things (ADR 005), so code deployed by Vercel a
+  # moment earlier keeps working. Drizzle runs them in one transaction.
+  migrate-production:
+    name: Migrate production database
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: migrate-production
+      cancel-in-progress: false
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_DIRECT }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Migrate
+        run: pnpm db:migrate
+      - name: Seed default categories
+        run: pnpm db:seed
+
+  # Same for the shared Neon "preview" branch used by Vercel preview
+  # deployments, on every push to a branch other than main.
+  migrate-preview:
+    name: Migrate preview database
+    needs: ci
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: migrate-preview
+      cancel-in-progress: false
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_PREVIEW_DIRECT }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Migrate
+        run: pnpm db:migrate
+      - name: Seed default categories
+        run: pnpm db:seed
