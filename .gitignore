@@ -30,6 +30,9 @@ coverage/
 npm-debug.log*
 pnpm-debug.log*
 
+# session handoff notes (local only)
+handoff.md
+
 # OS / editors
 .DS_Store
 Thumbs.db

@@ -45,3 +45,4 @@ Phase 0 — Foundation <!-- update as you progress -->
 - Significant decisions get an ADR in `docs/decisions/NNN-title.md`.
 - Mobile-first UI; every view handles loading, empty, error and offline states.
 - Keep the home screen focused on one number: today's spendable amount.
+- Arabic UI text is written in Tunisian derja (Arabic script), friendly and short, not Modern Standard Arabic.

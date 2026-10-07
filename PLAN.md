@@ -290,6 +290,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Sync status indicator (synced / pending / offline)
 - [ ] Tests: two devices editing offline, syncing in different orders → same result
 - [ ] ADR: sync design and conflict strategy
+- [ ] Installed app opens offline: start URL must not depend on a server redirect; precache it and test in airplane mode.
 - [ ] **Pilot: 10 students** use it for 2 weeks. Short feedback form + 3 quick interviews.
 - **Done when:** expenses logged in airplane mode appear on another device after reconnecting, and you have real feedback.
 
@@ -330,6 +331,8 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Test on a low-end Android phone with throttled 3G
 - [ ] Security: rate-limited auth, data isolation tests, secure headers, CSV export, account deletion
 - [ ] Sentry in all apps
+- [ ] Translate PWA manifest description
+- [ ] Place the language switcher properly on wide screens.
 
 ### Phase 10: Launch (1 week)
 
