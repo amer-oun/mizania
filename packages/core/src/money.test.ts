@@ -67,6 +67,10 @@ describe("parseTND", () => {
   ])("returns null for %j", (input) => {
     expect(parseTND(input)).toBeNull();
   });
+
+  it("returns null for an amount too large to store exactly", () => {
+    expect(parseTND("99999999999999999")).toBeNull();
+  });
 });
 
 describe("formatTND", () => {

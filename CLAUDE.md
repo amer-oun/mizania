@@ -37,6 +37,7 @@ Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 - The "ask for money" feature only generates text for the user to copy. Nothing is sent automatically.
 - All user-facing strings go through i18n; every layout must work in RTL.
 - Code in `packages/core`, `packages/sync` and `packages/parser` ships with tests (property-based where it fits).
+- packages/core must keep 100% coverage. A v8 ignore is allowed only for code that can't run, with a comment explaining why.
 
 ## Conventions
 

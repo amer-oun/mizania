@@ -257,8 +257,8 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 1: Core logic, no UI (1 week)
 
-- [x] `packages/core/money`: parse, format per locale, add, split (property-based tests)
-- [x] `packages/core/cycle`: days left, weekly portions, late transfer extension
+- [x] `packages/core/money`: parse, format per locale, split (property-based tests)
+- [x] `packages/core/cycle`: days left, weekly portions
 - [x] `packages/core/daily`: daily spendable amount (normal + weekly mode, rollover)
 - [x] `packages/core/checkin`: unlogged spending calculation
 - [x] `packages/core/warnings`: run-out date and fix-per-day amount
@@ -304,7 +304,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 ### Phase 6: Warnings, late transfers, notifications (1 week)
 
 - [ ] Run-out warnings on the home screen
-- [ ] "Did the money arrive?" on the expected date; extend cycle if not
+- [ ] "Did the money arrive?" on the expected date; late transfer extension (extend the cycle if not)
 - [ ] Cycle close: leftover → next month or savings
 - [ ] Savings goals
 - [ ] Push notifications: check-in reminder, fixed cost due, warnings (all toggleable)

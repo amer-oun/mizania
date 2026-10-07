@@ -11,6 +11,7 @@ catalog:
   "@eslint/js": ^9.39.5
   "@types/node": ^24.19.1
   vitest: ^5.0.3
+  "@vitest/coverage-v8": ^5.0.3 # must match the vitest version
   fast-check: ^4.10.2
   tsx: ^4.23.15
   tsdown: ^0.23.0
