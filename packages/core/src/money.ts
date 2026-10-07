@@ -35,6 +35,9 @@ export function parseTND(input: string): number | null {
   const match = AMOUNT_PATTERN.exec(normalized);
   if (!match) return null;
 
+  // Group 1 is `([0-9]*)`, which always matches (maybe as ""), so it's never
+  // undefined. The fallback only satisfies noUncheckedIndexedAccess.
+  /* v8 ignore next */
   const dinarDigits = match[1] ?? "";
   const millimeDigits = match[2];
   if (dinarDigits === "" && millimeDigits === undefined) return null; // empty input

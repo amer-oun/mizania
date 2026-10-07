@@ -80,7 +80,10 @@ function weeklyBudget(input: TodayBudgetInput, days: number, poolThisMorning: nu
   const weeks = cycleWeeks(startedOn, nextTransferOn);
   const index = weekIndexFor(today, weeks);
   const week = weeks[index];
-  if (!week) throw new RangeError(`No week found for ${today}.`); // unreachable: index is valid
+  // weekIndexFor returns an index into this same list (or throws), so the
+  // week always exists. The check only satisfies noUncheckedIndexedAccess.
+  /* v8 ignore next */
+  if (!week) throw new RangeError(`No week found for ${today}.`);
 
   const poolAtWeekStart = poolThisMorning + spentThisWeekBeforeToday;
   const weekAllowance = mulDivFloor(

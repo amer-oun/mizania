@@ -50,6 +50,10 @@ describe("todayInTunis", () => {
   ])("at %s UTC it is %s in Tunis", (instant, expected) => {
     expect(todayInTunis(new Date(instant))).toBe(expected);
   });
+
+  it("rejects an invalid date", () => {
+    expect(() => todayInTunis(new Date("not a date"))).toThrow();
+  });
 });
 
 describe("daysBetween", () => {
@@ -76,6 +80,11 @@ describe("addDays", () => {
     ["2026-10-01", 30, "2026-10-31"],
   ])("%s + %i days = %s", (date, days, expected) => {
     expect(addDays(date, days)).toBe(expected);
+  });
+
+  it("rejects a number of days that isn't a whole number", () => {
+    expect(() => addDays("2026-10-07", 1.5)).toThrow();
+    expect(() => addDays("2026-10-07", Number.NaN)).toThrow();
   });
 });
 
@@ -194,5 +203,9 @@ describe("weekIndexFor", () => {
 
   it("throws when today is before the cycle starts", () => {
     expect(() => weekIndexFor("2026-09-30", weeks())).toThrow();
+  });
+
+  it("throws when the cycle has no weeks", () => {
+    expect(() => weekIndexFor("2026-10-01", [])).toThrow();
   });
 });

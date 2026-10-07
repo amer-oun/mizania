@@ -11,11 +11,13 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "clean": "rimraf .turbo coverage"
   },
   "devDependencies": {
     "@mizania/config": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "fast-check": "catalog:",
     "rimraf": "catalog:",

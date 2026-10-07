@@ -115,6 +115,22 @@ describe("todayBudget, normal mode", () => {
     expect(() => normal("2026-09-30", 90_000, 0)).toThrow(); // before the cycle started
   });
 
+  it("rejects a cycle whose next transfer is not after its start", () => {
+    const input = {
+      today: "2026-10-01",
+      poolNow: 90_000,
+      spentToday: 0,
+      spentThisWeekBeforeToday: 0,
+      weeklyMode: false,
+    };
+    expect(() =>
+      todayBudget({ ...input, startedOn: "2026-10-01", nextTransferOn: "2026-10-01" }),
+    ).toThrow();
+    expect(() =>
+      todayBudget({ ...input, startedOn: "2026-10-10", nextTransferOn: "2026-10-01" }),
+    ).toThrow();
+  });
+
   // Property-based tests: random daily money, random spending, random day of the cycle.
   const poolAtStartOfDay = fc.integer({ min: 0, max: 10_000_000 });
   const dayOfCycle = fc.integer({ min: 0, max: 29 }).map((n) => addDays(cycle.startedOn, n));

@@ -81,6 +81,9 @@ export function todayInTunis(now: Date = new Date()): IsoDate {
     throw new RangeError("Invalid date: cannot tell which day it is in Tunis.");
   }
   const parts = tunisDateParts.formatToParts(now);
+  // Intl always returns year, month and day parts for these options. If it
+  // ever didn't, assertIsoDate below would throw on the malformed string.
+  /* v8 ignore next */
   const part = (type: "year" | "month" | "day") => parts.find((p) => p.type === type)?.value ?? "";
 
   const today = `${part("year").padStart(4, "0")}-${part("month")}-${part("day")}`;
