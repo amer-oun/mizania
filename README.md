@@ -52,7 +52,7 @@ Then run `docker compose up -d --wait` again.
 | `pnpm dev`                     | Web (Next.js), API (Fastify) and worker, in watch mode                    |
 | `pnpm build`                   | Production builds, including the service worker (`apps/web/public/sw.js`) |
 | `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript across the workspace                                  |
-| `pnpm test`                    | Vitest                                                                    |
+| `pnpm test`                    | Vitest. Database tests start a Postgres container: Docker must be running |
 | `pnpm format` / `format:check` | Prettier                                                                  |
 | `pnpm db:generate`             | New Drizzle migration from the schema                                     |
 | `pnpm db:migrate` / `db:seed`  | Apply migrations / upsert the default categories                          |
@@ -67,6 +67,18 @@ pnpm --filter @mizania/web start
 ```
 
 Then open `http://<your-PC-LAN-IP>:3000` on your phone (same Wi-Fi). Browsers only install PWAs and register service workers on HTTPS or `localhost`. To install from a phone, use an HTTPS tunnel (for example `cloudflared tunnel --url http://localhost:3000`) or deploy a preview.
+
+## Production
+
+See [ADR 005](docs/decisions/005-auth-hosting-and-phase-2-data.md) for why it's set up this way.
+
+| Where                  | Variables                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vercel, Production     | `DATABASE_URL` (Neon main, pooled), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` |
+| Vercel, Preview        | `DATABASE_URL` (Neon `preview` branch, pooled), `BETTER_AUTH_SECRET`, `SMTP_*`, `EMAIL_FROM`                                                      |
+| GitHub Actions secrets | `DATABASE_URL_DIRECT` (Neon main, direct), `DATABASE_URL_PREVIEW_DIRECT` (Neon `preview`, direct)                                                 |
+
+**Migrations reach the databases through CI**, after all checks pass: pushes to `main` migrate and seed production; pushes to any other branch migrate and seed the shared `preview` branch. Migrations must only add things (new tables, new nullable or defaulted columns), because Vercel can deploy the new code a moment before its migration runs.
 
 ## Repository layout
 

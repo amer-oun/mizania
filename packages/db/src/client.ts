@@ -3,8 +3,18 @@ import postgres from "postgres";
 
 import * as schema from "./schema";
 
-export function createDb(url: string, options: { max?: number } = {}) {
-  const client = postgres(url, { max: options.max ?? 10 });
+export interface CreateDbOptions {
+  /** Maximum connections in the pool. */
+  max?: number;
+  /**
+   * Use prepared statements. Turn off when connecting through a transaction-mode
+   * pooler such as Neon's pooled URL (used by Vercel), which may not support them.
+   */
+  prepare?: boolean;
+}
+
+export function createDb(url: string, options: CreateDbOptions = {}) {
+  const client = postgres(url, { max: options.max ?? 10, prepare: options.prepare ?? true });
   const db = drizzle({ client, schema, casing: "snake_case" });
   return { db, client };
 }

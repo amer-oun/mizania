@@ -196,8 +196,9 @@ mizania/
 ## 7. Data model
 
 ```
-users              (id, email, name, locale[ar|fr|en], weekly_mode bool,
-                    checkin_time, created_at, deleted_at)
+users              (id, email, name, locale[ar|fr|en], weekly_mode bool default true,
+                    checkin_time, usual_monthly_millimes, usual_arrival_day[1-31],
+                    onboarded_at nullable, created_at, deleted_at)
 
 wallets            (id, user_id, name, type[cash|d17|flouci|card|other],
                     archived, position)

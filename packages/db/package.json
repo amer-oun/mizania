@@ -15,6 +15,7 @@
     "db:studio": "drizzle-kit studio",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "clean": "rimraf .turbo"
   },
   "dependencies": {
@@ -23,11 +24,13 @@
   },
   "devDependencies": {
     "@mizania/config": "workspace:*",
+    "@testcontainers/postgresql": "^12.2.0",
     "@types/node": "catalog:",
     "drizzle-kit": "^0.31.11",
     "eslint": "catalog:",
     "rimraf": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

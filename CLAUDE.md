@@ -32,6 +32,7 @@ Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 - All business calculations live in `packages/core` and follow the formulas in `PLAN.md` §4. UI and API call core; they never re-implement it.
 - All dates and cycles use the `Africa/Tunis` time zone.
 - Offline-first: the UI writes to IndexedDB first and never blocks on the network. Syncable records have a client UUID, `updated_at`, `deleted_at`, `hlc`. Never hard-delete syncable records. Sync is idempotent.
+  - _Temporary:_ Until Phase 4, data changes go through Next.js server actions; the IndexedDB-first rule applies from Phase 4.
 - Every query is scoped by `user_id`; household data also requires membership. Isolation has tests.
 - The app never sends money and never connects to D17/Flouci/bank accounts. Wallets are manual.
 - The "ask for money" feature only generates text for the user to copy. Nothing is sent automatically.
