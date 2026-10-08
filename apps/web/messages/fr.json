@@ -92,5 +92,14 @@
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "consent": "En créant un compte, tu acceptes les <terms>Conditions d'utilisation</terms> et la <privacy>Politique de confidentialité</privacy>."
+  },
+  "Welcome": {
+    "points": {
+      "today": "Le montant du jour : un seul chiffre pour savoir combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille.",
+      "wallets": "Tes portefeuilles, à la main : espèces, D17, Flouci ou carte bancaire. Mizania ne s'y connecte jamais et ne déplace jamais d'argent.",
+      "languages": "Gratuit, en arabe tunisien, français ou anglais. Installe-le sur ton téléphone comme une app."
+    },
+    "signUp": "Créer un compte",
+    "signIn": "J'ai déjà un compte"
   }
 }

@@ -46,9 +46,9 @@ test("sign up in Arabic, confirm from the email, land signed in, sign out", asyn
   await page.getByRole("button", { name: t.Home.signOut }).click();
   await expect(page).toHaveURL(/\/ar\/sign-in$/);
 
-  // Signed out: the app sends visitors back to sign-in.
+  // Signed out: the home page shows the welcome page instead.
   await page.goto("/ar");
-  await expect(page).toHaveURL(/\/ar\/sign-in$/);
+  await expect(page).toHaveURL(/\/ar\/welcome$/);
 });
 
 test("signing up again with the same email looks exactly the same", async ({ page }) => {
