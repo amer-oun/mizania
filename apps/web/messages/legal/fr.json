@@ -28,6 +28,12 @@
         ]
       },
       {
+        "title": "Âge",
+        "body": [
+          "Mizania est réservé aux personnes de 18 ans et plus. On ne garde pas sciemment de données sur des personnes plus jeunes ; si on apprend qu'un compte appartient à quelqu'un de moins de 18 ans, on le supprime."
+        ]
+      },
+      {
         "title": "Pourquoi on les utilise",
         "body": [
           "Uniquement pour faire fonctionner Mizania : te connecter, calculer ton montant du jour, afficher ton historique, t'envoyer les emails nécessaires (confirmer ton email, changer ton mot de passe) et protéger ton compte."
@@ -61,7 +67,7 @@
         "body": [
           [
             "Exporter tes données : bientôt disponible.",
-            "Supprimer ton compte depuis l'app : bientôt disponible. En attendant, écris-nous à {contact} depuis l'adresse email de ton compte et on le supprime."
+            "Supprimer ton compte depuis l'app : bientôt disponible. En attendant, écris-nous à {contact} depuis l'adresse email de ton compte et on le supprime sous 30 jours."
           ]
         ]
       },
@@ -85,6 +91,12 @@
         "title": "Ce qu'est Mizania",
         "body": [
           "Une app de budget gratuite pour les étudiants. Elle montre combien tu peux dépenser chaque jour jusqu'à ton prochain virement, uniquement à partir de ce que tu saisis."
+        ]
+      },
+      {
+        "title": "Âge",
+        "body": [
+          "Il faut avoir 18 ans ou plus pour utiliser Mizania. Ne crée pas de compte si tu as moins de 18 ans."
         ]
       },
       {
@@ -126,7 +138,7 @@
       {
         "title": "Fermer ton compte",
         "body": [
-          "Tu peux arrêter d'utiliser Mizania quand tu veux et nous demander de supprimer ton compte (bientôt dans l'app ; en attendant par email à {contact}). On peut suspendre les comptes qui ne respectent pas ces conditions."
+          "Tu peux arrêter d'utiliser Mizania quand tu veux et nous demander de supprimer ton compte (bientôt dans l'app ; en attendant par email à {contact}, traité sous 30 jours). On peut suspendre les comptes qui ne respectent pas ces conditions."
         ]
       },
       {

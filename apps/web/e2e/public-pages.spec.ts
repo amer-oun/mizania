@@ -5,6 +5,7 @@ import { expect, messages, test } from "./support";
 
 const legal = { ar: legalAr, fr: legalFr, en: legalEn };
 const locales = ["ar", "fr", "en"] as const;
+const age = { ar: "العمر", fr: "Âge", en: "Age" };
 
 test.describe("welcome page", () => {
   test("signed-out visitors to / see what Mizania is, with a way in", async ({ page }) => {
@@ -31,7 +32,9 @@ test.describe("welcome page", () => {
 
 test.describe("privacy and terms", () => {
   for (const locale of locales) {
-    test(`${locale}: both open without an account and are marked as drafts`, async ({ page }) => {
+    test(`${locale}: both open without an account, reviewed (no draft banner), with the age limit`, async ({
+      page,
+    }) => {
       for (const [path, doc] of [
         ["privacy", legal[locale].privacy],
         ["terms", legal[locale].terms],
@@ -39,7 +42,11 @@ test.describe("privacy and terms", () => {
         await page.goto(`/${locale}/${path}`);
         await expect(page).toHaveURL(new RegExp(`/${locale}/${path}$`));
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(doc.title);
-        await expect(page.getByTestId("legal-draft")).toHaveText(legal[locale].draft);
+        await expect(page.getByTestId("legal-draft")).toHaveCount(0);
+        await expect(
+          page.getByRole("heading", { level: 2, name: age[locale], exact: true }),
+        ).toBeVisible();
+        await expect(page.getByText("18").first()).toBeVisible();
       }
     });
   }

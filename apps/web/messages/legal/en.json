@@ -28,6 +28,12 @@
         ]
       },
       {
+        "title": "Age",
+        "body": [
+          "Mizania is for people aged 18 and older. We don't knowingly keep data about anyone younger; if we learn that an account belongs to someone under 18, we delete it."
+        ]
+      },
+      {
         "title": "Why we use it",
         "body": [
           "Only to run Mizania: to sign you in, calculate your daily amount, show your history, send you emails you need (confirming your email, resetting your password) and keep your account secure."
@@ -61,7 +67,7 @@
         "body": [
           [
             "Export your data: coming soon.",
-            "Delete your account from the app: coming soon. Until then, write to us at {contact} from your account's email address and we'll delete it."
+            "Delete your account from the app: coming soon. Until then, write to us at {contact} from your account's email address and we'll delete it within 30 days."
           ]
         ]
       },
@@ -85,6 +91,12 @@
         "title": "What Mizania is",
         "body": [
           "A free budgeting app for students. It shows how much you can spend each day until your next transfer, based only on what you enter."
+        ]
+      },
+      {
+        "title": "Age",
+        "body": [
+          "You must be 18 or older to use Mizania. Don't create an account if you're under 18."
         ]
       },
       {
@@ -126,7 +138,7 @@
       {
         "title": "Closing your account",
         "body": [
-          "You can stop using Mizania at any time and ask us to delete your account (in the app soon; until then by email at {contact}). We may suspend accounts that break these terms."
+          "You can stop using Mizania at any time and ask us to delete your account (in the app soon; until then by email at {contact}, handled within 30 days). We may suspend accounts that break these terms."
         ]
       },
       {

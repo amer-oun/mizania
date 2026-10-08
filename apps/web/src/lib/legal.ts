@@ -9,7 +9,7 @@ import type legalEn from "../../messages/legal/en.json";
 export const CONTACT_EMAIL = "" as string;
 
 /** Shows a "draft, not yet reviewed" banner on the privacy and terms pages. */
-export const LEGAL_DRAFT = true as boolean;
+export const LEGAL_DRAFT = false as boolean;
 
 export type LegalMessages = typeof legalEn;
 export type LegalDocument = LegalMessages["privacy"];
