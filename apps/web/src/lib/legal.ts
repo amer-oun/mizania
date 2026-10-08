@@ -4,9 +4,8 @@ import type legalEn from "../../messages/legal/en.json";
 
 /**
  * Where users write about their data and account deletion.
- * TODO(owner): fill in before publishing the Google app.
  */
-export const CONTACT_EMAIL = "" as string;
+export const CONTACT_EMAIL = "mizania.app.pro@gmail.com" as string;
 
 /** Shows a "draft, not yet reviewed" banner on the privacy and terms pages. */
 export const LEGAL_DRAFT = false as boolean;

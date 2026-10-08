@@ -47,6 +47,9 @@ test.describe("privacy and terms", () => {
           page.getByRole("heading", { level: 2, name: age[locale], exact: true }),
         ).toBeVisible();
         await expect(page.getByText("18").first()).toBeVisible();
+        await expect(
+          page.locator('a[href="mailto:mizania.app.pro@gmail.com"]').first(),
+        ).toBeVisible();
       }
     });
   }
