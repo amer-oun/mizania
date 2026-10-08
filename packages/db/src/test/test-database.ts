@@ -6,6 +6,13 @@ import { inject } from "vitest";
 import { createDb, type Db } from "../client";
 import { runMigrations } from "../migrations";
 
+declare module "vitest" {
+  export interface ProvidedContext {
+    /** Set by global-setup.ts: the test container's server URL. */
+    postgresUrl: string;
+  }
+}
+
 export interface TestDatabase {
   db: Db;
   close: () => Promise<void>;
