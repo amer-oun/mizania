@@ -7,6 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
+    "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/test/test-database.ts",
     "./testing/global-setup": "./src/test/global-setup.ts"
@@ -22,6 +23,7 @@
     "clean": "rimraf .turbo"
   },
   "dependencies": {
+    "@mizania/core": "workspace:*",
     "drizzle-orm": "^0.45.3",
     "postgres": "^3.4.9"
   },

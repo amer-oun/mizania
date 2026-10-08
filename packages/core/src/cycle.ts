@@ -162,3 +162,32 @@ export function weekIndexFor(today: IsoDate, weeks: readonly CycleWeek[]): numbe
   const index = weeks.findIndex((week) => daysBetween(today, week.end) >= 0);
   return index === -1 ? weeks.length - 1 : index;
 }
+
+function daysInMonth(year: number, month: number): number {
+  // Day 0 of the next month is the last day of this one.
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+/** `arrivalDay` in the month `monthOffset` months after (year, month), clamped to its length. */
+function arrivalIn(year: number, month: number, monthOffset: number, arrivalDay: number): IsoDate {
+  const first = new Date(Date.UTC(year, month - 1 + monthOffset, 1));
+  const y = first.getUTCFullYear();
+  const m = first.getUTCMonth() + 1;
+  return fromUtcDate(new Date(Date.UTC(y, m - 1, Math.min(arrivalDay, daysInMonth(y, m)))));
+}
+
+/**
+ * When the next transfer is expected: the next time `arrivalDay` comes round,
+ * strictly after `today`. Short months use their last day: arrival day 31 is
+ * expected on 30 November and on 28 (or 29) February.
+ */
+export function nextTransferDate(today: IsoDate, arrivalDay: number): IsoDate {
+  if (!Number.isInteger(arrivalDay) || arrivalDay < 1 || arrivalDay > 31) {
+    throw new RangeError(
+      `Invalid arrival day: ${arrivalDay}. Expected a whole number from 1 to 31.`,
+    );
+  }
+  const { year, month } = parseIsoDate(today);
+  const thisMonth = arrivalIn(year, month, 0, arrivalDay);
+  return daysBetween(today, thisMonth) > 0 ? thisMonth : arrivalIn(year, month, 1, arrivalDay);
+}

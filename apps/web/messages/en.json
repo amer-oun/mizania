@@ -101,5 +101,55 @@
     },
     "signUp": "Create an account",
     "signIn": "I already have an account"
+  },
+  "Onboarding": {
+    "progress": "Step {step} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "saving": "Saving…",
+    "loading": "Loading…",
+    "error": "Couldn't save. Check your connection and try again.",
+    "currency": "DT",
+    "language": {
+      "title": "Which language do you prefer?",
+      "subtitle": "You can change it later."
+    },
+    "money": {
+      "title": "Money from home",
+      "amountLabel": "How much do you usually get each month?",
+      "amountInvalid": "Enter an amount, like 600 or 600.500",
+      "dayLabel": "Which day of the month does it usually arrive?",
+      "nextTransfer": "Next transfer expected: {date}"
+    },
+    "fixedCosts": {
+      "title": "Rent and bills",
+      "subtitle": "Amounts per month. A rough figure is fine.",
+      "rent": "I pay rent",
+      "rentAmount": "My share of the rent",
+      "billsTitle": "Bills I pay",
+      "amount": "Amount per month",
+      "alreadyPaid": "Already paid this month",
+      "names": {
+        "electricity": "Electricity (STEG)",
+        "water": "Water (SONEDE)",
+        "internet": "Internet",
+        "phone_recharge": "Phone recharge"
+      }
+    },
+    "wallets": {
+      "title": "Your wallets",
+      "subtitle": "Where is your money right now? Enter what's in each one (empty means 0).",
+      "balance": "Amount now",
+      "otherName": "Name",
+      "otherNamePlaceholder": "e.g. Piggy bank"
+    }
+  },
+  "WalletTypes": {
+    "cash": "Cash",
+    "d17": "D17",
+    "flouci": "Flouci",
+    "card": "Bank card",
+    "other": "Other"
   }
 }

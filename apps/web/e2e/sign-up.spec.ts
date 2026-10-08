@@ -39,9 +39,9 @@ test("sign up in Arabic, confirm from the email, land signed in, sign out", asyn
     page.getByRole("heading", { name: t.Auth.verifyEmail.confirmedTitle }),
   ).toBeVisible();
 
+  // A new account goes to onboarding first.
   await page.getByRole("link", { name: t.Auth.verifyEmail.continue }).click();
-  await expect(page).toHaveURL(/\/ar$/);
-  await expect(page.getByTestId("signed-in-as")).toContainText("أمل");
+  await expect(page).toHaveURL(/\/ar\/onboarding$/);
 
   await page.getByRole("button", { name: t.Home.signOut }).click();
   await expect(page).toHaveURL(/\/ar\/sign-in$/);

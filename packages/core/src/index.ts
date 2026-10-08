@@ -12,6 +12,7 @@ export {
   daysLeft,
   type IsoDate,
   isTransferDue,
+  nextTransferDate,
   todayInTunis,
   weekIndexFor,
 } from "./cycle";
@@ -24,4 +25,14 @@ export {
   type WeekBudget,
 } from "./daily";
 export { assertMillimes, formatTND, type Locale, parseTND, splitEven } from "./money";
+export {
+  type OnboardingAnswers,
+  type OnboardingFixedCost,
+  onboardingFixedCosts,
+  type OnboardingPlan,
+  planOnboarding,
+  WALLET_NAME_MAX_LENGTH,
+  type WalletKind,
+  walletKinds,
+} from "./onboarding";
 export { type RunOutForecast, runOutForecast, type RunOutInput } from "./warnings";

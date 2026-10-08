@@ -101,6 +101,18 @@ describe("sign-up", () => {
     expect(user).toMatchObject({ weeklyMode: true, emailVerified: false });
   });
 
+  it("refuses a sign-up that tries to set onboarding fields", async () => {
+    const email = newEmail();
+    const res = await signUp(email, {
+      onboardedAt: new Date().toISOString(),
+      usualArrivalDay: 5,
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ code: "FIELD_NOT_ALLOWED" });
+    expect(await t.test.db.select().from(users).where(eq(users.email, email))).toHaveLength(0);
+  });
+
   it("answers the same for an existing email, without creating a second account", async () => {
     const email = newEmail();
     const first = await signUp(email);

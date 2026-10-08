@@ -200,11 +200,14 @@ users              (id, email, name, locale[ar|fr|en], weekly_mode bool default 
                     checkin_time, usual_monthly_millimes, usual_arrival_day[1-31],
                     onboarded_at nullable, created_at, deleted_at)
 
-wallets            (id, user_id, name, type[cash|d17|flouci|card|other],
-                    archived, position)
+wallets            (id, user_id, type[cash|d17|flouci|card|other],
+                    name (only for "other", required there; the others are named
+                    in the UI from their type), archived, position,
+                    created_at, updated_at, deleted_at)
 
 cycles             (id, user_id, started_on, expected_next_on, actual_end_on,
-                    status[active|closed], weekly_mode)
+                    status[active|closed] (at most one active per user), weekly_mode,
+                    created_at, updated_at, deleted_at)
 incomes            (id, user_id, cycle_id, wallet_id, amount_millimes,
                     source[parents|bourse|job|other], received_on, note)
 
@@ -218,8 +221,10 @@ categories         (id, user_id nullable (null = default), key, icon, color,
 transactions       (id client UUID, user_id, cycle_id, wallet_id, category_id,
                     plan_item_id nullable, type[expense|income|transfer|adjustment],
                     amount_millimes, to_wallet_id, occurred_at, note,
-                    source[quick|text|checkin|plan|household],
+                    source[quick|text|checkin|plan|household|manual],
                     updated_at, deleted_at, hlc)
+                    (balances are derived: a starting balance is an "adjustment";
+                    wallet and cycle must belong to the same user)
 
 checkins           (id, user_id, wallet_id, reported_millimes, expected_millimes,
                     difference_millimes, created_at)

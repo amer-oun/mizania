@@ -107,6 +107,10 @@ jobs:
       - name: Migrate
         run: pnpm db:migrate
 
+      # Onboarding links rent and bills to the default categories.
+      - name: Seed default categories
+        run: pnpm db:seed
+
       - name: Build web
         run: pnpm exec turbo run build --filter=@mizania/web
 

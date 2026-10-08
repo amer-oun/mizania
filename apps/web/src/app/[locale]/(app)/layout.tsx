@@ -1,10 +1,14 @@
+import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
+import { redirect } from "@/i18n/navigation";
 import { requireSession } from "@/lib/session";
 
-// Every page in this group needs a signed-in user. The proxy already sent
-// visitors without a session cookie to sign-in; this checks the session itself.
+// Every page in this group needs a signed-in user who has finished
+// onboarding. The proxy already sent visitors without a session cookie to
+// sign-in; this checks the session itself.
 export default async function SignedInLayout({ children }: { children: ReactNode }) {
-  await requireSession();
+  const { user } = await requireSession();
+  if (!user.onboardedAt) redirect({ href: "/onboarding", locale: await getLocale() });
   return children;
 }

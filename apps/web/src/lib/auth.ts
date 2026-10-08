@@ -7,9 +7,10 @@ import {
   logger,
   parseAuthEnv,
 } from "@mizania/auth";
-import { createDb } from "@mizania/db/client";
 import { nextCookies } from "better-auth/next-js";
 import { after } from "next/server";
+
+import { getDb } from "@/lib/db";
 
 let instance: Auth | undefined;
 
@@ -34,15 +35,9 @@ export function getAuth(): Auth {
 
 function build(): Auth {
   const env = parseAuthEnv();
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) throw new Error("DATABASE_URL is not set.");
-
-  // Vercel connects through Neon's pooled URL, which doesn't keep prepared
-  // statements between transactions.
-  const { db } = createDb(databaseUrl, { max: 5, prepare: false });
 
   return createAuth({
-    db,
+    db: getDb(),
     env,
     mailer: createMailer({ sendEmail: createSmtpSender(env), logger }),
     // Send emails after the response: timing doesn't reveal whether an

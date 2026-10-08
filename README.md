@@ -62,6 +62,8 @@ Then run `docker compose up -d --wait` again.
 
 Sign up at http://localhost:3000/ar/sign-up (or `/fr`, `/en`). Emails don't leave your machine: the verification and password-reset links arrive in Mailpit at http://localhost:8025. Verification links work for 24 hours, reset links for 1 hour.
 
+After the first sign-in, a new account goes through the onboarding wizard (`/[locale]/onboarding`: language, money from home, rent and bills, wallets) before it can see the app. Its answers stay in the browser until "Finish" saves them all at once. To go through it again locally, set `onboarded_at` back to null for your user and delete its transactions, then its wallets and cycles (for example in `pnpm --filter @mizania/db db:studio`).
+
 The first time, install the browser for the end-to-end tests:
 
 ```powershell
