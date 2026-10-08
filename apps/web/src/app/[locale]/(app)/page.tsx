@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -9,11 +9,12 @@ import { requireSession } from "@/lib/session";
 export default async function HomePage() {
   const { user } = await requireSession();
   const t = await getTranslations("Home");
+  const locale = await getLocale();
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <header className="flex items-center justify-between gap-2 py-4">
-        <form action={signOut}>
+        <form action={signOut.bind(null, locale)}>
           <Button type="submit" variant="ghost" size="sm">
             {t("signOut")}
           </Button>

@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 import { attempt, commonError } from "@/lib/auth-errors";
 
@@ -19,7 +19,6 @@ import {
 export function SignInForm({ resetDone }: { resetDone: boolean }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
-  const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,16 +29,16 @@ export function SignInForm({ resetDone }: { resetDone: boolean }) {
       authClient.signIn.email({
         email: field("email"),
         password: field("password"),
-        // Where the fresh verification link leads, if the email isn't verified yet.
-        callbackURL: `/${locale}/verify-email`,
+        // Better Auth uses this both for the success redirect (the client
+        // follows it with a full page load) and for the fresh verification
+        // link sent when the email isn't verified yet. Home fits both:
+        // verifying signs the user in.
+        callbackURL: `/${locale}`,
       }),
     );
 
-    if (!result.error) {
-      router.replace("/");
-      router.refresh();
-      return;
-    }
+    // Signed in: the page is already navigating home.
+    if (!result.error) return;
     setPending(false);
     if (result.error.status === 401) setError(t("signIn.invalid"));
     else if (result.error.status === 403) setError(t("signIn.notVerified"));
