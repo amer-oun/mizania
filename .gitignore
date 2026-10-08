@@ -19,6 +19,9 @@ apps/web/public/swe-worker-*.js
 
 # tests
 coverage/
+playwright-report/
+test-results/
+blob-report/
 
 # env
 .env
