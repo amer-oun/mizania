@@ -46,8 +46,8 @@ test("forgot password: link by email, new password, sign in with it", async ({ p
 
   await page.getByLabel(t.Auth.common.password, { exact: true }).fill(NEW_PASSWORD);
   await page.getByRole("button", { name: t.Auth.signIn.submit }).click();
-  await expect(page).toHaveURL(/\/en$/);
-  await expect(page.getByTestId("signed-in-as")).toContainText("Amel");
+  // Signed in; this new account still has to go through onboarding.
+  await expect(page).toHaveURL(/\/en\/onboarding$/);
 });
 
 test("an expired or broken reset link offers a new one", async ({ page }) => {

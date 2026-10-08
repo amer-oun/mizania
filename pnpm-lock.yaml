@@ -272,6 +272,9 @@ importers:
       '@mizania/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mizania/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@serwist/next':
         specifier: ^9.5.12
         version: 9.5.12(@serwist/cli@9.5.12(@types/node@24.19.1)(browserslist@4.28.6)(esbuild@0.28.2)(typescript@6.0.3))(next@16.3.8(@babel/core@7.29.7(supports-color@7.2.0))(@playwright/test@1.63.0)(@types/node@24.19.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(typescript@6.0.3)

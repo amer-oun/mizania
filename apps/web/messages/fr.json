@@ -101,5 +101,55 @@
     },
     "signUp": "Créer un compte",
     "signIn": "J'ai déjà un compte"
+  },
+  "Onboarding": {
+    "progress": "Étape {step} sur {total}",
+    "back": "Retour",
+    "next": "Suivant",
+    "finish": "Terminer",
+    "saving": "Enregistrement…",
+    "loading": "Chargement…",
+    "error": "Impossible d'enregistrer. Vérifie ta connexion et réessaie.",
+    "currency": "DT",
+    "language": {
+      "title": "Quelle langue préfères-tu ?",
+      "subtitle": "Tu pourras la changer plus tard."
+    },
+    "money": {
+      "title": "L'argent de la famille",
+      "amountLabel": "Combien tu reçois d'habitude chaque mois ?",
+      "amountInvalid": "Entre un montant, comme 600 ou 600,500",
+      "dayLabel": "Quel jour du mois il arrive d'habitude ?",
+      "nextTransfer": "Prochain virement prévu : {date}"
+    },
+    "fixedCosts": {
+      "title": "Loyer et factures",
+      "subtitle": "Montants par mois. Une estimation suffit.",
+      "rent": "Je paie un loyer",
+      "rentAmount": "Ma part du loyer",
+      "billsTitle": "Factures que je paie",
+      "amount": "Montant par mois",
+      "alreadyPaid": "Déjà payé ce mois-ci",
+      "names": {
+        "electricity": "Électricité (STEG)",
+        "water": "Eau (SONEDE)",
+        "internet": "Internet",
+        "phone_recharge": "Recharge téléphone"
+      }
+    },
+    "wallets": {
+      "title": "Tes portefeuilles",
+      "subtitle": "Où est ton argent maintenant ? Entre ce qu'il y a dans chacun (vide = 0).",
+      "balance": "Montant actuel",
+      "otherName": "Nom",
+      "otherNamePlaceholder": "ex. Tirelire"
+    }
+  },
+  "WalletTypes": {
+    "cash": "Espèces",
+    "d17": "D17",
+    "flouci": "Flouci",
+    "card": "Carte bancaire",
+    "other": "Autre"
   }
 }

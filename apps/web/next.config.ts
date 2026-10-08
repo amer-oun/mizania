@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Internal workspace packages ship TypeScript source (exports -> src/*.ts),
   // so Next must compile them. Add each @mizania/* package the app imports.
-  transpilePackages: ["@mizania/auth", "@mizania/core", "@mizania/db"],
+  transpilePackages: ["@mizania/auth", "@mizania/core", "@mizania/db", "@mizania/shared"],
   headers() {
     return Promise.resolve([
       {

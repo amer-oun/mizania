@@ -160,6 +160,11 @@ export function createAuth({
         },
         weeklyMode: { type: "boolean", required: false, defaultValue: true, input: false },
         checkinTime: { type: "string", required: false, defaultValue: "21:00", input: false },
+        // Onboarding answers, written only by saveOnboarding (never from a request).
+        usualMonthlyMillimes: { type: "number", required: false, input: false },
+        usualArrivalDay: { type: "number", required: false, input: false },
+        // Null until onboarding is done; signed-in pages redirect to it until then.
+        onboardedAt: { type: "date", required: false, input: false },
         deletedAt: { type: "date", required: false, input: false, returned: false },
       },
     },
