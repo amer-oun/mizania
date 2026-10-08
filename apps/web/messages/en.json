@@ -79,6 +79,12 @@
       "expiredTitle": "This link has expired",
       "expiredBody": "Reset links work for 1 hour. Ask for a new one.",
       "requestNew": "Get a new link"
+    },
+    "google": {
+      "continue": "Continue with Google",
+      "or": "or",
+      "accountNotLinked": "An account with this email already exists. Sign in with your email and password (confirm your email first if you haven't yet).",
+      "failed": "Google sign-in didn't work. Try again."
     }
   }
 }

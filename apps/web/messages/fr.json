@@ -79,6 +79,12 @@
       "expiredTitle": "Ce lien a expiré",
       "expiredBody": "Les liens pour changer de mot de passe sont valables 1 heure. Demandes-en un nouveau.",
       "requestNew": "Recevoir un nouveau lien"
+    },
+    "google": {
+      "continue": "Continuer avec Google",
+      "or": "ou",
+      "accountNotLinked": "Un compte existe déjà avec cet email. Connecte-toi avec ton email et ton mot de passe (confirme d'abord ton email si ce n'est pas encore fait).",
+      "failed": "La connexion avec Google n'a pas marché. Réessaie."
     }
   }
 }

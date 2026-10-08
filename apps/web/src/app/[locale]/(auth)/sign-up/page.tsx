@@ -1,8 +1,10 @@
 import { getTranslations } from "next-intl/server";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
+import { GoogleButton, OrDivider } from "@/components/auth/google-button";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 import { Link } from "@/i18n/navigation";
+import { googleEnabled } from "@/lib/auth";
 import { redirectIfSignedIn } from "@/lib/session";
 
 export default async function SignUpPage() {
@@ -12,6 +14,12 @@ export default async function SignUpPage() {
   return (
     <>
       <AuthHeading title={t("title")} subtitle={t("subtitle")} />
+      {googleEnabled() && (
+        <>
+          <GoogleButton />
+          <OrDivider />
+        </>
+      )}
       <SignUpForm />
       <p className="text-center text-sm text-muted-foreground">
         {t("haveAccount")}{" "}
