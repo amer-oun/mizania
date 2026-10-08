@@ -11,11 +11,15 @@
     "lint": "next typegen && eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
-    "clean": "rimraf .turbo .next public/sw.js public/sw.js.map"
+    "clean": "rimraf .turbo .next public/sw.js public/sw.js.map",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@mizania/auth": "workspace:*",
     "@mizania/core": "workspace:*",
+    "@mizania/db": "workspace:*",
     "@serwist/next": "^9.5.12",
+    "better-auth": "~1.7.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.51.0",
@@ -28,6 +32,7 @@
   },
   "devDependencies": {
     "@mizania/config": "workspace:*",
+    "@playwright/test": "~1.63.0",
     "@serwist/cli": "^9.5.12",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "catalog:",

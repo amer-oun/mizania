@@ -28,8 +28,10 @@ export function LanguageSwitcher() {
     if (!routing.locales.includes(next as Locale) || next === locale) return;
     // next-intl stores the choice in the NEXT_LOCALE cookie, so it wins over
     // the browser language on the next visit.
+    // Keep the query: a reset link's token must survive a language change.
+    const href = `${pathname}${window.location.search}`;
     startTransition(() => {
-      router.replace(pathname, { locale: next as Locale });
+      router.replace(href, { locale: next as Locale });
     });
   }
 

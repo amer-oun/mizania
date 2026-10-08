@@ -53,12 +53,79 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Applies migrations and the idempotent seed to a Neon database once CI is
-  # green. Migrations only add things (ADR 005), so code deployed by Vercel a
+  # Playwright against a production build of the web app, with its own
+  # Postgres and Mailpit (the tests read the emails through Mailpit's API).
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: mizania
+          POSTGRES_PASSWORD: mizania
+          POSTGRES_DB: mizania
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mizania -d mizania"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      mailpit:
+        image: axllent/mailpit:latest
+        ports:
+          - 1025:1025
+          - 8025:8025
+    env:
+      TURBO_TELEMETRY_DISABLED: 1
+      NEXT_TELEMETRY_DISABLED: 1
+      DATABASE_URL: postgres://mizania:mizania@localhost:5432/mizania
+      # Throwaway values for this job only; not a real secret.
+      BETTER_AUTH_SECRET: ci-e2e-only-secret-0123456789abcdef
+      BETTER_AUTH_URL: http://localhost:3000
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      EMAIL_FROM: Mizania <ci@example.com>
+      MAILPIT_URL: http://localhost:8025
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm --filter @mizania/web exec playwright install --with-deps chromium
+
+      - name: Migrate
+        run: pnpm db:migrate
+
+      - name: Build web
+        run: pnpm exec turbo run build --filter=@mizania/web
+
+      - name: Playwright
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+          retention-days: 7
+
+  # Applies migrations and the idempotent seed to a Neon database once all
+  # checks are green. Migrations only add things (ADR 005), so code deployed by Vercel a
   # moment earlier keeps working. Drizzle runs them in one transaction.
   migrate-production:
     name: Migrate production database
-    needs: ci
+    needs: [ci, e2e]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -85,7 +152,7 @@ jobs:
   # deployments, on every push to a branch other than main.
   migrate-preview:
     name: Migrate preview database
-    needs: ci
+    needs: [ci, e2e]
     if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10

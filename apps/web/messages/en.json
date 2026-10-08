@@ -5,10 +5,80 @@
   },
   "Home": {
     "title": "Mizania",
-    "tagline": "How much you can spend today, until your next transfer from home."
+    "tagline": "How much you can spend today, until your next transfer from home.",
+    "signedInAs": "Signed in as {name}",
+    "signOut": "Sign out"
   },
   "LanguageSwitcher": {
     "label": "Language",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Unknown}}"
+  },
+  "Auth": {
+    "common": {
+      "email": "Email",
+      "password": "Password",
+      "firstName": "First name",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "passwordHint": "At least 8 characters",
+      "spamHint": "Don't see it? Check your spam folder.",
+      "offline": "You're offline. Connect to the internet to continue.",
+      "tooMany": "Too many tries. Wait a moment and try again.",
+      "genericError": "Something went wrong. Try again.",
+      "sending": "Please wait…"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "subtitle": "See how much you can spend each day until the next transfer.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "submit": "Sign in",
+      "noAccount": "No account yet?",
+      "signUp": "Create one",
+      "forgot": "Forgot password?",
+      "invalid": "Wrong email or password.",
+      "notVerified": "Confirm your email first. We just sent you a new link.",
+      "resetDone": "Password changed. Sign in with your new password."
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "body": "We sent a link to {email}. Open it to confirm your account.",
+      "bodyNoEmail": "We sent you a link. Open it to confirm your account.",
+      "expiry": "The link works for 24 hours.",
+      "resend": "Send a new link",
+      "resendIn": "Send again in {seconds} s",
+      "resent": "New link sent.",
+      "wrongEmail": "Wrong email? Sign up again"
+    },
+    "verifyEmail": {
+      "confirmedTitle": "Email confirmed",
+      "confirmedBody": "Your account is ready.",
+      "continue": "Continue",
+      "signIn": "Sign in",
+      "expiredTitle": "This link has expired",
+      "invalidTitle": "This link doesn't work",
+      "errorBody": "Enter your email and we'll send you a new one."
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "body": "Enter your email and we'll send you a link to choose a new one.",
+      "submit": "Send link",
+      "sent": "If an account exists for this email, we sent it a link. It works for 1 hour.",
+      "back": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Choose a new password",
+      "newPassword": "New password",
+      "confirmPassword": "Repeat the password",
+      "mismatch": "The passwords don't match.",
+      "submit": "Save password",
+      "expiredTitle": "This link has expired",
+      "expiredBody": "Reset links work for 1 hour. Ask for a new one.",
+      "requestNew": "Get a new link"
+    }
   }
 }

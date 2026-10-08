@@ -1,0 +1,33 @@
+{
+  "name": "@mizania/auth",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Better Auth configuration and auth emails, shared by web and (Phase 4) api.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf .turbo"
+  },
+  "dependencies": {
+    "@mizania/db": "workspace:*",
+    "better-auth": "~1.7.7",
+    "drizzle-orm": "^0.45.3",
+    "nodemailer": "~10.0.15",
+    "pino": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@mizania/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/nodemailer": "^8.0.2",
+    "eslint": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

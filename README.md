@@ -47,15 +47,26 @@ Then run `docker compose up -d --wait` again.
 
 ## Scripts
 
-| Command                        | Does                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| `pnpm dev`                     | Web (Next.js), API (Fastify) and worker, in watch mode                    |
-| `pnpm build`                   | Production builds, including the service worker (`apps/web/public/sw.js`) |
-| `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript across the workspace                                  |
-| `pnpm test`                    | Vitest. Database tests start a Postgres container: Docker must be running |
-| `pnpm format` / `format:check` | Prettier                                                                  |
-| `pnpm db:generate`             | New Drizzle migration from the schema                                     |
-| `pnpm db:migrate` / `db:seed`  | Apply migrations / upsert the default categories                          |
+| Command                        | Does                                                                                      |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| `pnpm dev`                     | Web (Next.js), API (Fastify) and worker, in watch mode                                    |
+| `pnpm build`                   | Production builds, including the service worker (`apps/web/public/sw.js`)                 |
+| `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript across the workspace                                                  |
+| `pnpm test`                    | Vitest. Database and auth tests start a Postgres container: Docker must be running        |
+| `pnpm test:e2e`                | Playwright, against a production build (`pnpm build` first) with `docker compose` running |
+| `pnpm format` / `format:check` | Prettier                                                                                  |
+| `pnpm db:generate`             | New Drizzle migration from the schema                                                     |
+| `pnpm db:migrate` / `db:seed`  | Apply migrations / upsert the default categories                                          |
+
+## Accounts and email locally
+
+Sign up at http://localhost:3000/ar/sign-up (or `/fr`, `/en`). Emails don't leave your machine: the verification and password-reset links arrive in Mailpit at http://localhost:8025. Verification links work for 24 hours, reset links for 1 hour.
+
+The first time, install the browser for the end-to-end tests:
+
+```powershell
+pnpm --filter @mizania/web exec playwright install chromium
+```
 
 ## Try the PWA on your phone
 
@@ -78,6 +89,10 @@ See [ADR 005](docs/decisions/005-auth-hosting-and-phase-2-data.md) for why it's 
 | Vercel, Preview        | `DATABASE_URL` (Neon `preview` branch, pooled), `BETTER_AUTH_SECRET`, `SMTP_*`, `EMAIL_FROM`                                                      |
 | GitHub Actions secrets | `DATABASE_URL_DIRECT` (Neon main, direct), `DATABASE_URL_PREVIEW_DIRECT` (Neon `preview`, direct)                                                 |
 
+**Auth on Preview deployments:** `BETTER_AUTH_URL` isn't set there. The app then accepts exactly the deployment's own two hosts (`VERCEL_URL` and `VERCEL_BRANCH_URL`, from Vercel's system environment variables, which must stay enabled) and refuses any other host. Previews are behind Vercel's login, so open email links in a browser where you're signed in to Vercel.
+
+**Auth emails** go through Gmail (port 465). A failed send doesn't block the user; it shows up in the Vercel function logs as `auth email failed` with the user id and SMTP error code (never the address or link).
+
 **Migrations reach the databases through CI**, after all checks pass: pushes to `main` migrate and seed production; pushes to any other branch migrate and seed the shared `preview` branch. Migrations must only add things (new tables, new nullable or defaulted columns), because Vercel can deploy the new code a moment before its migration runs.
 
 ## Repository layout
@@ -87,6 +102,7 @@ apps/web        Next.js PWA (next-intl, Tailwind, shadcn/ui, Serwist)
 apps/api        Fastify API
 apps/worker     Background jobs (Redis)
 packages/core   Pure business logic, no I/O
+packages/auth   Better Auth configuration and auth emails
 packages/db     Drizzle schema, migrations, seed
 packages/shared Zod schemas, types, constants
 packages/sync   Offline sync protocol

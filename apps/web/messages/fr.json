@@ -5,10 +5,80 @@
   },
   "Home": {
     "title": "Mizania",
-    "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille."
+    "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille.",
+    "signedInAs": "Connecté·e en tant que {name}",
+    "signOut": "Se déconnecter"
   },
   "LanguageSwitcher": {
     "label": "Langue",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"
+  },
+  "Auth": {
+    "common": {
+      "email": "Email",
+      "password": "Mot de passe",
+      "firstName": "Prénom",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
+      "passwordHint": "Au moins 8 caractères",
+      "spamHint": "Tu ne le vois pas ? Regarde dans tes spams.",
+      "offline": "Tu es hors ligne. Connecte-toi à internet pour continuer.",
+      "tooMany": "Trop d'essais. Attends un moment et réessaie.",
+      "genericError": "Un problème est survenu. Réessaie.",
+      "sending": "Un instant…"
+    },
+    "signUp": {
+      "title": "Crée ton compte",
+      "subtitle": "Vois combien tu peux dépenser chaque jour jusqu'au prochain virement.",
+      "submit": "Créer mon compte",
+      "haveAccount": "Déjà un compte ?",
+      "signIn": "Se connecter"
+    },
+    "signIn": {
+      "title": "Bon retour",
+      "submit": "Se connecter",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "Crée-le",
+      "forgot": "Mot de passe oublié ?",
+      "invalid": "Email ou mot de passe incorrect.",
+      "notVerified": "Confirme d'abord ton email. On vient de t'envoyer un nouveau lien.",
+      "resetDone": "Mot de passe changé. Connecte-toi avec le nouveau."
+    },
+    "checkEmail": {
+      "title": "Regarde tes emails",
+      "body": "On a envoyé un lien à {email}. Ouvre-le pour confirmer ton compte.",
+      "bodyNoEmail": "On t'a envoyé un lien. Ouvre-le pour confirmer ton compte.",
+      "expiry": "Le lien est valable 24 heures.",
+      "resend": "Envoyer un nouveau lien",
+      "resendIn": "Renvoyer dans {seconds} s",
+      "resent": "Nouveau lien envoyé.",
+      "wrongEmail": "Mauvais email ? Recommence l'inscription"
+    },
+    "verifyEmail": {
+      "confirmedTitle": "Email confirmé",
+      "confirmedBody": "Ton compte est prêt.",
+      "continue": "Continuer",
+      "signIn": "Se connecter",
+      "expiredTitle": "Ce lien a expiré",
+      "invalidTitle": "Ce lien ne marche pas",
+      "errorBody": "Entre ton email et on t'en envoie un nouveau."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié ?",
+      "body": "Entre ton email et on t'envoie un lien pour en choisir un nouveau.",
+      "submit": "Envoyer le lien",
+      "sent": "Si un compte existe avec cet email, on lui a envoyé un lien. Il est valable 1 heure.",
+      "back": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Choisis un nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Répète le mot de passe",
+      "mismatch": "Les mots de passe ne sont pas identiques.",
+      "submit": "Enregistrer",
+      "expiredTitle": "Ce lien a expiré",
+      "expiredBody": "Les liens pour changer de mot de passe sont valables 1 heure. Demandes-en un nouveau.",
+      "requestNew": "Recevoir un nouveau lien"
+    }
   }
 }

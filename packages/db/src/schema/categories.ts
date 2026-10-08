@@ -11,6 +11,8 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { users } from "./auth";
+
 export const categoryGroup = pgEnum("category_group", ["fixed", "envelope", "daily", "income"]);
 
 /** Category name in each supported locale. */
@@ -24,9 +26,8 @@ export const categories = pgTable(
   "categories",
   {
     id: uuid().primaryKey().defaultRandom(),
-    // null = a default category shared by everyone. No foreign key yet:
-    // the users table arrives with Better Auth in Phase 2.
-    userId: uuid(),
+    // null = a default category shared by everyone.
+    userId: uuid().references(() => users.id, { onDelete: "cascade" }),
     key: text().notNull(),
     names: jsonb().$type<CategoryNames>().notNull(),
     icon: text().notNull(),
