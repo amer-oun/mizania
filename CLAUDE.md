@@ -40,6 +40,7 @@ Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 - All user-facing strings go through i18n; every layout must work in RTL.
 - Code in `packages/core`, `packages/sync` and `packages/parser` ships with tests (property-based where it fits).
 - packages/core must keep 100% coverage. A v8 ignore is allowed only for code that can't run, with a comment explaining why.
+- Never delete or move files or folders outside this repository. Inside it, never delete anything you didn't create in this session without asking first.
 
 ## Conventions
 
