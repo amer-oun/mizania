@@ -86,5 +86,11 @@
       "accountNotLinked": "Un compte existe déjà avec cet email. Connecte-toi avec ton email et ton mot de passe (confirme d'abord ton email si ce n'est pas encore fait).",
       "failed": "La connexion avec Google n'a pas marché. Réessaie."
     }
+  },
+  "Legal": {
+    "label": "Mentions légales",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "consent": "En créant un compte, tu acceptes les <terms>Conditions d'utilisation</terms> et la <privacy>Politique de confidentialité</privacy>."
   }
 }

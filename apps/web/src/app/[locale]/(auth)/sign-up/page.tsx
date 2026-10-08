@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 
 import { AuthHeading } from "@/components/auth/auth-heading";
 import { GoogleButton, OrDivider } from "@/components/auth/google-button";
@@ -10,6 +11,15 @@ import { redirectIfSignedIn } from "@/lib/session";
 export default async function SignUpPage() {
   await redirectIfSignedIn();
   const t = await getTranslations("Auth.signUp");
+  const legal = await getTranslations("Legal");
+  const link = (href: "/terms" | "/privacy") =>
+    function LegalLink(chunks: ReactNode) {
+      return (
+        <Link href={href} className="underline underline-offset-4">
+          {chunks}
+        </Link>
+      );
+    };
 
   return (
     <>
@@ -21,6 +31,9 @@ export default async function SignUpPage() {
         </>
       )}
       <SignUpForm />
+      <p className="text-center text-xs text-muted-foreground">
+        {legal.rich("consent", { terms: link("/terms"), privacy: link("/privacy") })}
+      </p>
       <p className="text-center text-sm text-muted-foreground">
         {t("haveAccount")}{" "}
         <Link

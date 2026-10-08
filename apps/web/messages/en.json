@@ -86,5 +86,11 @@
       "accountNotLinked": "An account with this email already exists. Sign in with your email and password (confirm your email first if you haven't yet).",
       "failed": "Google sign-in didn't work. Try again."
     }
+  },
+  "Legal": {
+    "label": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "consent": "By creating an account, you accept the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>."
   }
 }
