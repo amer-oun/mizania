@@ -87,6 +87,9 @@ jobs:
       SMTP_PORT: 1025
       EMAIL_FROM: Mizania <ci@example.com>
       MAILPIT_URL: http://localhost:8025
+      # Fake Google client: shows the Google button; tests stop at Google's URL.
+      GOOGLE_CLIENT_ID: ci-e2e.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: ci-e2e-not-a-secret
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
