@@ -7,6 +7,7 @@ import { useSyncExternalStore } from "react";
 import { Link } from "@/i18n/navigation";
 import { readPendingEmail } from "@/lib/auth-errors";
 
+import { SpamHint } from "./form-parts";
 import { ResendVerification } from "./resend-verification";
 
 const noSubscription = () => () => undefined;
@@ -27,8 +28,9 @@ export function CheckEmail() {
               t("body", { email: `⁨${email}⁩` })
             : t("bodyNoEmail")}
         </p>
-        <p className="text-sm text-balance text-muted-foreground">{t("spam")}</p>
+        <p className="text-sm text-balance text-muted-foreground">{t("expiry")}</p>
       </div>
+      <SpamHint />
       <ResendVerification email={email} justSent />
       <Link
         href="/sign-up"

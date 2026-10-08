@@ -6,7 +6,14 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { attempt, commonError } from "@/lib/auth-errors";
 
-import { Field, FormMessage, OfflineNotice, SubmitButton, submitHandler } from "./form-parts";
+import {
+  Field,
+  FormMessage,
+  OfflineNotice,
+  SpamHint,
+  SubmitButton,
+  submitHandler,
+} from "./form-parts";
 
 export function ForgotPasswordForm() {
   const t = useTranslations("Auth");
@@ -29,7 +36,14 @@ export function ForgotPasswordForm() {
     else setSent(true);
   });
 
-  if (sent) return <FormMessage tone="success">{t("forgotPassword.sent")}</FormMessage>;
+  if (sent) {
+    return (
+      <div className="flex flex-col gap-3">
+        <FormMessage tone="success">{t("forgotPassword.sent")}</FormMessage>
+        <SpamHint />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">

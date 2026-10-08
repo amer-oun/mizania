@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeIcon, EyeOffIcon, WifiOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, MailWarningIcon, WifiOffIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   type ComponentProps,
@@ -147,4 +147,18 @@ export function submitHandler(
     };
     void handler(field);
   };
+}
+
+/** Auth emails from a Gmail address often land in spam (until Phase 10's own domain). */
+export function SpamHint() {
+  const t = useTranslations("Auth.common");
+  return (
+    <p
+      data-testid="spam-hint"
+      className="flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary"
+    >
+      <MailWarningIcon className="size-4 shrink-0" aria-hidden />
+      {t("spamHint")}
+    </p>
+  );
 }

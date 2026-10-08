@@ -28,6 +28,7 @@ test("sign up in Arabic, confirm from the email, land signed in, sign out", asyn
   await expect(page).toHaveURL(/\/ar\/check-email$/);
   await expect(page.getByRole("heading", { name: t.Auth.checkEmail.title })).toBeVisible();
   await expect(page.getByTestId("check-email-body")).toContainText(email);
+  await expect(page.getByTestId("spam-hint")).toHaveText(t.Auth.common.spamHint);
   // Just sent: resending waits a minute.
   await expect(page.getByRole("button", { name: /\d/ })).toBeDisabled();
 

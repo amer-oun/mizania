@@ -24,6 +24,7 @@ test("forgot password: link by email, new password, sign in with it", async ({ p
   await page.getByLabel(t.Auth.common.email).fill(email);
   await page.getByRole("button", { name: t.Auth.forgotPassword.submit }).click();
   await expect(page.getByText(t.Auth.forgotPassword.sent)).toBeVisible();
+  await expect(page.getByTestId("spam-hint")).toHaveText(t.Auth.common.spamHint);
 
   await page.goto(await linkFromEmail(request, email, resetSubject.en));
   await expect(page).toHaveURL(/\/en\/reset-password\?token=/);
