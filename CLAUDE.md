@@ -12,6 +12,7 @@ Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 - `apps/api` — Fastify REST + sync endpoints. Input validated with Zod from `packages/shared`.
 - `apps/worker` — BullMQ jobs: reminders, warnings, expected-transfer checks.
 - `packages/core` — pure business logic (money, cycles, daily amount, check-in, warnings, splits). No I/O, no framework imports. Runs in browser and server.
+- `packages/auth` — Better Auth configuration (mounted by `apps/web` at `/api/auth`) and auth emails.
 - `packages/db` — Drizzle schema, migrations, seed.
 - `packages/shared` — Zod schemas, types, constants.
 - `packages/sync` — offline sync protocol.
