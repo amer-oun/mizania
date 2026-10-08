@@ -10,10 +10,12 @@ import {
 } from "@mizania/db/schema";
 import { betterAuth, type BetterAuthPlugin } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { getOAuthState } from "better-auth/api";
 import { z } from "zod";
 
 import { resolveBaseURL } from "./base-url";
 import type { AuthEnv } from "./env";
+import { googleCredentials } from "./google";
 
 const DAY = 60 * 60 * 24;
 
@@ -42,7 +44,13 @@ export interface CreateAuthOptions {
   db: Db;
   env: Pick<
     AuthEnv,
-    "BETTER_AUTH_SECRET" | "BETTER_AUTH_URL" | "VERCEL_ENV" | "VERCEL_URL" | "VERCEL_BRANCH_URL"
+    | "BETTER_AUTH_SECRET"
+    | "BETTER_AUTH_URL"
+    | "VERCEL_ENV"
+    | "VERCEL_URL"
+    | "VERCEL_BRANCH_URL"
+    | "GOOGLE_CLIENT_ID"
+    | "GOOGLE_CLIENT_SECRET"
   >;
   mailer: AuthMailer;
   /**
@@ -78,6 +86,8 @@ export function createAuth({
   rateLimit,
   plugins = [],
 }: CreateAuthOptions) {
+  const google = googleCredentials(env);
+
   return betterAuth({
     appName: "Mizania",
     baseURL: resolveBaseURL(env),
@@ -103,6 +113,39 @@ export function createAuth({
       autoSignInAfterVerification: true,
       expiresIn: VERIFICATION_LINK_EXPIRES_IN,
       sendVerificationEmail: ({ user, url }) => mailer.send("verify-email", recipient(user), url),
+    },
+
+    // Off on previews (see googleCredentials). Account linking keeps Better
+    // Auth's default (ADR 005): Google joins an existing account only when
+    // Google and our own account have both verified the email.
+    ...(google && {
+      socialProviders: {
+        google: {
+          ...google,
+          // Shared phones: always let the user pick the Google account.
+          prompt: "select_account",
+        },
+      },
+    }),
+    account: {
+      // Google's tokens are stored only because Better Auth keeps them; we
+      // never call Google APIs. Encrypted at rest with the auth secret.
+      encryptOAuthTokens: true,
+    },
+
+    databaseHooks: {
+      user: {
+        create: {
+          // New Google users: take the language of the page they started
+          // from (sent as additionalData). Untrusted input, so only ar/fr/en.
+          before: async (user) => {
+            const state = await getOAuthState();
+            const locale: unknown = state?.locale;
+            if (!isUserLocale(locale)) return;
+            return { data: { ...user, locale } };
+          },
+        },
+      },
     },
 
     user: {

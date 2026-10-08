@@ -18,6 +18,10 @@ const authEnvSchema = z.object({
   SMTP_USER: optional(z.string()),
   SMTP_PASSWORD: optional(z.string()),
   EMAIL_FROM: z.string().min(1),
+
+  // Google sign-in (optional: without them, only email + password).
+  GOOGLE_CLIENT_ID: optional(z.string()),
+  GOOGLE_CLIENT_SECRET: optional(z.string()),
 });
 
 export type AuthEnv = z.infer<typeof authEnvSchema>;

@@ -3,6 +3,7 @@ import {
   createAuth,
   createMailer,
   createSmtpSender,
+  isGoogleEnabled,
   logger,
   parseAuthEnv,
 } from "@mizania/auth";
@@ -11,6 +12,15 @@ import { nextCookies } from "better-auth/next-js";
 import { after } from "next/server";
 
 let instance: Auth | undefined;
+
+/** Whether to show "Continue with Google" (off on preview deployments). */
+export function googleEnabled(): boolean {
+  return isGoogleEnabled({
+    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  });
+}
 
 /**
  * The server's Better Auth instance, created on first use so `next build`

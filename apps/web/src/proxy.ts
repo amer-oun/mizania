@@ -9,12 +9,15 @@ const intl = createMiddleware(routing);
 
 /** Pages anyone can open; every other page needs a session. */
 const publicPaths = [
+  "/welcome",
   "/sign-in",
   "/sign-up",
   "/check-email",
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/privacy",
+  "/terms",
 ];
 
 export default function proxy(request: NextRequest) {
@@ -29,7 +32,9 @@ export default function proxy(request: NextRequest) {
     !publicPaths.includes(path) &&
     !getSessionCookie(request)
   ) {
-    return NextResponse.redirect(new URL(`/${locale}/sign-in`, request.url));
+    // The home page introduces the app; other pages go straight to sign-in.
+    const target = path === "/" ? "welcome" : "sign-in";
+    return NextResponse.redirect(new URL(`/${locale}/${target}`, request.url));
   }
 
   return intl(request);

@@ -14,4 +14,5 @@ export { createMailer } from "./email/mailer";
 export { createSmtpSender, type EmailMessage, type SendEmail } from "./email/smtp";
 export { renderAuthEmail } from "./email/templates";
 export { type AuthEnv, parseAuthEnv } from "./env";
+export { googleCredentials, isGoogleEnabled } from "./google";
 export { type Logger, logger } from "./logger";

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { LegalLinks } from "@/components/legal/legal-links";
 
 // Sign-up, sign-in, email verification and password reset screens.
 export default async function AuthLayout({ children }: { children: ReactNode }) {
@@ -13,7 +14,10 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
         <span className="text-xl font-bold text-primary">{t("title")}</span>
         <LanguageSwitcher />
       </header>
-      <main className="flex flex-1 flex-col justify-center gap-6 pb-12">{children}</main>
+      <main className="flex flex-1 flex-col justify-center gap-6 pb-8">{children}</main>
+      <footer className="py-6">
+        <LegalLinks />
+      </footer>
     </div>
   );
 }

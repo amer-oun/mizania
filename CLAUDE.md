@@ -49,3 +49,4 @@ Phase 2: Auth, onboarding, wallets <!-- update as you progress -->
 - Mobile-first UI; every view handles loading, empty, error and offline states.
 - Keep the home screen focused on one number: today's spendable amount.
 - Arabic UI text is written in Tunisian derja (Arabic script), friendly and short, not Modern Standard Arabic.
+  - Some words use the standard spelling instead: "wallet" is محفظة, plural محافظ (never بزطام).

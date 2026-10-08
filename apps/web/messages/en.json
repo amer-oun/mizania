@@ -79,6 +79,27 @@
       "expiredTitle": "This link has expired",
       "expiredBody": "Reset links work for 1 hour. Ask for a new one.",
       "requestNew": "Get a new link"
+    },
+    "google": {
+      "continue": "Continue with Google",
+      "or": "or",
+      "accountNotLinked": "An account with this email already exists. Sign in with your email and password (confirm your email first if you haven't yet).",
+      "failed": "Google sign-in didn't work. Try again."
     }
+  },
+  "Legal": {
+    "label": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "consent": "By creating an account, you accept the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>."
+  },
+  "Welcome": {
+    "points": {
+      "today": "Today's amount: one number that tells you how much you can spend today, until the next transfer from home.",
+      "wallets": "Your wallets, by hand: cash, D17, Flouci or bank card. Mizania never connects to them and never moves money.",
+      "languages": "Free, in Tunisian Arabic, French or English. Install it on your phone like an app."
+    },
+    "signUp": "Create an account",
+    "signIn": "I already have an account"
   }
 }

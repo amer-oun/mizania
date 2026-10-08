@@ -1,0 +1,152 @@
+{
+  "draft": "Brouillon : ce texte n'a pas encore été relu et peut changer.",
+  "contactMissing": "[email de contact]",
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "intro": "Mizania aide les étudiants à voir combien ils peuvent dépenser chaque jour jusqu'au prochain virement de la famille. Cette page explique simplement ce qu'on enregistre et pourquoi.",
+    "sections": [
+      {
+        "title": "Ce qu'on enregistre",
+        "body": [
+          "Ton compte : ton prénom et ton adresse email. Si tu t'inscris avec un mot de passe, on n'enregistre qu'une version brouillée (un hash), jamais le mot de passe lui-même.",
+          "Si tu continues avec Google : le nom, l'adresse email et le lien de la photo de profil que Google nous transmet, et les identifiants que Google nous donne pour te connecter. On garde les jetons de connexion de Google chiffrés et on ne les utilise pas pour lire autre chose dans ton compte Google.",
+          "Tes réglages : ta langue, le mode semaine et l'heure du bilan du soir.",
+          "Ce que tu saisis dans l'app : tes portefeuilles (leurs noms et les soldes que tu entres), tes dépenses et revenus, tes budgets et tes bilans du soir.",
+          "Pour la sécurité : pour chaque appareil connecté, son adresse IP et le type de navigateur, et des traces de courte durée des tentatives de connexion pour bloquer qui essaie de deviner un mot de passe."
+        ]
+      },
+      {
+        "title": "Ce qu'on ne fait jamais",
+        "body": [
+          [
+            "On ne vend jamais tes données et on ne les partage pas pour de la publicité.",
+            "Pas de publicité, pas d'outils de suivi ni de statistiques.",
+            "On ne se connecte jamais à ta banque, à D17 ou à Flouci. C'est toi qui entres tes soldes.",
+            "L'app n'envoie et ne déplace jamais d'argent.",
+            "Personne d'autre, ta famille comprise, ne voit tes données. Si l'app t'aide à écrire un message pour demander de l'argent, elle te donne seulement un texte à copier ; rien n'est envoyé automatiquement."
+          ]
+        ]
+      },
+      {
+        "title": "Âge",
+        "body": [
+          "Mizania est réservé aux personnes de 18 ans et plus. On ne garde pas sciemment de données sur des personnes plus jeunes ; si on apprend qu'un compte appartient à quelqu'un de moins de 18 ans, on le supprime."
+        ]
+      },
+      {
+        "title": "Pourquoi on les utilise",
+        "body": [
+          "Uniquement pour faire fonctionner Mizania : te connecter, calculer ton montant du jour, afficher ton historique, t'envoyer les emails nécessaires (confirmer ton email, changer ton mot de passe) et protéger ton compte."
+        ]
+      },
+      {
+        "title": "Qui nous aide à faire tourner l'app",
+        "body": [
+          [
+            "Vercel héberge l'app. Ses serveurs tournent à Francfort, en Allemagne.",
+            "Neon stocke la base de données, aussi à Francfort.",
+            "Google envoie nos emails (Gmail) et, si tu le choisis, te connecte avec ton compte Google."
+          ],
+          "Ils traitent les données uniquement pour nous fournir ces services."
+        ]
+      },
+      {
+        "title": "Cookies et données sur ton téléphone",
+        "body": [
+          "On utilise deux cookies : un qui te garde connecté·e (30 jours) et un qui retient ta langue. L'app enregistre aussi ses propres fichiers sur ton téléphone pour s'ouvrir sans connexion."
+        ]
+      },
+      {
+        "title": "Combien de temps on les garde",
+        "body": [
+          "Tant que tu as un compte. Quand tu supprimes ton compte, on supprime tes données."
+        ]
+      },
+      {
+        "title": "Tes choix",
+        "body": [
+          [
+            "Exporter tes données : bientôt disponible.",
+            "Supprimer ton compte depuis l'app : bientôt disponible. En attendant, écris-nous à {contact} depuis l'adresse email de ton compte et on le supprime sous 30 jours."
+          ]
+        ]
+      },
+      {
+        "title": "Changements",
+        "body": [
+          "Si cette politique change de façon importante, on te prévient dans l'app ou par email avant que ça s'applique."
+        ]
+      },
+      {
+        "title": "Contact",
+        "body": ["Questions sur tes données : {contact}."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "intro": "Ces conditions s'appliquent quand tu utilises Mizania. Lis-les, elles sont courtes.",
+    "sections": [
+      {
+        "title": "Ce qu'est Mizania",
+        "body": [
+          "Une app de budget gratuite pour les étudiants. Elle montre combien tu peux dépenser chaque jour jusqu'à ton prochain virement, uniquement à partir de ce que tu saisis."
+        ]
+      },
+      {
+        "title": "Âge",
+        "body": [
+          "Il faut avoir 18 ans ou plus pour utiliser Mizania. Ne crée pas de compte si tu as moins de 18 ans."
+        ]
+      },
+      {
+        "title": "Pas un conseil financier",
+        "body": [
+          "Les montants affichés sont des estimations basées sur tes propres saisies. Ce ne sont pas des conseils financiers, et c'est toi qui décides comment dépenser ton argent."
+        ]
+      },
+      {
+        "title": "Aucun argent ne passe par Mizania",
+        "body": [
+          "Mizania ne se connecte jamais aux banques, à D17 ou à Flouci et n'envoie jamais d'argent. Les portefeuilles sont suivis à la main. La fonction « demander de l'argent » écrit seulement un texte que tu copies."
+        ]
+      },
+      {
+        "title": "Ton compte",
+        "body": [
+          "Utilise ta propre adresse email et garde ton mot de passe pour toi. Un compte, c'est une personne. Tu es responsable de ce qui se passe dans ton compte."
+        ]
+      },
+      {
+        "title": "Usage correct",
+        "body": [
+          "N'abuse pas de l'app : pas d'attaques, pas de tentatives d'accéder aux données des autres, pas d'inscriptions automatiques en masse et rien d'illégal."
+        ]
+      },
+      {
+        "title": "Tes données",
+        "body": [
+          "Ce que tu saisis reste à toi. Tu nous autorises à l'enregistrer et à le traiter uniquement pour faire fonctionner l'app pour toi, comme expliqué dans la politique de confidentialité."
+        ]
+      },
+      {
+        "title": "Le service",
+        "body": [
+          "Mizania est fourni tel quel, sans garantie. On fait de notre mieux pour qu'il reste disponible et juste, mais il peut y avoir des erreurs ou des interruptions. Les fonctions peuvent évoluer. Si on arrête un jour le service, on te prévient à l'avance."
+        ]
+      },
+      {
+        "title": "Fermer ton compte",
+        "body": [
+          "Tu peux arrêter d'utiliser Mizania quand tu veux et nous demander de supprimer ton compte (bientôt dans l'app ; en attendant par email à {contact}, traité sous 30 jours). On peut suspendre les comptes qui ne respectent pas ces conditions."
+        ]
+      },
+      {
+        "title": "Changements et contact",
+        "body": [
+          "Si ces conditions changent de façon importante, on te prévient avant que ça s'applique. Questions : {contact}."
+        ]
+      }
+    ]
+  }
+}

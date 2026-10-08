@@ -1,0 +1,152 @@
+{
+  "draft": "Draft: this text has not been reviewed yet and may change.",
+  "contactMissing": "[contact email]",
+  "privacy": {
+    "title": "Privacy policy",
+    "intro": "Mizania helps students see how much they can spend each day until the next transfer from home. This page explains, in simple words, what we store and why.",
+    "sections": [
+      {
+        "title": "What we store",
+        "body": [
+          "Your account: your first name and email address. If you sign up with a password, we store only a scrambled version (a hash) of it, never the password itself.",
+          "If you continue with Google: the name, email address and profile photo link that Google shares with us, and the identifiers Google gives us to sign you in. We store Google's sign-in tokens encrypted and don't use them to read anything else from your Google account.",
+          "Your settings: your language, weekly mode and check-in time.",
+          "What you type into the app: your wallets (their names and the balances you enter), transactions, budget plans and evening check-ins.",
+          "For security: for each signed-in device, its IP address and browser type, and short-lived records of sign-in attempts to stop password guessing."
+        ]
+      },
+      {
+        "title": "What we never do",
+        "body": [
+          [
+            "We never sell your data or share it for advertising.",
+            "We don't show ads and don't use tracking or analytics tools.",
+            "We never connect to your bank, D17 or Flouci. You enter your balances yourself.",
+            "The app never sends or moves money.",
+            "Nobody else, including your family, can see your data. If the app helps you write a message to ask for money, it only gives you text to copy; nothing is sent automatically."
+          ]
+        ]
+      },
+      {
+        "title": "Age",
+        "body": [
+          "Mizania is for people aged 18 and older. We don't knowingly keep data about anyone younger; if we learn that an account belongs to someone under 18, we delete it."
+        ]
+      },
+      {
+        "title": "Why we use it",
+        "body": [
+          "Only to run Mizania: to sign you in, calculate your daily amount, show your history, send you emails you need (confirming your email, resetting your password) and keep your account secure."
+        ]
+      },
+      {
+        "title": "Who helps us run the app",
+        "body": [
+          [
+            "Vercel hosts the app. Its servers run in Frankfurt, Germany.",
+            "Neon stores the database, also in Frankfurt.",
+            "Google sends our emails (Gmail) and, if you choose it, signs you in with your Google account."
+          ],
+          "They process data only to provide these services to us."
+        ]
+      },
+      {
+        "title": "Cookies and data on your phone",
+        "body": [
+          "We use two cookies: one that keeps you signed in (for 30 days) and one that remembers your language. The app also saves its own files on your phone so it opens without a connection."
+        ]
+      },
+      {
+        "title": "How long we keep it",
+        "body": [
+          "As long as you have an account. When you delete your account, we delete your data."
+        ]
+      },
+      {
+        "title": "Your choices",
+        "body": [
+          [
+            "Export your data: coming soon.",
+            "Delete your account from the app: coming soon. Until then, write to us at {contact} from your account's email address and we'll delete it within 30 days."
+          ]
+        ]
+      },
+      {
+        "title": "Changes",
+        "body": [
+          "If this policy changes in an important way, we'll tell you in the app or by email before it applies."
+        ]
+      },
+      {
+        "title": "Contact",
+        "body": ["Questions about your data: {contact}."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of use",
+    "intro": "These terms apply when you use Mizania. Please read them; they are short.",
+    "sections": [
+      {
+        "title": "What Mizania is",
+        "body": [
+          "A free budgeting app for students. It shows how much you can spend each day until your next transfer, based only on what you enter."
+        ]
+      },
+      {
+        "title": "Age",
+        "body": [
+          "You must be 18 or older to use Mizania. Don't create an account if you're under 18."
+        ]
+      },
+      {
+        "title": "Not financial advice",
+        "body": [
+          "The amounts the app shows are estimates from your own entries. They are not financial advice, and you decide how to spend your money."
+        ]
+      },
+      {
+        "title": "No money moves through Mizania",
+        "body": [
+          "Mizania never connects to banks, D17 or Flouci and never sends money. Wallets are tracked by hand. The \"ask for money\" feature only writes text for you to copy."
+        ]
+      },
+      {
+        "title": "Your account",
+        "body": [
+          "Use your own email address and keep your password private. One account is for one person. You're responsible for what happens in your account."
+        ]
+      },
+      {
+        "title": "Fair use",
+        "body": [
+          "Don't misuse the app: no attacks, no attempts to access other people's data, no automated mass sign-ups and nothing illegal."
+        ]
+      },
+      {
+        "title": "Your data",
+        "body": [
+          "What you enter stays yours. You allow us to store and process it only to run the app for you, as described in the privacy policy."
+        ]
+      },
+      {
+        "title": "The service",
+        "body": [
+          "Mizania is provided as it is, without guarantees. We work to keep it available and correct, but it may have errors or stop for a while. Features may change. If we ever close the service, we'll tell you in advance."
+        ]
+      },
+      {
+        "title": "Closing your account",
+        "body": [
+          "You can stop using Mizania at any time and ask us to delete your account (in the app soon; until then by email at {contact}, handled within 30 days). We may suspend accounts that break these terms."
+        ]
+      },
+      {
+        "title": "Changes and contact",
+        "body": [
+          "If these terms change in an important way, we'll tell you before it applies. Questions: {contact}."
+        ]
+      }
+    ]
+  }
+}

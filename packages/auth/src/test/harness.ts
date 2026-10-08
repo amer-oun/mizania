@@ -39,7 +39,9 @@ export interface RequestOptions {
  * records emails instead of sending them. Requests go straight to the handler.
  */
 export async function createTestAuth(
-  options: Partial<Omit<CreateAuthOptions, "db">> = {},
+  options: Partial<Omit<CreateAuthOptions, "db" | "env">> & {
+    env?: Partial<CreateAuthOptions["env"]>;
+  } = {},
 ): Promise<TestAuth> {
   const test = await createTestDatabase();
   const emails: SentEmail[] = [];
@@ -49,6 +51,7 @@ export async function createTestAuth(
     env: {
       BETTER_AUTH_SECRET: "test-secret-that-is-at-least-32-characters",
       BETTER_AUTH_URL: BASE_URL,
+      ...options.env,
     },
     mailer: {
       send(kind, to, url) {
@@ -56,7 +59,9 @@ export async function createTestAuth(
         return Promise.resolve();
       },
     },
-    ...options,
+    ...(options.runInBackground && { runInBackground: options.runInBackground }),
+    ...(options.mailer && { mailer: options.mailer }),
+    ...(options.rateLimit !== undefined && { rateLimit: options.rateLimit }),
   });
 
   const request = (path: string, init: RequestOptions = {}) => {
