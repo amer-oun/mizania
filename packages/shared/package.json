@@ -10,12 +10,18 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "clean": "rimraf .turbo coverage"
+    "clean": "rimraf .turbo coverage",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mizania/core": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@mizania/config": "workspace:*",
     "eslint": "catalog:",
     "rimraf": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
