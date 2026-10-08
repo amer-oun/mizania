@@ -42,10 +42,18 @@ export const users = pgTable(
     weeklyMode: boolean().notNull().default(true),
     // Evening check-in reminder, Africa/Tunis local time.
     checkinTime: time().notNull().default("21:00"),
+    // Onboarding answers (null until onboarded).
+    usualMonthlyMillimes: bigint({ mode: "number" }),
+    usualArrivalDay: integer(),
+    onboardedAt: timestamp({ withTimezone: true }),
     deletedAt: timestamp({ withTimezone: true }),
     ...timestamps,
   },
-  (t) => [check("users_locale_check", sql`${t.locale} in ('ar', 'fr', 'en')`)],
+  (t) => [
+    check("users_locale_check", sql`${t.locale} in ('ar', 'fr', 'en')`),
+    check("users_usual_monthly_positive", sql`${t.usualMonthlyMillimes} > 0`),
+    check("users_usual_arrival_day_range", sql`${t.usualArrivalDay} between 1 and 31`),
+  ],
 );
 
 export const sessions = pgTable(
