@@ -341,6 +341,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 - [ ] Production deploy, demo account with a realistic month of data
 - [ ] Buy a domain and send email through Resend with SPF/DKIM/DMARC, so emails stop landing in spam
+- [ ] Review privacy and terms; check Tunisian data protection requirements (Organic Law 2004-63, INPDP declaration) before public launch
 - [ ] Share with 50+ students (university groups, student Facebook groups, friends' flats)
 - [ ] Track simple, privacy-friendly metrics: weekly active users, check-in rate, % of users who finish a cycle on budget
 - [ ] README (see §10), 2-minute demo video

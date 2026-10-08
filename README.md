@@ -83,13 +83,17 @@ Then open `http://<your-PC-LAN-IP>:3000` on your phone (same Wi-Fi). Browsers on
 
 See [ADR 005](docs/decisions/005-auth-hosting-and-phase-2-data.md) for why it's set up this way.
 
-| Where                  | Variables                                                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vercel, Production     | `DATABASE_URL` (Neon main, pooled), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` |
-| Vercel, Preview        | `DATABASE_URL` (Neon `preview` branch, pooled), `BETTER_AUTH_SECRET`, `SMTP_*`, `EMAIL_FROM`                                                      |
-| GitHub Actions secrets | `DATABASE_URL_DIRECT` (Neon main, direct), `DATABASE_URL_PREVIEW_DIRECT` (Neon `preview`, direct)                                                 |
+| Where                  | Variables                                                                                                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vercel, Production     | `DATABASE_URL` (Neon main, pooled), `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
+| Vercel, Preview        | `DATABASE_URL` (Neon `preview` branch, pooled), `BETTER_AUTH_SECRET`, `SMTP_*`, `EMAIL_FROM`, `GOOGLE_*` (unused: Google is off on previews)                                                  |
+| GitHub Actions secrets | `DATABASE_URL_DIRECT` (Neon main, direct), `DATABASE_URL_PREVIEW_DIRECT` (Neon `preview`, direct)                                                                                             |
 
 **Auth on Preview deployments:** `BETTER_AUTH_URL` isn't set there. The app then accepts exactly the deployment's own two hosts (`VERCEL_URL` and `VERCEL_BRANCH_URL`, from Vercel's system environment variables, which must stay enabled) and refuses any other host. Previews are behind Vercel's login, so open email links in a browser where you're signed in to Vercel.
+
+**Google sign-in** works locally and in production only: the OAuth client "Mizania Web" accepts redirects to `http://localhost:3000/api/auth/callback/google` and `https://mizania-roan.vercel.app/api/auth/callback/google`. Previews have neither a registered redirect nor a fixed URL, so the button is hidden there. While the Google app is in Testing mode, only its test users can sign in with Google.
+
+**Privacy and terms** are drafts: fill in `CONTACT_EMAIL` and turn off `LEGAL_DRAFT` in `apps/web/src/lib/legal.ts` after reviewing them. The public home page for Google's branding review is `/en/welcome` (signed-out visitors to `/` land there).
 
 **Auth emails** go through Gmail (port 465). A failed send doesn't block the user; it shows up in the Vercel function logs as `auth email failed` with the user id and SMTP error code (never the address or link).
 
