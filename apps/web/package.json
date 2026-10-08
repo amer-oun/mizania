@@ -14,8 +14,11 @@
     "clean": "rimraf .turbo .next public/sw.js public/sw.js.map"
   },
   "dependencies": {
+    "@mizania/auth": "workspace:*",
     "@mizania/core": "workspace:*",
+    "@mizania/db": "workspace:*",
     "@serwist/next": "^9.5.12",
+    "better-auth": "~1.7.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.51.0",

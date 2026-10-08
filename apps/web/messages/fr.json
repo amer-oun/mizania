@@ -5,7 +5,9 @@
   },
   "Home": {
     "title": "Mizania",
-    "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille."
+    "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille.",
+    "signedInAs": "Connecté·e en tant que {name}",
+    "signOut": "Se déconnecter"
   },
   "LanguageSwitcher": {
     "label": "Langue",

@@ -5,7 +5,9 @@
   },
   "Home": {
     "title": "Mizania",
-    "tagline": "How much you can spend today, until your next transfer from home."
+    "tagline": "How much you can spend today, until your next transfer from home.",
+    "signedInAs": "Signed in as {name}",
+    "signOut": "Sign out"
   },
   "LanguageSwitcher": {
     "label": "Language",
