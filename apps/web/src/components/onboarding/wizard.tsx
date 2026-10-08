@@ -4,7 +4,7 @@ import { nextTransferDate, todayInTunis } from "@mizania/core";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { completeOnboarding } from "@/app/actions/onboarding";
 import { FormMessage, OfflineNotice } from "@/components/auth/form-parts";
@@ -33,6 +33,12 @@ import { Checkbox, MoneyInput } from "./fields";
 
 const SERVER = "\u0000server";
 const noSubscription = () => () => undefined;
+
+/** The step a URL query asks for ("?step=3"), or 1. */
+function stepFromQuery(value: string | null): number {
+  const step = Number(value);
+  return Number.isInteger(step) && step >= 1 && step <= STEPS ? step : 1;
+}
 
 function readStorage(key: string): string | null {
   try {
@@ -81,13 +87,22 @@ function Wizard({ storageKey: key, initial }: { storageKey: string; initial: Dra
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState(false);
 
+  // The step is ours, mirrored in the URL (?step=N) so a reload and the
+  // back button work. Next.js's own pushState sync isn't relied on: it stops
+  // following after a language switch.
+  const [requested, setRequested] = useState(() => stepFromQuery(searchParams.get("step")));
+  useEffect(() => {
+    const onPopState = () => {
+      setRequested(stepFromQuery(new URLSearchParams(window.location.search).get("step")));
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, []);
   // The URL may ask for a step that isn't reachable yet (after a reload, or
   // a typed URL): show the first step that still needs an answer instead.
-  const requested = Number(searchParams.get("step"));
-  const step = Math.min(
-    Number.isInteger(requested) && requested >= 1 && requested <= STEPS ? requested : 1,
-    furthestStep(draft),
-  ) as Step;
+  const step = Math.min(requested, furthestStep(draft)) as Step;
 
   function update(change: (d: Draft) => Draft) {
     const next = change(draft);
@@ -96,8 +111,9 @@ function Wizard({ storageKey: key, initial }: { storageKey: string; initial: Dra
   }
 
   function goTo(target: number) {
-    // Next.js keeps useSearchParams in sync with pushState; Back works too.
-    window.history.pushState(null, "", `?step=${target}`);
+    // Keep Next.js's history state: its router needs it on back/forward.
+    window.history.pushState(window.history.state, "", `?step=${target}`);
+    setRequested(target);
   }
 
   async function finish() {
