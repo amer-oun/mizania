@@ -107,6 +107,20 @@ export function formatTND(millimes: number, locale: Locale): string {
 }
 
 /**
+ * Millimes as a person would type them, to pre-fill an amount: dinars with
+ * only the decimals needed and no separators or unit. 250000 → "250",
+ * 12500 → "12.5", 50 → "0.05". parseTND reads it back exactly.
+ */
+export function formatTypedTND(millimes: number): string {
+  assertMillimes(millimes);
+  if (millimes < 0) throw new RangeError(`Can't type a negative amount: ${millimes} millimes.`);
+  const millimePart = millimes % 1000;
+  const dinars = String((millimes - millimePart) / 1000);
+  if (millimePart === 0) return dinars;
+  return `${dinars}.${String(millimePart).padStart(3, "0").replace(/0+$/, "")}`;
+}
+
+/**
  * Splits `total` millimes into `people` shares that differ by at most 1 millime.
  * The leftover millimes go to the first shares: 10.000 DT / 3 → 3.334, 3.333, 3.333.
  */

@@ -29,6 +29,7 @@ export {
 export {
   assertMillimes,
   formatTND,
+  formatTypedTND,
   type Locale,
   millimesReading,
   parseTND,
