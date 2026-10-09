@@ -71,6 +71,14 @@
     "decimal": "Virgule",
     "offline": "Tu es hors ligne. Connecte-toi à Internet pour enregistrer."
   },
+  "TodayList": {
+    "title": "Aujourd'hui",
+    "empty": "Rien d'enregistré aujourd'hui. Appuie sur + pour ajouter un café.",
+    "unlogged": "Dépense non notée",
+    "covered": "Couvert par ton plan",
+    "partial": "{amount} sur l'argent du jour",
+    "delete": "Supprimer {category} {amount}"
+  },
   "LanguageSwitcher": {
     "label": "Langue",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"

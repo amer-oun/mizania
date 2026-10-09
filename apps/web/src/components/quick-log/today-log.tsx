@@ -73,18 +73,20 @@ export function TodayLog({
   return (
     <>
       {children?.(show)}
-      <button
-        type="button"
-        aria-label={t("title")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] end-[max(1rem,calc(50vw-14rem+1rem))] z-30 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-        data-testid="quick-log-open"
-        onClick={() => {
-          setError(null);
-          setOpen(true);
-        }}
-      >
-        <PlusIcon className="size-7" aria-hidden />
-      </button>
+      {options.wallets.length > 0 && (
+        <button
+          type="button"
+          aria-label={t("title")}
+          className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] end-[max(1rem,calc(50vw-14rem+1rem))] z-30 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          data-testid="quick-log-open"
+          onClick={() => {
+            setError(null);
+            setOpen(true);
+          }}
+        >
+          <PlusIcon className="size-7" aria-hidden />
+        </button>
+      )}
       {open && (
         <QuickLogSheet
           open

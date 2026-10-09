@@ -1,10 +1,12 @@
 import { todayInTunis } from "@mizania/core";
 import { getBudget } from "@mizania/db/budget";
-import { getQuickLogOptions } from "@mizania/db/expenses";
+import { getCategories, getQuickLogOptions } from "@mizania/db/expenses";
+import { getWalletsOverview } from "@mizania/db/wallets";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { TodayList } from "@/components/quick-log/today-list";
 import { TodayLog } from "@/components/quick-log/today-log";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
@@ -17,9 +19,12 @@ export default async function TodayPage() {
   const t = await getTranslations("Home");
   const today = await getTranslations("Today");
   const locale = await getLocale();
-  const [budget, quickLog] = await Promise.all([
-    getBudget(getDb(), user.id, todayInTunis()),
-    getQuickLogOptions(getDb(), user.id),
+  const db = getDb();
+  const [budget, quickLog, categories, { wallets }] = await Promise.all([
+    getBudget(db, user.id, todayInTunis()),
+    getQuickLogOptions(db, user.id),
+    getCategories(db, user.id),
+    getWalletsOverview(db, user.id),
   ]);
 
   return (
@@ -35,7 +40,8 @@ export default async function TodayPage() {
           </form>
         </div>
       </header>
-      <main className="flex flex-1 flex-col justify-center pb-6">
+      {/* Room at the bottom so the "+" button never covers the last row. */}
+      <main className="flex flex-1 flex-col pt-2 pb-24">
         {budget ? (
           <TodayScreen
             view={{
@@ -56,7 +62,20 @@ export default async function TodayPage() {
             {today("noCycle")}
           </p>
         )}
-        {quickLog.wallets.length > 0 && <TodayLog options={quickLog} />}
+        <TodayLog options={quickLog}>
+          {(show) =>
+            budget && (
+              <div className="mt-6">
+                <TodayList
+                  expenses={budget.todayExpenses}
+                  categories={categories}
+                  wallets={wallets}
+                  show={show}
+                />
+              </div>
+            )
+          }
+        </TodayLog>
       </main>
     </div>
   );

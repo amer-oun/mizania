@@ -71,6 +71,14 @@
     "decimal": "فاصلة",
     "offline": "ماكش متصل بالأنترنات. اتصل باش تسجّل."
   },
+  "TodayList": {
+    "title": "اليوم",
+    "empty": "ما سجّلت شي اليوم. اضغط + باش تزيد قهوة.",
+    "unlogged": "مصروف ما تسجّلش",
+    "covered": "من البلان متاعك",
+    "partial": "{amount} من فلوس اليوم",
+    "delete": "افسخ {category} {amount}"
+  },
   "LanguageSwitcher": {
     "label": "اللغة",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {غير معروفة}}"
