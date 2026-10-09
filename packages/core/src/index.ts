@@ -49,6 +49,8 @@ export {
   type CycleSummary,
   cycleSummary,
   type CycleSummaryInput,
+  type EnvelopeStatus,
+  type FixedCostStatus,
   type PlanItemKind,
   type SummaryPlanItem,
   type SummaryTransaction,
