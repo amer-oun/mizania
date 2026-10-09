@@ -11,7 +11,8 @@
   "Nav": {
     "label": "التنقل",
     "today": "اليوم",
-    "wallets": "المحافظ"
+    "wallets": "المحافظ",
+    "plan": "البلان"
   },
   "Today": {
     "spendToday": "تنجم تصرف اليوم",
@@ -78,6 +79,24 @@
     "covered": "من البلان متاعك",
     "partial": "{amount} من فلوس اليوم",
     "delete": "افسخ {category} {amount}"
+  },
+  "Plan": {
+    "title": "البلان",
+    "period": "{start} – {end}",
+    "fixedTitle": "المصاريف الثابتة",
+    "envelopesTitle": "الظروف",
+    "noFixed": "ما ثمّاش مصاريف ثابتة هالشهر.",
+    "toPay": "مازال ما تخلّصش",
+    "paidOn": "تخلّص {amount} · {date}",
+    "alreadyPaid": "تخلّص قبل",
+    "paidPart": "تخلّص {paid} من {planned}",
+    "stillToPay": "باقي للخلاص",
+    "envelopeSpent": "صرفت {spent} من {planned}",
+    "envelopeLeft": "باقي {amount}",
+    "loadError": "ما نجمناش نحمّلو البلان متاعك.",
+    "retry": "عاود جرّب",
+    "loading": "قاعد يحمّل…",
+    "noCycle": "ما ثمّاش شهر مفتوح."
   },
   "LanguageSwitcher": {
     "label": "اللغة",

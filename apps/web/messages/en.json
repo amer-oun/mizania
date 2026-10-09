@@ -11,7 +11,8 @@
   "Nav": {
     "label": "Navigation",
     "today": "Today",
-    "wallets": "Wallets"
+    "wallets": "Wallets",
+    "plan": "Plan"
   },
   "Today": {
     "spendToday": "You can spend today",
@@ -78,6 +79,24 @@
     "covered": "Covered by your plan",
     "partial": "{amount} from today's money",
     "delete": "Delete {category} {amount}"
+  },
+  "Plan": {
+    "title": "Plan",
+    "period": "{start} – {end}",
+    "fixedTitle": "Fixed costs",
+    "envelopesTitle": "Envelopes",
+    "noFixed": "No fixed costs this month.",
+    "toPay": "To pay",
+    "paidOn": "Paid {amount} · {date}",
+    "alreadyPaid": "Already paid",
+    "paidPart": "Paid {paid} of {planned}",
+    "stillToPay": "Still to pay",
+    "envelopeSpent": "Spent {spent} of {planned}",
+    "envelopeLeft": "{amount} left",
+    "loadError": "Couldn't load your plan.",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "noCycle": "No month in progress."
   },
   "LanguageSwitcher": {
     "label": "Language",

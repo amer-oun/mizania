@@ -11,7 +11,8 @@
   "Nav": {
     "label": "Navigation",
     "today": "Aujourd'hui",
-    "wallets": "Portefeuilles"
+    "wallets": "Portefeuilles",
+    "plan": "Plan"
   },
   "Today": {
     "spendToday": "Tu peux dépenser aujourd'hui",
@@ -78,6 +79,24 @@
     "covered": "Couvert par ton plan",
     "partial": "{amount} sur l'argent du jour",
     "delete": "Supprimer {category} {amount}"
+  },
+  "Plan": {
+    "title": "Plan",
+    "period": "{start} – {end}",
+    "fixedTitle": "Frais fixes",
+    "envelopesTitle": "Enveloppes",
+    "noFixed": "Aucun frais fixe ce mois-ci.",
+    "toPay": "À payer",
+    "paidOn": "Payé {amount} · {date}",
+    "alreadyPaid": "Déjà payé",
+    "paidPart": "Payé {paid} sur {planned}",
+    "stillToPay": "Reste à payer",
+    "envelopeSpent": "Dépensé {spent} sur {planned}",
+    "envelopeLeft": "Il reste {amount}",
+    "loadError": "Impossible de charger ton plan.",
+    "retry": "Réessayer",
+    "loading": "Chargement…",
+    "noCycle": "Aucun mois en cours."
   },
   "LanguageSwitcher": {
     "label": "Langue",
