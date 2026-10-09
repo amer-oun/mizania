@@ -180,6 +180,65 @@ describe("cycleSummary", () => {
     expect(summary.spentToday).toBe(0);
   });
 
+  it("covers spending only from an envelope's start: earlier spending stays daily money", () => {
+    const added = Date.parse("2026-10-09T12:00:00Z");
+    const before = expense("2026-10-08", "cash", 10_000, { categoryId: "groceries", id: "old" });
+    const sameDay = expense("2026-10-09", "cash", 3_000, { categoryId: "groceries", id: "early" });
+    const after = expense("2026-10-10", "cash", 4_000, { categoryId: "groceries", id: "new" });
+    const summary = cycleSummary({
+      ...input,
+      planItems: [
+        {
+          id: "food",
+          kind: "envelope",
+          categoryId: "groceries",
+          amountMillimes: 30_000,
+          paid: false,
+          coversFrom: added,
+        },
+      ],
+      transactions: [before, { ...sameDay, at: added - 1 }, { ...after }],
+    });
+    expect(Object.fromEntries(summary.dailyParts)).toEqual({ old: 10_000, early: 3_000, new: 0 });
+    expect(summary.envelopes).toEqual([
+      { categoryId: "groceries", planned: 30_000, spent: 4_000, left: 26_000 },
+    ]);
+  });
+
+  it("uses a category's envelopes oldest first, each from its own start", () => {
+    const later = Date.parse("2026-10-10T00:00:00Z");
+    const summary = cycleSummary({
+      ...input,
+      planItems: [
+        {
+          id: "more",
+          kind: "envelope",
+          categoryId: "groceries",
+          amountMillimes: 20_000,
+          paid: false,
+          coversFrom: later,
+        },
+        {
+          id: "food",
+          kind: "envelope",
+          categoryId: "groceries",
+          amountMillimes: 10_000,
+          paid: false,
+        },
+      ],
+      transactions: [
+        // 10 from the first envelope, 2 over: daily money (the second hadn't started).
+        expense("2026-10-09", "cash", 12_000, { categoryId: "groceries", id: "a" }),
+        // The first is empty: 15 from the second.
+        expense("2026-10-10", "cash", 15_000, { categoryId: "groceries", id: "b" }),
+      ],
+    });
+    expect(Object.fromEntries(summary.dailyParts)).toEqual({ a: 2_000, b: 0 });
+    expect(summary.envelopes).toEqual([
+      { categoryId: "groceries", planned: 30_000, spent: 27_000, left: 5_000 },
+    ]);
+  });
+
   it("counts a payment for an unknown plan item, or without a category, as daily money", () => {
     const summary = cycleSummary({
       ...input,

@@ -24,6 +24,12 @@ export interface SummaryPlanItem {
   amountMillimes: number;
   /** Fixed costs: marked as paid. */
   paid: boolean;
+  /**
+   * Envelopes: spending before this time (milliseconds) isn't covered by it,
+   * so adding an envelope mid-month doesn't rewrite past days. Null or
+   * missing: it covers the whole cycle.
+   */
+  coversFrom?: number | null | undefined;
 }
 
 export interface SummaryTransaction extends BalanceTransaction {
@@ -87,7 +93,10 @@ export interface EnvelopeStatus {
   /** Null for an envelope without a category (nothing is spent from it). */
   categoryId: string | null;
   planned: number;
-  /** Spent in its category this cycle, even beyond what's planned. */
+  /**
+   * Spent in its category this cycle (from the time it covers), even beyond
+   * what's planned.
+   */
   spent: number;
   /** Still set aside: never below 0 (overspending is daily money). */
   left: number;
@@ -126,9 +135,10 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     [...balances].filter(([id]) => active.has(id)).map(([, balance]) => balance),
   );
 
-  // Each fixed cost and each envelope category, as it's used up by spending
-  // (envelopes are matched by category). A fixed cost marked paid reserves
-  // nothing, but its payments still use up its planned amount.
+  // Each fixed cost and each envelope, as it's used up by spending. A fixed
+  // cost marked paid reserves nothing, but its payments still use up its
+  // planned amount. Envelopes are matched by category, oldest first, each
+  // from the time it covers.
   interface Entry {
     planned: number;
     /** Still covered by the plan. */
@@ -137,7 +147,7 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     used: number;
   }
   const fixedCosts = new Map<string, Entry & { paid: boolean }>();
-  const envelopeEntries = new Map<string, Entry>();
+  const envelopeEntries = new Map<string, (Entry & { from: number })[]>();
   const unmatched: number[] = []; // envelopes without a category: always set aside
   let savings = 0;
   for (const item of input.planItems) {
@@ -150,27 +160,46 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     } else if (item.categoryId === null) {
       unmatched.push(amount);
     } else {
-      const entry = envelopeEntries.get(item.categoryId);
-      if (entry) {
-        entry.planned += amount;
-        entry.left += amount;
-      } else {
-        envelopeEntries.set(item.categoryId, { planned: amount, left: amount, used: 0 });
-      }
+      const entries = envelopeEntries.get(item.categoryId) ?? [];
+      entries.push({ planned: amount, left: amount, used: 0, from: item.coversFrom ?? -Infinity });
+      envelopeEntries.set(item.categoryId, entries);
     }
   }
+  for (const entries of envelopeEntries.values()) entries.sort((a, b) => a.from - b.from);
 
   /**
-   * Takes `amount` from what's left of the plan entry under `key` and returns
-   * the part that didn't fit (daily spending). Null when `key` isn't in the plan.
+   * Takes `amount` from what's left of the fixed cost `planItemId` and
+   * returns the part that didn't fit (daily spending). Null when it isn't in
+   * the plan.
    */
-  const cover = (entries: Map<string, Entry>, key: string | null | undefined, amount: number) => {
-    const entry = key ? entries.get(key) : undefined;
+  const coverFixed = (planItemId: string | null | undefined, amount: number) => {
+    const entry = planItemId ? fixedCosts.get(planItemId) : undefined;
     if (!entry) return null;
     const covered = Math.min(entry.left, amount);
     entry.left -= covered;
     entry.used += amount;
     return amount - covered;
+  };
+  // Spending beyond the envelopes of each category (daily money).
+  const overspent = new Map<string, number>();
+  /**
+   * The same for an envelope expense at `at`, from the envelopes of its
+   * category that cover that time. Null when none does.
+   */
+  const coverEnvelope = (categoryId: string | null | undefined, at: number, amount: number) => {
+    const entries = (categoryId ? envelopeEntries.get(categoryId) : undefined)?.filter(
+      (e) => e.from <= at,
+    );
+    if (!categoryId || !entries?.length) return null;
+    let rest = amount;
+    for (const entry of entries) {
+      const covered = Math.min(entry.left, rest);
+      entry.left -= covered;
+      entry.used += covered;
+      rest -= covered;
+    }
+    overspent.set(categoryId, (overspent.get(categoryId) ?? 0) + rest);
+    return rest;
   };
 
   const spending = new Map<IsoDate, number>();
@@ -182,8 +211,8 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     let daily = 0;
     if (t.type === "expense") {
       daily =
-        cover(fixedCosts, t.planItemId, t.amountMillimes) ??
-        cover(envelopeEntries, t.categoryId, t.amountMillimes) ??
+        coverFixed(t.planItemId, t.amountMillimes) ??
+        coverEnvelope(t.categoryId, t.at, t.amountMillimes) ??
         t.amountMillimes;
     } else if (t.type === "adjustment" && t.amountMillimes < 0) {
       daily = -t.amountMillimes;
@@ -200,11 +229,11 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     paid: c.paid,
   }));
   const envelopeStatuses: EnvelopeStatus[] = [
-    ...[...envelopeEntries].map(([categoryId, e]) => ({
+    ...[...envelopeEntries].map(([categoryId, entries]) => ({
       categoryId,
-      planned: e.planned,
-      spent: e.used,
-      left: e.left,
+      planned: totalBalance(entries.map((e) => e.planned)),
+      spent: totalBalance([...entries.map((e) => e.used), overspent.get(categoryId) ?? 0]),
+      left: totalBalance(entries.map((e) => e.left)),
     })),
     ...unmatched.map((planned) => ({ categoryId: null, planned, spent: 0, left: planned })),
   ];
