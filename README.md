@@ -64,6 +64,8 @@ Sign up at http://localhost:3000/ar/sign-up (or `/fr`, `/en`). Emails don't leav
 
 After the first sign-in, a new account goes through the onboarding wizard (`/[locale]/onboarding`: language, money from home, rent and bills, wallets) before it can see the app. Its answers stay in the browser until "Finish" saves them all at once. To go through it again locally, set `onboarded_at` back to null for your user and delete its transactions, then its wallets and cycles (for example in `pnpm --filter @mizania/db db:studio`).
 
+The **Wallets** tab (`/[locale]/wallets`) lists the wallets with their balances, which are always computed from transactions (a starting balance is an adjustment). From there you can add, rename ("Other" wallets only), reorder and archive wallets, and record transfers between them, such as a cash withdrawal from the card. Undoing a transfer soft-deletes it.
+
 The first time, install the browser for the end-to-end tests:
 
 ```powershell
