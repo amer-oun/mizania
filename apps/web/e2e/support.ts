@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { type APIRequestContext, expect, test as base } from "@playwright/test";
+import { type APIRequestContext, expect, type Page, test as base } from "@playwright/test";
 
 import ar from "../messages/ar.json" with { type: "json" };
 import en from "../messages/en.json" with { type: "json" };
@@ -85,6 +85,18 @@ export async function createVerifiedUser(
   const link = await linkFromEmail(request, email, verifySubject[locale]);
   const verify = await request.get(link, { maxRedirects: 0 });
   expect(verify.status()).toBe(302);
+}
+
+/** A verified account, signed in through the API in this page's browser. */
+export async function signedInNewUser(page: Page, locale: "ar" | "fr" | "en") {
+  const email = newEmail();
+  await createVerifiedUser(page.request, { email, locale });
+  const res = await page.request.post("/api/auth/sign-in/email", {
+    headers: { origin: "http://localhost:3000" },
+    data: { email, password: PASSWORD },
+  });
+  expect(res.ok()).toBe(true);
+  return email;
 }
 
 // Subjects from packages/auth/src/email/messages.ts.
