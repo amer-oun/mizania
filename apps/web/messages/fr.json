@@ -9,6 +9,11 @@
     "signedInAs": "Connecté·e en tant que {name}",
     "signOut": "Se déconnecter"
   },
+  "Nav": {
+    "label": "Navigation",
+    "today": "Aujourd'hui",
+    "wallets": "Portefeuilles"
+  },
   "LanguageSwitcher": {
     "label": "Langue",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"

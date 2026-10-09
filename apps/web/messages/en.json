@@ -9,6 +9,11 @@
     "signedInAs": "Signed in as {name}",
     "signOut": "Sign out"
   },
+  "Nav": {
+    "label": "Navigation",
+    "today": "Today",
+    "wallets": "Wallets"
+  },
   "LanguageSwitcher": {
     "label": "Language",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Unknown}}"

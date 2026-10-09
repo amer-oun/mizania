@@ -9,6 +9,11 @@
     "signedInAs": "داخل باسم {name}",
     "signOut": "خروج"
   },
+  "Nav": {
+    "label": "التنقل",
+    "today": "اليوم",
+    "wallets": "المحافظ"
+  },
   "LanguageSwitcher": {
     "label": "اللغة",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {غير معروفة}}"
