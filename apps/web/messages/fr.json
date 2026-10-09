@@ -11,7 +11,8 @@
   "Nav": {
     "label": "Navigation",
     "today": "Aujourd'hui",
-    "wallets": "Portefeuilles"
+    "wallets": "Portefeuilles",
+    "plan": "Plan"
   },
   "Today": {
     "spendToday": "Tu peux dépenser aujourd'hui",
@@ -78,6 +79,42 @@
     "covered": "Couvert par ton plan",
     "partial": "{amount} sur l'argent du jour",
     "delete": "Supprimer {category} {amount}"
+  },
+  "Plan": {
+    "title": "Plan",
+    "period": "{start} – {end}",
+    "fixedTitle": "Frais fixes",
+    "envelopesTitle": "Enveloppes",
+    "noFixed": "Aucun frais fixe ce mois-ci.",
+    "toPay": "À payer",
+    "paidOn": "Payé {amount} · {date}",
+    "alreadyPaid": "Déjà payé",
+    "paidPart": "Payé {paid} sur {planned}",
+    "stillToPay": "Reste à payer",
+    "envelopeSpent": "Dépensé {spent} sur {planned}",
+    "envelopeLeft": "Il reste {amount}",
+    "loadError": "Impossible de charger ton plan.",
+    "retry": "Réessayer",
+    "loading": "Chargement…",
+    "noCycle": "Aucun mois en cours."
+  },
+  "PayFixed": {
+    "pay": "Payer",
+    "undo": "Annuler",
+    "title": "Payer : {name}",
+    "amount": "Montant vraiment payé",
+    "final": "C'est tout pour ce mois-ci",
+    "finalHint": "Désactive si tu paies le reste plus tard, par exemple le loyer en deux fois.",
+    "confirm": "Payer",
+    "markPaid": "Marquer payé sans payer plus",
+    "paid": "{name} payé",
+    "paidPart": "{amount} payé pour {name}",
+    "undone": "Paiement annulé",
+    "markedPaid": "{name} marqué payé",
+    "saving": "Enregistrement…",
+    "close": "Fermer",
+    "undoLabel": "Annuler le paiement : {name}",
+    "payLabel": "Payer : {name}"
   },
   "LanguageSwitcher": {
     "label": "Langue",
@@ -205,7 +242,8 @@
         "water": "Eau (SONEDE)",
         "internet": "Internet",
         "phone_recharge": "Recharge téléphone"
-      }
+      },
+      "rechargeHint": "Prévu pour le mois. Note chaque recharge avec + quand tu la fais."
     },
     "wallets": {
       "title": "Tes portefeuilles",
@@ -265,7 +303,8 @@
       "wallet-archived": "Impossible d'annuler : un de ses portefeuilles est archivé. Restaure-le d'abord.",
       "invalid": "Vérifie ce que tu as saisi.",
       "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
-      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
+      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie.",
+      "already-paid": "C'est déjà payé. Annule d'abord le paiement pour le modifier."
     },
     "transferTitle": "Transfert entre portefeuilles",
     "transferSubtitle": "Par exemple, du cash retiré au distributeur.",

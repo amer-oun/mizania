@@ -1,7 +1,14 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
-import { assertMillimes, formatTND, millimesReading, parseTND, splitEven } from "./money";
+import {
+  assertMillimes,
+  formatTND,
+  formatTypedTND,
+  millimesReading,
+  parseTND,
+  splitEven,
+} from "./money";
 
 // Money is always an integer number of millimes: 1 TND = 1000 millimes.
 
@@ -184,6 +191,33 @@ describe("millimesReading", () => {
       fc.property(fc.integer({ min: 1000, max: 1_000_000_000 }), (n) => {
         expect(millimesReading(String(n))).toBe(n);
         expect(parseTND(String(n))).toBe(n * 1000);
+      }),
+    );
+  });
+});
+
+describe("formatTypedTND", () => {
+  it.each([
+    [250_000, "250"],
+    [12_500, "12.5"],
+    [2_050, "2.05"],
+    [50, "0.05"],
+    [1, "0.001"],
+    [0, "0"],
+    [1_234_567, "1234.567"],
+  ])("%i millimes → %s", (millimes, typed) => {
+    expect(formatTypedTND(millimes)).toBe(typed);
+  });
+
+  it("refuses negative or fractional amounts", () => {
+    expect(() => formatTypedTND(-1)).toThrow(RangeError);
+    expect(() => formatTypedTND(1.5)).toThrow(RangeError);
+  });
+
+  it("is read back exactly by parseTND", () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }), (millimes) => {
+        expect(parseTND(formatTypedTND(millimes))).toBe(millimes);
       }),
     );
   });

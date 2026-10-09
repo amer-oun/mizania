@@ -29,6 +29,7 @@ export {
 export {
   assertMillimes,
   formatTND,
+  formatTypedTND,
   type Locale,
   millimesReading,
   parseTND,
@@ -36,6 +37,7 @@ export {
 } from "./money";
 export {
   type OnboardingAnswers,
+  onboardingEnvelopes,
   type OnboardingFixedCost,
   onboardingFixedCosts,
   type OnboardingPlan,
@@ -48,6 +50,8 @@ export {
   type CycleSummary,
   cycleSummary,
   type CycleSummaryInput,
+  type EnvelopeStatus,
+  type FixedCostStatus,
   type PlanItemKind,
   type SummaryPlanItem,
   type SummaryTransaction,

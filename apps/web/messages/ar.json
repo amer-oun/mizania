@@ -11,7 +11,8 @@
   "Nav": {
     "label": "التنقل",
     "today": "اليوم",
-    "wallets": "المحافظ"
+    "wallets": "المحافظ",
+    "plan": "البلان"
   },
   "Today": {
     "spendToday": "تنجم تصرف اليوم",
@@ -78,6 +79,42 @@
     "covered": "من البلان متاعك",
     "partial": "{amount} من فلوس اليوم",
     "delete": "افسخ {category} {amount}"
+  },
+  "Plan": {
+    "title": "البلان",
+    "period": "{start} – {end}",
+    "fixedTitle": "المصاريف الثابتة",
+    "envelopesTitle": "الظروف",
+    "noFixed": "ما ثمّاش مصاريف ثابتة هالشهر.",
+    "toPay": "مازال ما تخلّصش",
+    "paidOn": "تخلّص {amount} · {date}",
+    "alreadyPaid": "تخلّص قبل",
+    "paidPart": "تخلّص {paid} من {planned}",
+    "stillToPay": "باقي للخلاص",
+    "envelopeSpent": "صرفت {spent} من {planned}",
+    "envelopeLeft": "باقي {amount}",
+    "loadError": "ما نجمناش نحمّلو البلان متاعك.",
+    "retry": "عاود جرّب",
+    "loading": "قاعد يحمّل…",
+    "noCycle": "ما ثمّاش شهر مفتوح."
+  },
+  "PayFixed": {
+    "pay": "خلّص",
+    "undo": "بطّل",
+    "title": "خلّص {name}",
+    "amount": "قدّاش خلّصت بالحق",
+    "final": "هذا الكل لهالشهر",
+    "finalHint": "نحّيها إذا باش تخلّص الباقي من بعد، مثلا الكراء على زوز مرات.",
+    "confirm": "خلّص",
+    "markPaid": "اعتبرها مخلّصة بلا ما تخلّص أكثر",
+    "paid": "{name} تخلّص",
+    "paidPart": "{amount} تخلّصو من {name}",
+    "undone": "الخلاص تبطّل",
+    "markedPaid": "{name} تعتبر مخلّص",
+    "saving": "قاعد يسجّل…",
+    "close": "سكّر",
+    "undoLabel": "بطّل خلاص {name}",
+    "payLabel": "خلّص {name}"
   },
   "LanguageSwitcher": {
     "label": "اللغة",
@@ -205,7 +242,8 @@
         "water": "الماء (الصوناد)",
         "internet": "الأنترنات",
         "phone_recharge": "شحن التليفون"
-      }
+      },
+      "rechargeHint": "محسوب للشهر. سجّل كل شحنة بـ + كي تعملها."
     },
     "wallets": {
       "title": "المحافظ متاعك",
@@ -265,7 +303,8 @@
       "wallet-archived": "ما تنجمش تبطّل: وحدة من المحافظ متاعو في الأرشيف. رجّعها قبل.",
       "invalid": "ثبّت في اللي كتبتو.",
       "signed-out": "خرجت من حسابك. اعمل دخول مرّة أخرى.",
-      "server": "ما نجمناش نسجّلو. ثبّت في الكونكسيون وعاود."
+      "server": "ما نجمناش نسجّلو. ثبّت في الكونكسيون وعاود.",
+      "already-paid": "هذا تخلّص. بطّل الخلاص قبل باش تبدّلو."
     },
     "transferTitle": "تحويل بين المحافظ",
     "transferSubtitle": "مثلا كاش سحبتو من الموزّع.",

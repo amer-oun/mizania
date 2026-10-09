@@ -5,6 +5,12 @@ export {
   type LogExpenseInput,
   logExpenseSchema,
 } from "./expenses";
+export {
+  type PayFixedCostInput,
+  payFixedCostSchema,
+  type PlanItemIdInput,
+  planItemIdSchema,
+} from "./fixed-costs";
 export { type OnboardingInput, onboardingInputSchema, toOnboardingAnswers } from "./onboarding";
 export {
   type AddWalletInput,

@@ -40,7 +40,7 @@ Money arrives ──► Plan it (once, 1 minute) ──► Spend + check in dail
 
 1. **Money arrives.** Student taps "I received money": amount, source (parents / bourse / job / other), wallet (cash / D17 / Flouci / card), expected date of the next transfer.
 2. **Plan it.** The app suggests a split based on last month, the student adjusts:
-   - **Fixed costs** (paid once): rent share, STEG, SONEDE, internet, phone recharge, transport home
+   - **Fixed costs** (paid once, or in parts): rent share, STEG, SONEDE, internet, transport home
    - **Envelopes** (spent over the month): groceries, studies
    - **Savings goal** (optional): laptop, summer
    - **Daily money:** whatever is left = coffee, snacks, going out, small transport
@@ -293,7 +293,7 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 
 - [x] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress; tapping the amount shows how it's calculated. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
 - [x] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
-- [ ] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
+- [x] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
 - [ ] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
 - [ ] **"I received money" + late transfer:** new month or extra money; the new month's plan is suggested from the previous cycle; "Did the money arrive? / Not yet → new date". _Done when:_ a new month is ready in under a minute, and a passed expected date shows the question instead of a huge number.
 - [ ] **Evening check-in:** cash, from 18:00 (or the user's check-in time). _Done when:_ after counting, the cash wallet matches and the difference shows as unlogged spending.
@@ -302,9 +302,9 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 
 Decisions (accepted 2026-10-09):
 
-1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = groceries, studies, health, clothes; fixed = rent, bills, phone recharge, trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default. Quick log offers daily and envelope categories, most used in the last 30 days first; a new student sees coffee, transport, food out, going out, groceries, studies, health, clothes, then other (always last). Phone recharge stays a fixed cost.
+1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = phone recharge, groceries, studies, health, clothes; fixed = rent, bills (electricity, water, internet), trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default. Quick log offers daily and envelope categories, most used in the last 30 days first; a new student sees coffee, transport, food out, going out, phone recharge, groceries, studies, health, clothes, then other (always last). Phone recharge is an envelope (changed 2026-10-09): it's topped up several times a month at a kiosk, so it's logged with quick log. Planned, each top-up uses the envelope first and any overspend is daily money; unplanned, it's daily money. Onboarding's phone recharge answer becomes a phone recharge envelope.
 2. Reserved = unpaid fixed costs + envelope remainders (never below 0; overspending comes out of daily money) + savings at its full amount. One optional savings line now; savings goals in V1.
-3. "Mark paid" asks for the amount actually paid (pre-filled). Extra comes out of today's daily money; a saving goes back into it.
+3. "Mark paid" asks for the amount actually paid (pre-filled with what's left to pay). Extra comes out of today's daily money; a saving goes back into it. A fixed cost can be paid in parts (rent in two halves): "That's everything for this month" is on by default; off, only what's left stays set aside. Undo reverses the last action (the final payment, a "mark paid", or the latest part).
 4. Quick log uses cash by default, with a one-tap switch, and remembers the last wallet per category.
 5. The evening check-in asks about cash only; the other wallets are behind a "check all" link.
 6. Counted more than expected: "Did you receive money?" Yes records income; "No, I miscounted earlier" records a correction. Neither counts as spending.

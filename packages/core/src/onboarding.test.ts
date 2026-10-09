@@ -39,8 +39,8 @@ describe("planOnboarding", () => {
         { walletIndex: 2, amountMillimes: 20_000 },
       ],
       fixedCosts: [
-        { categoryKey: "rent", amountMillimes: 250_000, paid: true },
-        { categoryKey: "electricity", amountMillimes: 30_000, paid: false },
+        { categoryKey: "rent", kind: "fixed", amountMillimes: 250_000, paid: true },
+        { categoryKey: "electricity", kind: "fixed", amountMillimes: 30_000, paid: false },
       ],
     });
   });
@@ -52,6 +52,19 @@ describe("planOnboarding", () => {
     );
     expect(plan.wallets).toEqual([{ kind: "card", name: null, position: 0 }]);
     expect(plan.startingBalances).toEqual([]);
+  });
+
+  it("plans phone recharge as an envelope, never already paid", () => {
+    const plan = planOnboarding(
+      {
+        ...answers,
+        fixedCosts: [{ key: "phone_recharge", amountMillimes: 20_000, alreadyPaid: true }],
+      },
+      "2026-10-08",
+    );
+    expect(plan.fixedCosts).toEqual([
+      { categoryKey: "phone_recharge", kind: "envelope", amountMillimes: 20_000, paid: false },
+    ]);
   });
 
   it("accepts no fixed costs (no rent, no bills)", () => {
@@ -154,6 +167,10 @@ describe("planOnboarding", () => {
         expect(plan.fixedCosts.map((c) => c.amountMillimes)).toEqual(
           fixedCosts.map((c) => c.amountMillimes),
         );
+        for (const cost of plan.fixedCosts) {
+          expect(cost.kind).toBe(cost.categoryKey === "phone_recharge" ? "envelope" : "fixed");
+          if (cost.kind === "envelope") expect(cost.paid).toBe(false);
+        }
       }),
     );
   });

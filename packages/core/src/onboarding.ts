@@ -7,7 +7,11 @@ import { assertMillimes, type Locale } from "./money";
 export const walletKinds = ["cash", "d17", "flouci", "card", "other"] as const;
 export type WalletKind = (typeof walletKinds)[number];
 
-/** Fixed costs asked about during onboarding; each is a default category key. */
+/**
+ * Monthly costs asked about during onboarding ("rent and bills"); each is a
+ * default category key. Phone recharge is topped up several times a month,
+ * so it becomes an envelope; the others are fixed costs.
+ */
 export const onboardingFixedCosts = [
   "rent",
   "electricity",
@@ -16,6 +20,9 @@ export const onboardingFixedCosts = [
   "phone_recharge",
 ] as const;
 export type OnboardingFixedCost = (typeof onboardingFixedCosts)[number];
+
+/** Onboarding costs planned as envelopes rather than fixed costs. */
+export const onboardingEnvelopes: readonly OnboardingFixedCost[] = ["phone_recharge"];
 
 /** Longest name for an "other" wallet. */
 export const WALLET_NAME_MAX_LENGTH = 40;
@@ -30,7 +37,7 @@ export interface OnboardingAnswers {
     key: OnboardingFixedCost;
     /** Per month, in millimes. */
     amountMillimes: number;
-    /** Already paid in this cycle, so not set aside again. */
+    /** Already paid in this cycle, so not set aside again. Ignored for envelopes. */
     alreadyPaid: boolean;
   }[];
   wallets: readonly {
@@ -49,8 +56,14 @@ export interface OnboardingPlan {
   wallets: { kind: WalletKind; name: string | null; position: number }[];
   /** One per wallet that isn't empty: its starting balance. */
   startingBalances: { walletIndex: number; amountMillimes: number }[];
-  /** Fixed costs of the first cycle, named by their default category. */
-  fixedCosts: { categoryKey: OnboardingFixedCost; amountMillimes: number; paid: boolean }[];
+  /** Fixed costs and envelopes of the first cycle, named by their default category. */
+  fixedCosts: {
+    categoryKey: OnboardingFixedCost;
+    kind: "fixed" | "envelope";
+    amountMillimes: number;
+    /** Fixed costs only; an envelope is never "paid". */
+    paid: boolean;
+  }[];
 }
 
 function fail(message: string): never {
@@ -101,10 +114,14 @@ export function planOnboarding(answers: OnboardingAnswers, today: IsoDate): Onbo
     startingBalances: answers.wallets.flatMap((wallet, walletIndex) =>
       wallet.balanceMillimes > 0 ? [{ walletIndex, amountMillimes: wallet.balanceMillimes }] : [],
     ),
-    fixedCosts: answers.fixedCosts.map((cost) => ({
-      categoryKey: cost.key,
-      amountMillimes: cost.amountMillimes,
-      paid: cost.alreadyPaid,
-    })),
+    fixedCosts: answers.fixedCosts.map((cost) => {
+      const envelope = onboardingEnvelopes.includes(cost.key);
+      return {
+        categoryKey: cost.key,
+        kind: envelope ? ("envelope" as const) : ("fixed" as const),
+        amountMillimes: cost.amountMillimes,
+        paid: !envelope && cost.alreadyPaid,
+      };
+    }),
   };
 }

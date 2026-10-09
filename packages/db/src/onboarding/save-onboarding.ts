@@ -9,7 +9,8 @@ export type SaveOnboardingResult = "saved" | "already-onboarded";
 /**
  * Writes a planned onboarding for `userId` in one transaction: the user's
  * answers, the wallets, their starting balances (adjustments), the first
- * cycle and its fixed costs. Either everything is saved or nothing is.
+ * cycle and its fixed costs and envelopes (phone recharge). Either
+ * everything is saved or nothing is.
  *
  * Safe to retry: the user's row is locked first, and once `onboarded_at` is
  * set a second call (double tap, lost response, two tabs) changes nothing.
@@ -82,7 +83,7 @@ export async function saveOnboarding(
           }
           return {
             cycleId: cycle.id,
-            kind: "fixed" as const,
+            kind: cost.kind,
             categoryId: category.id,
             amountMillimes: cost.amountMillimes,
             paidAt: cost.paid ? now : null,

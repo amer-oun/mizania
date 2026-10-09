@@ -39,7 +39,8 @@ for (const locale of ["ar", "fr", "en"] as const) {
     // A new student sees coffee, transport and food out first; fixed costs never.
     const chips = sheet.getByTestId("quick-log-categories").getByRole("button");
     await expect(chips.first()).toContainText(coffee[locale]);
-    await expect(chips).toHaveCount(9);
+    // Daily and envelope categories, phone recharge included; never fixed costs.
+    await expect(chips).toHaveCount(10);
     await expect(categoryButton(page, coffee[locale])).toBeDisabled();
 
     // The amount: 2.5.

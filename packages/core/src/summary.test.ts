@@ -108,7 +108,40 @@ describe("cycleSummary", () => {
       spentThisWeekBeforeToday: 0,
       spendingByDay: [{ day: "2026-10-08", amount: 0 }],
       dailyParts: new Map(),
+      fixedCosts: [{ id: "rent", planned: 250_000, paidSoFar: 0, left: 250_000, paid: false }],
+      envelopes: [],
     });
+  });
+
+  it("gives each fixed cost and envelope what's paid or spent, and what's left", () => {
+    const summary = cycleSummary(input);
+    expect(summary.fixedCosts).toEqual([
+      { id: "rent", planned: 250_000, paidSoFar: 250_000, left: 0, paid: true },
+      { id: "steg", planned: 30_000, paidSoFar: 0, left: 30_000, paid: false },
+      // 40 paid for 35 planned; marked paid.
+      { id: "net", planned: 35_000, paidSoFar: 40_000, left: 0, paid: true },
+    ]);
+    expect(summary.envelopes).toEqual([
+      { categoryId: "groceries", planned: 100_000, spent: 110_000, left: 0 },
+      { categoryId: null, planned: 15_000, spent: 0, left: 15_000 },
+    ]);
+  });
+
+  it("keeps a partly paid fixed cost's rest set aside", () => {
+    const summary = cycleSummary({
+      ...input,
+      planItems: [
+        { id: "rent", kind: "fixed", categoryId: "rent", amountMillimes: 250_000, paid: false },
+      ],
+      transactions: [
+        ...history.filter((t) => t.planItemId !== "rent"),
+        expense("2026-10-05", "card", 125_000, { categoryId: "rent", planItemId: "rent" }),
+      ],
+    });
+    expect(summary.fixedCosts).toEqual([
+      { id: "rent", planned: 250_000, paidSoFar: 125_000, left: 125_000, paid: false },
+    ]);
+    expect(summary.reserved.fixed).toBe(125_000);
   });
 
   it("gives each transaction with an ID its daily part", () => {
@@ -246,6 +279,67 @@ const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 const summarize = (planned: SummaryPlanItem[], transactions: SummaryTransaction[]) =>
   cycleSummary({ ...cycle, wallets, planItems: planned, transactions });
 
+// The table in the PR plan: 20 days left, 200 DT of daily money, STEG
+// planned at 30 DT. Normal mode.
+describe("paying a fixed cost: same, higher or lower than planned", () => {
+  const start = "2026-10-01";
+  const today = "2026-10-11"; // Oct 11 → 31: 20 days left
+  const steg: SummaryPlanItem = {
+    id: "steg",
+    kind: "fixed",
+    categoryId: "electricity",
+    amountMillimes: 30_000,
+    paid: false,
+  };
+  const funds = tx(start, { type: "adjustment", walletId: "cash", amountMillimes: 230_000 });
+  const pay = (amountMillimes: number) =>
+    expense(today, "cash", amountMillimes, { categoryId: "electricity", planItemId: "steg" });
+  const budgetAfter = (paid: boolean, payments: SummaryTransaction[]) => {
+    const s = cycleSummary({
+      today,
+      startedOn: start,
+      nextTransferOn: "2026-10-31",
+      wallets: [{ id: "cash", archived: false }],
+      planItems: [{ ...steg, paid }],
+      transactions: [funds, ...payments],
+    });
+    return todayBudget({
+      today,
+      startedOn: start,
+      nextTransferOn: "2026-10-31",
+      poolNow: s.poolNow,
+      spentToday: s.spentToday,
+      spentThisWeekBeforeToday: s.spentThisWeekBeforeToday,
+      weeklyMode: false,
+    });
+  };
+
+  it("before paying: 200 DT over 20 days is 10 DT a day", () => {
+    expect(budgetAfter(false, [])).toMatchObject({ allowance: 10_000, left: 10_000 });
+  });
+
+  it("same: nothing moves", () => {
+    expect(budgetAfter(true, [pay(30_000)])).toMatchObject({ allowance: 10_000, left: 10_000 });
+  });
+
+  it("higher: today's amount stays, what's left drops by the difference", () => {
+    expect(budgetAfter(true, [pay(36_000)])).toMatchObject({
+      allowance: 10_000,
+      left: 4_000,
+      status: "on_track",
+    });
+  });
+
+  it("lower and marked paid: the rest goes back into the daily money at once", () => {
+    // 205 DT over 20 days.
+    expect(budgetAfter(true, [pay(25_000)])).toMatchObject({ allowance: 10_250, left: 10_250 });
+  });
+
+  it("lower but not marked paid: the rest stays set aside", () => {
+    expect(budgetAfter(false, [pay(25_000)])).toMatchObject({ allowance: 10_000, left: 10_000 });
+  });
+});
+
 describe("cycleSummary properties", () => {
   it("classifies every millime of spending exactly once", () => {
     fc.assert(
@@ -266,6 +360,12 @@ describe("cycleSummary properties", () => {
         expect(sum(s.spendingByDay.map((d) => d.amount)) + fixedUsed + envelopesUsed).toBe(spent);
         expect(s.reserved.savings).toBe(p.savings);
         expect(s.poolNow).toBe(s.available - s.reserved.total);
+        expect(sum(s.fixedCosts.map((c) => c.left))).toBe(s.reserved.fixed);
+        expect(sum(s.envelopes.map((e) => e.left))).toBe(s.reserved.envelopes);
+        for (const cost of s.fixedCosts) {
+          const payments = h.filter((t) => t.type === "expense" && t.planItemId === cost.id);
+          expect(cost.paidSoFar).toBe(sum(payments.map((t) => t.amountMillimes)));
+        }
       }),
     );
   });

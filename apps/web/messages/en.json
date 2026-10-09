@@ -11,7 +11,8 @@
   "Nav": {
     "label": "Navigation",
     "today": "Today",
-    "wallets": "Wallets"
+    "wallets": "Wallets",
+    "plan": "Plan"
   },
   "Today": {
     "spendToday": "You can spend today",
@@ -78,6 +79,42 @@
     "covered": "Covered by your plan",
     "partial": "{amount} from today's money",
     "delete": "Delete {category} {amount}"
+  },
+  "Plan": {
+    "title": "Plan",
+    "period": "{start} – {end}",
+    "fixedTitle": "Fixed costs",
+    "envelopesTitle": "Envelopes",
+    "noFixed": "No fixed costs this month.",
+    "toPay": "To pay",
+    "paidOn": "Paid {amount} · {date}",
+    "alreadyPaid": "Already paid",
+    "paidPart": "Paid {paid} of {planned}",
+    "stillToPay": "Still to pay",
+    "envelopeSpent": "Spent {spent} of {planned}",
+    "envelopeLeft": "{amount} left",
+    "loadError": "Couldn't load your plan.",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "noCycle": "No month in progress."
+  },
+  "PayFixed": {
+    "pay": "Pay",
+    "undo": "Undo",
+    "title": "Pay {name}",
+    "amount": "Amount actually paid",
+    "final": "That's everything for this month",
+    "finalHint": "Turn it off if you'll pay the rest later, for example rent in two halves.",
+    "confirm": "Pay",
+    "markPaid": "Mark paid without paying more",
+    "paid": "{name} paid",
+    "paidPart": "{amount} paid towards {name}",
+    "undone": "Payment undone",
+    "markedPaid": "{name} marked paid",
+    "saving": "Saving…",
+    "close": "Close",
+    "undoLabel": "Undo the payment of {name}",
+    "payLabel": "Pay {name}"
   },
   "LanguageSwitcher": {
     "label": "Language",
@@ -205,7 +242,8 @@
         "water": "Water (SONEDE)",
         "internet": "Internet",
         "phone_recharge": "Phone recharge"
-      }
+      },
+      "rechargeHint": "Planned for the month. Log each top-up with + when you make it."
     },
     "wallets": {
       "title": "Your wallets",
@@ -265,7 +303,8 @@
       "wallet-archived": "Can't undo: one of its wallets is archived. Restore it first.",
       "invalid": "Check what you entered.",
       "signed-out": "You've been signed out. Sign in again.",
-      "server": "Couldn't save. Check your connection and try again."
+      "server": "Couldn't save. Check your connection and try again.",
+      "already-paid": "This is already paid. Undo the payment first to change it."
     },
     "transferTitle": "Transfer between wallets",
     "transferSubtitle": "For example, cash taken out at an ATM.",

@@ -1,14 +1,15 @@
 "use client";
 
-import { SunIcon, WalletIcon } from "lucide-react";
+import { ClipboardListIcon, SunIcon, WalletIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-// Today stays first and is the default screen; later phases add Plan and More.
+// Today stays first and is the default screen; a later phase adds More.
 const tabs = [
   { href: "/", key: "today", Icon: SunIcon },
+  { href: "/plan", key: "plan", Icon: ClipboardListIcon },
   { href: "/wallets", key: "wallets", Icon: WalletIcon },
 ] as const;
 

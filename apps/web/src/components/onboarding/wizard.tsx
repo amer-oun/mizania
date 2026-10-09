@@ -1,6 +1,6 @@
 "use client";
 
-import { nextTransferDate, todayInTunis } from "@mizania/core";
+import { nextTransferDate, onboardingEnvelopes, todayInTunis } from "@mizania/core";
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
@@ -324,10 +324,13 @@ function MoneyStep({ draft, update }: StepProps) {
 function CostFields({
   cost,
   label,
+  envelope = false,
   onChange,
 }: {
   cost: CostDraft;
   label: string;
+  /** Planned as an envelope (phone recharge): it's never "already paid". */
+  envelope?: boolean;
   onChange: (cost: CostDraft) => void;
 }) {
   const t = useTranslations("Onboarding.fixedCosts");
@@ -340,14 +343,18 @@ function CostFields({
           onChange({ ...cost, amount });
         }}
       />
-      <Checkbox
-        checked={cost.paid}
-        onChange={(paid) => {
-          onChange({ ...cost, paid });
-        }}
-      >
-        {t("alreadyPaid")}
-      </Checkbox>
+      {envelope ? (
+        <p className="text-xs text-muted-foreground">{t("rechargeHint")}</p>
+      ) : (
+        <Checkbox
+          checked={cost.paid}
+          onChange={(paid) => {
+            onChange({ ...cost, paid });
+          }}
+        >
+          {t("alreadyPaid")}
+        </Checkbox>
+      )}
     </div>
   );
 }
@@ -398,6 +405,7 @@ function FixedCostsStep({ draft, update }: StepProps) {
               <CostFields
                 cost={draft.bills[bill]}
                 label={t("amount")}
+                envelope={onboardingEnvelopes.includes(bill)}
                 onChange={(cost) => {
                   update((d) => ({ ...d, bills: { ...d.bills, [bill]: cost } }));
                 }}

@@ -147,12 +147,14 @@ describe("logExpense", () => {
         walletId,
       });
     expect(await log("rent", cash)).toBe("not-found");
-    expect(await log("phone_recharge", cash)).toBe("not-found");
+    expect(await log("electricity", cash)).toBe("not-found");
     expect(await log("?", cash)).toBe("not-found");
     expect(await log("coffee", randomUUID())).toBe("not-found");
     await archiveWallet(test.db, userId, d17, { kind: "move", toWalletId: cash });
     expect(await log("coffee", d17)).toBe("not-found");
     expect(await log("groceries", cash)).toBe("saved");
+    // Phone recharge is an envelope category: topped up at a kiosk.
+    expect(await log("phone_recharge", cash)).toBe("saved");
   });
 
   it("marks spending covered by an envelope as not from today's money", async () => {
@@ -217,6 +219,7 @@ describe("getQuickLogOptions", () => {
       "transport",
       "food_out",
       "going_out",
+      "phone_recharge",
       "groceries",
       "studies",
       "health",
@@ -257,6 +260,7 @@ describe("getQuickLogOptions", () => {
       "coffee",
       "transport",
       "food_out",
+      "phone_recharge",
       "groceries",
       "health",
       "clothes",
