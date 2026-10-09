@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 
+import { todayInTunis } from "@mizania/core";
 import { type APIRequestContext, expect, type Page, test as base } from "@playwright/test";
 
 import ar from "../messages/ar.json" with { type: "json" };
@@ -7,6 +8,7 @@ import en from "../messages/en.json" with { type: "json" };
 import fr from "../messages/fr.json" with { type: "json" };
 
 export const messages = { ar, fr, en };
+type Locale = keyof typeof messages;
 
 const mailpit =
   process.env.MAILPIT_URL ?? `http://localhost:${process.env.MAILPIT_UI_PORT ?? 8025}`;
@@ -97,6 +99,53 @@ export async function signedInNewUser(page: Page, locale: "ar" | "fr" | "en") {
   });
   expect(res.ok()).toBe(true);
   return email;
+}
+
+/**
+ * A signed-in student who finished onboarding with cash 10, D17 at 0 and a
+ * card with 120, and money expected on `arrivalDay` (default: the same day
+ * next month, the longest cycle). Optionally a rent share, not yet paid.
+ * The wizard itself is tested in onboarding.spec.ts: here its saved draft is
+ * filled in and only "Finish" is clicked.
+ */
+export async function onboardedStudent(
+  page: Page,
+  locale: Locale,
+  {
+    rent,
+    arrivalDay = Number(todayInTunis().slice(8)),
+  }: { rent?: string; arrivalDay?: number } = {},
+) {
+  await signedInNewUser(page, locale);
+  const session = await page.request.get("/api/auth/get-session");
+  const { user } = (await session.json()) as { user: { id: string } };
+
+  await page.goto(`/${locale}/onboarding`);
+  const cost = { enabled: false, amount: "", paid: false };
+  const draft = {
+    version: 1,
+    monthly: "600",
+    arrivalDay,
+    rent: rent ? { enabled: true, amount: rent, paid: false } : cost,
+    bills: { electricity: cost, water: cost, internet: cost, phone_recharge: cost },
+    cash: { balance: "10" },
+    wallets: {
+      d17: { enabled: true, balance: "" },
+      flouci: { enabled: false, balance: "" },
+      card: { enabled: true, balance: "120" },
+      other: { enabled: false, balance: "" },
+    },
+    otherName: "",
+  };
+  await page.evaluate(
+    ([key, value]) => {
+      localStorage.setItem(key, value);
+    },
+    [`mizania.onboarding.${user.id}`, JSON.stringify(draft)] as const,
+  );
+  await page.goto(`/${locale}/onboarding?step=4`);
+  await page.getByRole("button", { name: messages[locale].Onboarding.finish }).click();
+  await expect(page).toHaveURL(new RegExp(`/${locale}$`));
 }
 
 // Subjects from packages/auth/src/email/messages.ts.

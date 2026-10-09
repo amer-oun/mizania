@@ -1,47 +1,9 @@
 import { formatTND } from "@mizania/core";
 import type { Page } from "@playwright/test";
 
-import { expect, messages, signedInNewUser, test } from "./support";
+import { expect, messages, onboardedStudent, test } from "./support";
 
 type Locale = "ar" | "fr" | "en";
-
-/**
- * A signed-in student who finished onboarding with cash 10, D17 at 0 and a
- * card with 120. The wizard itself is tested in onboarding.spec.ts: here its
- * saved draft is filled in and only "Finish" is clicked.
- */
-async function onboardedStudent(page: Page, locale: Locale) {
-  await signedInNewUser(page, locale);
-  const session = await page.request.get("/api/auth/get-session");
-  const { user } = (await session.json()) as { user: { id: string } };
-
-  await page.goto(`/${locale}/onboarding`);
-  const cost = { enabled: false, amount: "", paid: false };
-  const draft = {
-    version: 1,
-    monthly: "600",
-    arrivalDay: 1,
-    rent: cost,
-    bills: { electricity: cost, water: cost, internet: cost, phone_recharge: cost },
-    cash: { balance: "10" },
-    wallets: {
-      d17: { enabled: true, balance: "" },
-      flouci: { enabled: false, balance: "" },
-      card: { enabled: true, balance: "120" },
-      other: { enabled: false, balance: "" },
-    },
-    otherName: "",
-  };
-  await page.evaluate(
-    ([key, value]) => {
-      localStorage.setItem(key, value);
-    },
-    [`mizania.onboarding.${user.id}`, JSON.stringify(draft)] as const,
-  );
-  await page.goto(`/${locale}/onboarding?step=4`);
-  await page.getByRole("button", { name: messages[locale].Onboarding.finish }).click();
-  await expect(page).toHaveURL(new RegExp(`/${locale}$`));
-}
 
 const money = (locale: Locale, dinars: number) => formatTND(dinars * 1000, locale);
 
