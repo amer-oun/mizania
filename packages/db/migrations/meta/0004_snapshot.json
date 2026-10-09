@@ -1,6 +1,6 @@
 {
-  "id": "df91d557-773d-4db1-8244-cae8101cd536",
-  "prevId": "26d30c23-54fc-4c87-946a-0402575ed763",
+  "id": "18153ae0-d825-4880-b704-081ecb8b6418",
+  "prevId": "df91d557-773d-4db1-8244-cae8101cd536",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1222,6 +1222,107 @@
         "wallets_name_only_for_other": {
           "name": "wallets_name_only_for_other",
           "value": "(\"wallets\".\"type\" = 'other' and \"wallets\".\"name\" is not null and btrim(\"wallets\".\"name\") <> '')\n        or (\"wallets\".\"type\" <> 'other' and \"wallets\".\"name\" is null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.week_snapshots": {
+      "name": "week_snapshots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cycle_id": {
+          "name": "cycle_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "week_index": {
+          "name": "week_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "starts_on": {
+          "name": "starts_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ends_on": {
+          "name": "ends_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "allowance_millimes": {
+          "name": "allowance_millimes",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "week_snapshots_user_id_users_id_fk": {
+          "name": "week_snapshots_user_id_users_id_fk",
+          "tableFrom": "week_snapshots",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "week_snapshots_cycle_same_user_fk": {
+          "name": "week_snapshots_cycle_same_user_fk",
+          "tableFrom": "week_snapshots",
+          "tableTo": "cycles",
+          "columnsFrom": ["cycle_id", "user_id"],
+          "columnsTo": ["id", "user_id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "week_snapshots_cycle_week_unique": {
+          "name": "week_snapshots_cycle_week_unique",
+          "nullsNotDistinct": false,
+          "columns": ["cycle_id", "week_index"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "week_snapshots_week_index_not_negative": {
+          "name": "week_snapshots_week_index_not_negative",
+          "value": "\"week_snapshots\".\"week_index\" >= 0"
+        },
+        "week_snapshots_allowance_not_negative": {
+          "name": "week_snapshots_allowance_not_negative",
+          "value": "\"week_snapshots\".\"allowance_millimes\" >= 0"
+        },
+        "week_snapshots_dates": {
+          "name": "week_snapshots_dates",
+          "value": "\"week_snapshots\".\"ends_on\" >= \"week_snapshots\".\"starts_on\""
         }
       },
       "isRLSEnabled": false

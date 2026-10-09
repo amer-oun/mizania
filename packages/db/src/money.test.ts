@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { cycles, transactions, users, wallets } from "./schema";
+import { cycles, transactions, users, wallets, weekSnapshots } from "./schema";
 import { createTestDatabase, type TestDatabase } from "./test/test-database";
 
 // The database rules from migration 0002, checked against a real Postgres.
@@ -194,6 +194,46 @@ describe("cycles", () => {
     ).resolves.toBeDefined();
     await expect(
       test.db.insert(cycles).values({ ...cycle, status: "closed", expectedNextOn: "2026-10-08" }),
+    ).rejects.toThrow();
+  });
+});
+
+// Migration 0004.
+describe("week snapshots", () => {
+  it("store one allowance per week of a cycle, for the cycle's own user", async () => {
+    const amel = await newUser();
+    const sami = await newUser();
+    const [cycle] = await test.db
+      .insert(cycles)
+      .values({
+        userId: amel.id,
+        startedOn: "2026-10-08",
+        expectedNextOn: "2026-11-01",
+        weeklyMode: true,
+      })
+      .returning();
+    const week = {
+      userId: amel.id,
+      cycleId: cycle?.id ?? "",
+      weekIndex: 0,
+      startsOn: "2026-10-08",
+      endsOn: "2026-10-14",
+      allowanceMillimes: 70_000,
+    };
+
+    await test.db.insert(weekSnapshots).values(week);
+    await expect(test.db.insert(weekSnapshots).values(week)).rejects.toThrow();
+    await expect(
+      test.db.insert(weekSnapshots).values({ ...week, weekIndex: 1, userId: sami.id }),
+    ).rejects.toThrow();
+    await expect(
+      test.db.insert(weekSnapshots).values({ ...week, weekIndex: 1, allowanceMillimes: -1 }),
+    ).rejects.toThrow();
+    await expect(
+      test.db.insert(weekSnapshots).values({ ...week, weekIndex: 1, endsOn: "2026-10-07" }),
+    ).rejects.toThrow();
+    await expect(
+      test.db.insert(weekSnapshots).values({ ...week, weekIndex: -1 }),
     ).rejects.toThrow();
   });
 });

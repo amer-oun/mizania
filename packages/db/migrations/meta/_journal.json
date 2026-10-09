@@ -29,6 +29,13 @@
       "when": 1791531539951,
       "tag": "0003_wallets_one_per_type",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791534896374,
+      "tag": "0004_week_snapshots",
+      "breakpoints": true
     }
   ]
 }
