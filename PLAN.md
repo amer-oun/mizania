@@ -84,6 +84,7 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 - **"Ask for money" message:** writes a polite message for parents with a short summary of what the last transfer covered; student copies it into WhatsApp/Messenger (nothing is sent automatically)
 - Export CSV, delete account
 - Consider several card wallets with nicknames (e.g. BIAT card, Poste card). For now, a second card is added as Other.
+- Fixed costs with a name the student types (a gym, a subscription). For now the plan offers the fixed-cost categories only.
 
 ### Stretch (only after V1 ships)
 
@@ -294,7 +295,7 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 - [x] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress; tapping the amount shows how it's calculated. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
 - [x] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
 - [x] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
-- [ ] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
+- [x] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
 - [ ] **"I received money" + late transfer:** new month or extra money; the new month's plan is suggested from the previous cycle; "Did the money arrive? / Not yet → new date". _Done when:_ a new month is ready in under a minute, and a passed expected date shows the question instead of a huge number.
 - [ ] **Evening check-in:** cash, from 18:00 (or the user's check-in time). _Done when:_ after counting, the cash wallet matches and the difference shows as unlogged spending.
 - [ ] **This month by category vs last month,** and run-out warnings worded kindly. _Done when:_ categories match what you spent, and a fast pace shows when you'll run out and how much less per day fixes it.
@@ -315,6 +316,7 @@ Decisions (accepted 2026-10-09):
 11. Warnings are worded kindly now; the link to "ask for money" comes with that feature in Phase 8.
 12. "This month by category" compares with the same point last month (day 12 with day 12).
 13. Tabs: Today, Plan, Wallets, with "+" on Today.
+14. Editing the plan never rewrites past days (added 2026-10-09): amounts can't go below what's used, paid or overspent items are locked, a used envelope is closed instead of removed, and a new envelope covers spending from when it's added. In weekly mode a saved change keeps this week's amount or lowers it, never raises it (ADR 006 §7).
 
 ### Pilot (2 weeks)
 
