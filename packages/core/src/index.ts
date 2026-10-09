@@ -23,6 +23,8 @@ export {
   type TodayBudgetInput,
   type TodayBudgetStatus,
   type WeekBudget,
+  type WeekStart,
+  weekStartAllowance,
 } from "./daily";
 export { assertMillimes, formatTND, type Locale, parseTND, splitEven } from "./money";
 export {
@@ -35,6 +37,14 @@ export {
   type WalletKind,
   walletKinds,
 } from "./onboarding";
+export {
+  type CycleSummary,
+  cycleSummary,
+  type CycleSummaryInput,
+  type PlanItemKind,
+  type SummaryPlanItem,
+  type SummaryTransaction,
+} from "./summary";
 export {
   type ArchiveChoice,
   archiveSettlement,

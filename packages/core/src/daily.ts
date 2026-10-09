@@ -13,6 +13,11 @@ export interface TodayBudgetInput {
   spentToday: number;
   spentThisWeekBeforeToday: number;
   weeklyMode: boolean;
+  /**
+   * Weekly mode: this week's amount as stored at its start (ADR 006). Without
+   * it, the week's amount is rebuilt from today's numbers (ADR 003).
+   */
+  weekAllowance?: number | undefined;
 }
 
 /**
@@ -65,17 +70,28 @@ function assertSpending(value: number, name: string): void {
   }
 }
 
+/** The week that contains `today`, and its amount at its start. */
+export interface WeekStart {
+  index: number;
+  start: IsoDate;
+  end: IsoDate;
+  allowance: number;
+}
+
 /**
  * Weekly mode: the week's amount is its fair share of the money it started
  * with, pool × (days in this week) / (days from week start to transfer).
- * Each day then gets an equal share of what's left of the week this morning.
- *
- * Known limitation: the week's starting money is rebuilt from today's numbers
- * (poolNow + spentToday + spentThisWeekBeforeToday), so a plan change mid-week
- * shifts the week's amount. Phase 3 stores a week-start snapshot (ADR 003).
+ * The money it started with is rebuilt from today's numbers:
+ * poolNow + spentToday + spentThisWeekBeforeToday. That's what a week
+ * snapshot stores the first time it's needed (ADR 006).
  */
-function weeklyBudget(input: TodayBudgetInput, days: number, poolThisMorning: number): TodayBudget {
+export function weekStartAllowance(
+  input: Omit<TodayBudgetInput, "weeklyMode" | "weekAllowance">,
+): WeekStart {
   const { today, startedOn, nextTransferOn, poolNow, spentToday, spentThisWeekBeforeToday } = input;
+  assertMillimes(poolNow);
+  assertSpending(spentToday, "spending today");
+  assertSpending(spentThisWeekBeforeToday, "spending earlier this week");
 
   const weeks = cycleWeeks(startedOn, nextTransferOn);
   const index = weekIndexFor(today, weeks);
@@ -85,17 +101,36 @@ function weeklyBudget(input: TodayBudgetInput, days: number, poolThisMorning: nu
   /* v8 ignore next */
   if (!week) throw new RangeError(`No week found for ${today}.`);
 
-  const poolAtWeekStart = poolThisMorning + spentThisWeekBeforeToday;
-  const weekAllowance = mulDivFloor(
+  const poolAtWeekStart = poolNow + spentToday + spentThisWeekBeforeToday;
+  const allowance = mulDivFloor(
     Math.max(0, poolAtWeekStart),
     week.days,
     daysBetween(week.start, nextTransferOn),
   );
+  return { index, start: week.start, end: week.end, allowance };
+}
+
+/**
+ * Each day of the week gets an equal share of what's left of the week this
+ * morning. That's never more than the money that exists this morning, even
+ * when a stored week amount is larger (the plan changed mid-week).
+ */
+function weeklyBudget(input: TodayBudgetInput, days: number, poolThisMorning: number): TodayBudget {
+  const { today, poolNow, spentToday, spentThisWeekBeforeToday } = input;
+  const week = weekStartAllowance(input);
+  const index = week.index;
+  const weekAllowance = input.weekAllowance ?? week.allowance;
 
   // Days left in this week, today included. At least 1 when the transfer is
   // late and today is past the last week: today still has to be paid for.
   const weekDaysLeft = Math.max(1, daysBetween(today, week.end) + 1);
-  const weekLeftThisMorning = weekAllowance - spentThisWeekBeforeToday;
+  // A stored week amount can't promise more than the money that exists this
+  // morning. (A rebuilt one never does: it's a share of what the week
+  // started with, so for it this changes nothing.)
+  const weekLeftThisMorning = Math.min(
+    weekAllowance - spentThisWeekBeforeToday,
+    Math.max(0, poolThisMorning),
+  );
 
   // Once the week is overspent, nothing is left for the rest of it: 0 a day.
   const allowance = Math.floor(Math.max(0, weekLeftThisMorning) / weekDaysLeft);
@@ -136,6 +171,9 @@ export function todayBudget(input: TodayBudgetInput): TodayBudget {
   }
   if (daysBetween(startedOn, today) < 0) {
     throw new RangeError(`Invalid date: ${today} is before the cycle started on ${startedOn}.`);
+  }
+  if (input.weekAllowance !== undefined) {
+    assertSpending(input.weekAllowance, "week amount");
   }
 
   const days = daysLeft(today, nextTransferOn);

@@ -2,7 +2,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { addDays } from "./cycle";
-import { dailyPool, todayBudget } from "./daily";
+import { dailyPool, todayBudget, weekStartAllowance } from "./daily";
 
 // Option B: today's amount is set once from what the student had at the
 // START of the day. Spending today subtracts from it. Overspending or
@@ -335,5 +335,127 @@ describe("todayBudget, weekly mode", () => {
         expect(result.allowance).toBeGreaterThanOrEqual(0);
       }),
     );
+  });
+});
+
+describe("todayBudget with a stored week amount (ADR 006)", () => {
+  const withSnapshot = (
+    today: string,
+    poolNow: number,
+    spentToday: number,
+    spentThisWeekBeforeToday: number,
+    weekAllowance: number,
+  ) =>
+    todayBudget({
+      ...cycle,
+      today,
+      poolNow,
+      spentToday,
+      spentThisWeekBeforeToday,
+      weeklyMode: true,
+      weekAllowance,
+    });
+
+  it("keeps the week's amount when the plan changes mid-week", () => {
+    // Week 1 stored 70 DT. On day 3 she adds a 60 DT envelope: the daily money
+    // drops from 280 DT to 220 DT, but this week still has 70 − 20 spent = 50 DT.
+    const result = withSnapshot("2026-10-03", 220_000, 0, 20_000, 70_000);
+    expect(result.week).toEqual({ index: 0, allowance: 70_000, left: 50_000, daysLeft: 5 });
+    expect(result.allowance).toBe(10_000);
+  });
+
+  it("never promises more than the money that exists this morning", () => {
+    // The week stored 70 DT, but only 12 DT of daily money is left.
+    const result = withSnapshot("2026-10-03", 12_000, 0, 20_000, 70_000);
+    expect(result.week?.left).toBe(12_000);
+    expect(result.allowance).toBe(2_400); // 12 DT over 5 days
+  });
+
+  it("rejects an invalid stored amount", () => {
+    expect(() => withSnapshot("2026-10-03", 1_000, 0, 0, -1)).toThrow(RangeError);
+    expect(() => withSnapshot("2026-10-03", 1_000, 0, 0, 1.5)).toThrow(RangeError);
+  });
+
+  it("ignores the stored amount in normal mode", () => {
+    const result = todayBudget({
+      ...cycle,
+      today: "2026-10-22",
+      poolNow: 90_000,
+      spentToday: 0,
+      spentThisWeekBeforeToday: 0,
+      weeklyMode: false,
+      weekAllowance: 1,
+    });
+    expect(result.allowance).toBe(10_000);
+  });
+
+  const day = fc.integer({ min: 0, max: 33 }).map((i) => addDays(cycle.startedOn, i));
+  const money = fc.integer({ min: -1_000_000, max: 1_000_000 });
+  const spent = fc.integer({ min: 0, max: 500_000 });
+
+  it("gives the same result when the stored amount is the rebuilt one", () => {
+    fc.assert(
+      fc.property(day, money, spent, spent, (today, poolNow, spentToday, before) => {
+        const input = { ...cycle, today, poolNow, spentToday, spentThisWeekBeforeToday: before };
+        const week = weekStartAllowance(input);
+        const rebuilt = todayBudget({ ...input, weeklyMode: true });
+        expect(rebuilt.week?.allowance).toBe(week.allowance);
+        expect(todayBudget({ ...input, weeklyMode: true, weekAllowance: week.allowance })).toEqual(
+          rebuilt,
+        );
+      }),
+    );
+  });
+
+  it("never gives the rest of the week more than this morning's money", () => {
+    fc.assert(
+      fc.property(
+        day,
+        money,
+        spent,
+        spent,
+        fc.integer({ min: 0, max: 2_000_000 }),
+        (today, poolNow, spentToday, before, weekAllowance) => {
+          const result = todayBudget({
+            ...cycle,
+            today,
+            poolNow,
+            spentToday,
+            spentThisWeekBeforeToday: before,
+            weeklyMode: true,
+            weekAllowance,
+          });
+          const week = result.week;
+          expect(week).not.toBeNull();
+          expect(result.allowance * (week?.daysLeft ?? 1)).toBeLessThanOrEqual(
+            Math.max(0, poolNow + spentToday),
+          );
+        },
+      ),
+    );
+  });
+});
+
+describe("weekStartAllowance", () => {
+  it("gives the week's dates and its share of the money it started with", () => {
+    // Day 10 (week 2, Oct 8–14). 230 DT now + 5 spent today + 10 earlier this
+    // week = 245 DT at the week's start, shared over Oct 8–30: 245 × 7 / 23.
+    expect(
+      weekStartAllowance({
+        ...cycle,
+        today: "2026-10-10",
+        poolNow: 230_000,
+        spentToday: 5_000,
+        spentThisWeekBeforeToday: 10_000,
+      }),
+    ).toEqual({ index: 1, start: "2026-10-08", end: "2026-10-14", allowance: 74_565 });
+  });
+
+  it("rejects invalid input", () => {
+    const base = { ...cycle, today: "2026-10-10", poolNow: 0, spentToday: 0 };
+    expect(() => weekStartAllowance({ ...base, spentThisWeekBeforeToday: -1 })).toThrow(RangeError);
+    expect(() =>
+      weekStartAllowance({ ...base, poolNow: 0.5, spentThisWeekBeforeToday: 0 }),
+    ).toThrow(RangeError);
   });
 });
