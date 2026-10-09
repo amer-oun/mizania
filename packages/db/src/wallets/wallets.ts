@@ -132,12 +132,15 @@ export async function getWalletsOverview(db: Db, userId: string): Promise<Wallet
   };
 }
 
-export type AddWalletResult = { status: "added"; walletId: string } | { status: "type-taken" };
+export type AddWalletResult =
+  { status: "added"; walletId: string; restored: boolean } | { status: "type-taken" };
 
 /**
  * Adds a wallet at the end of the list, with its starting balance as an
- * adjustment. Cash, D17, Flouci and card exist once per user (an archived
- * one is restored instead); "other" wallets can repeat.
+ * adjustment. Cash, D17, Flouci and card exist once per user: adding one
+ * whose wallet is archived restores that wallet instead (the student doesn't
+ * need to know about archiving), and one that's active is refused. "Other"
+ * wallets can repeat.
  */
 export async function addWallet(
   db: Db,
@@ -148,21 +151,38 @@ export async function addWallet(
   return db.transaction(async (tx) => {
     await lockWallets(tx, userId);
     const name = input.kind === "other" ? input.name : null;
-    if (input.kind !== "other") {
-      const [taken] = await tx
-        .select({ id: wallets.id })
-        .from(wallets)
-        .where(
-          and(eq(wallets.userId, userId), eq(wallets.type, input.kind), isNull(wallets.deletedAt)),
-        );
-      if (taken) return { status: "type-taken" };
-    }
+    const [existing] =
+      input.kind === "other"
+        ? []
+        : await tx
+            .select({ id: wallets.id, archived: wallets.archived })
+            .from(wallets)
+            .where(
+              and(
+                eq(wallets.userId, userId),
+                eq(wallets.type, input.kind),
+                isNull(wallets.deletedAt),
+              ),
+            );
+    if (existing && !existing.archived) return { status: "type-taken" };
 
-    const [wallet] = await tx
-      .insert(wallets)
-      .values({ userId, type: input.kind, name, position: await nextPosition(tx, userId) })
-      .returning({ id: wallets.id });
-    if (!wallet) throw new Error("addWallet: wallet not created");
+    const position = await nextPosition(tx, userId);
+    let wallet: { id: string } | undefined;
+    if (existing) {
+      // An archived wallet is always at 0 (archiveWallet empties it first),
+      // so the starting balance below brings it to exactly what was entered.
+      [wallet] = await tx
+        .update(wallets)
+        .set({ archived: false, position })
+        .where(and(eq(wallets.id, existing.id), eq(wallets.userId, userId)))
+        .returning({ id: wallets.id });
+    } else {
+      [wallet] = await tx
+        .insert(wallets)
+        .values({ userId, type: input.kind, name, position })
+        .returning({ id: wallets.id });
+    }
+    if (!wallet) throw new Error("addWallet: wallet not saved");
 
     if (input.balanceMillimes !== 0) {
       await tx.insert(transactions).values({
@@ -175,7 +195,7 @@ export async function addWallet(
         source: "manual",
       });
     }
-    return { status: "added", walletId: wallet.id };
+    return { status: "added", walletId: wallet.id, restored: existing !== undefined };
   });
 }
 

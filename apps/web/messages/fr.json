@@ -225,7 +225,7 @@
     "allTypesTaken": "Tu as déjà espèces, D17, Flouci et une carte. Une autre carte ou un autre compte ? Ajoute-le comme Autre.",
     "renameTitle": "Renommer {name}",
     "archiveTitle": "Archiver {name} ?",
-    "archiveEmpty": "Il est à 0. Tu pourras le restaurer plus tard.",
+    "archiveEmpty": "Il est à 0. Tu pourras le rajouter quand tu veux avec « Ajouter un portefeuille ».",
     "archiveBalance": "{name} contient encore {amount}. Un portefeuille archivé est toujours à 0, donc d'abord :",
     "archiveMove": "Déplacer l'argent vers",
     "archiveZero": "Je n'ai plus cet argent (mettre à 0)",
@@ -236,7 +236,7 @@
     "offline": "Tu es hors ligne. Connecte-toi à Internet pour enregistrer.",
     "errors": {
       "not-found": "Ce portefeuille a changé. Actualise la page et réessaie.",
-      "type-taken": "Tu as déjà ce portefeuille. Regarde dans Archivés pour le restaurer.",
+      "type-taken": "Tu as déjà ce portefeuille.",
       "last-wallet": "Garde au moins un portefeuille.",
       "wallet-archived": "Impossible d'annuler : un de ses portefeuilles est archivé. Restaure-le d'abord.",
       "invalid": "Vérifie ce que tu as saisi.",

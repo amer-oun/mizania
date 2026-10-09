@@ -95,7 +95,8 @@ export function AddWalletDialog({
   const online = useOnline();
   const { pending, error, setError, run } = useWalletAction();
   const available = walletKinds.filter(
-    (kind) => kind === "other" || !existing.some((w) => w.type === kind),
+    // An archived wallet's type is offered again: adding it restores that wallet.
+    (kind) => kind === "other" || !existing.some((w) => w.type === kind && !w.archived),
   );
   const [kind, setKind] = useState<WalletKind>(available[0] ?? "other");
   const [name, setName] = useState("");
