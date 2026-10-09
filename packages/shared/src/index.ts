@@ -11,6 +11,12 @@ export {
   type PlanItemIdInput,
   planItemIdSchema,
 } from "./fixed-costs";
+export {
+  PLAN_MAX_ITEMS,
+  planDraftItemSchema,
+  type SavePlanInput,
+  savePlanSchema,
+} from "./month-plan";
 export { type OnboardingInput, onboardingInputSchema, toOnboardingAnswers } from "./onboarding";
 export {
   type AddWalletInput,
