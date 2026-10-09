@@ -147,12 +147,7 @@
     "public.category_group": {
       "name": "category_group",
       "schema": "public",
-      "values": [
-        "fixed",
-        "envelope",
-        "daily",
-        "income"
-      ]
+      "values": ["fixed", "envelope", "daily", "income"]
     }
   },
   "schemas": {},

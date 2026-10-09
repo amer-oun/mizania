@@ -200,7 +200,40 @@ export const transactions = pgTable(
   ],
 );
 
+/**
+ * A week's allowance in weekly mode, stored the first time it's needed so
+ * that plan changes mid-week don't move it (ADR 006).
+ */
+export const weekSnapshots = pgTable(
+  "week_snapshots",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    cycleId: uuid().notNull(),
+    // 0 for the cycle's first week.
+    weekIndex: integer().notNull(),
+    startsOn: date({ mode: "string" }).notNull(),
+    endsOn: date({ mode: "string" }).notNull(),
+    allowanceMillimes: millimes().notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    unique("week_snapshots_cycle_week_unique").on(t.cycleId, t.weekIndex),
+    foreignKey({
+      name: "week_snapshots_cycle_same_user_fk",
+      columns: [t.cycleId, t.userId],
+      foreignColumns: [cycles.id, cycles.userId],
+    }).onDelete("cascade"),
+    check("week_snapshots_week_index_not_negative", sql`${t.weekIndex} >= 0`),
+    check("week_snapshots_allowance_not_negative", sql`${t.allowanceMillimes} >= 0`),
+    check("week_snapshots_dates", sql`${t.endsOn} >= ${t.startsOn}`),
+  ],
+);
+
 export type Wallet = typeof wallets.$inferSelect;
 export type Cycle = typeof cycles.$inferSelect;
 export type PlanItem = typeof planItems.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
+export type WeekSnapshot = typeof weekSnapshots.$inferSelect;

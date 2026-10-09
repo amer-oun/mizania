@@ -6,13 +6,54 @@
   "Home": {
     "title": "Mizania",
     "tagline": "How much you can spend today, until your next transfer from home.",
-    "signedInAs": "Signed in as {name}",
     "signOut": "Sign out"
   },
   "Nav": {
     "label": "Navigation",
     "today": "Today",
     "wallets": "Wallets"
+  },
+  "Today": {
+    "spendToday": "You can spend today",
+    "leftToday": "{amount} left today",
+    "overToday": "You spent {amount} more than today's amount. Tomorrow will be a little less.",
+    "overWeek": "This week's money is used up. It starts again {days, plural, =1 {tomorrow} other {in # days}}.",
+    "overBudget": "Your plan needs {amount} more than you have.",
+    "overBudgetHint": "Lower an envelope or your savings, or add money you received.",
+    "status": {
+      "on_track": "On track",
+      "over_today": "Over today",
+      "over_week": "Week used up",
+      "over_budget": "Over budget"
+    },
+    "daysLeft": "{days, plural, =1 {1 day} other {# days}} until your next transfer",
+    "expected": "Expected on {date}",
+    "week": "This week: {amount} left · {days, plural, =1 {1 day} other {# days}}",
+    "transferDue": "Your transfer was expected on {date}.",
+    "transferDueHint": "Soon you'll record it here. Until then, today's amount is paused.",
+    "noCycle": "No month in progress. Soon you'll start one here when your money arrives.",
+    "breakdownHint": "See how it's calculated",
+    "breakdown": {
+      "title": "How today's amount is calculated",
+      "wallets": "Money in your wallets",
+      "setAside": "Set aside",
+      "fixed": "Unpaid fixed costs",
+      "envelopes": "Envelopes",
+      "savings": "Savings",
+      "daily": "Daily money",
+      "weekAmount": "This week's amount",
+      "weekDays": "Days left this week",
+      "daysLeft": "Days until your next transfer",
+      "today": "Today's amount",
+      "spent": "Spent today",
+      "left": "Left today",
+      "close": "Close",
+      "weekly": "This week's amount is shared over its days. Today's amount is set from this morning's money, so spending today doesn't change it.",
+      "normal": "The daily money is shared over the days left. Today's amount is set from this morning's money, so spending today doesn't change it."
+    },
+    "loadError": "Couldn't load today's amount.",
+    "retry": "Try again",
+    "loading": "Loading…"
   },
   "LanguageSwitcher": {
     "label": "Language",

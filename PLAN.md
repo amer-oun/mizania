@@ -212,8 +212,10 @@ wallets            (id, user_id, type[cash|d17|flouci|card|other],
 cycles             (id, user_id, started_on, expected_next_on, actual_end_on,
                     status[active|closed] (at most one active per user), weekly_mode,
                     created_at, updated_at, deleted_at)
-incomes            (id, user_id, cycle_id, wallet_id, amount_millimes,
-                    source[parents|bourse|job|other], received_on, note)
+week_snapshots     (id, user_id, cycle_id, week_index, starts_on, ends_on,
+                    allowance_millimes, created_at)
+                    (the week's allowance, stored the first time it's needed;
+                    ADR 006)
 
 plan_items         (id, cycle_id, kind[fixed|envelope|savings], name, category_id,
                     amount_millimes, due_on nullable, paid_at nullable,
@@ -226,9 +228,12 @@ transactions       (id client UUID, user_id, cycle_id, wallet_id, category_id,
                     plan_item_id nullable, type[expense|income|transfer|adjustment],
                     amount_millimes, to_wallet_id, occurred_at, note,
                     source[quick|text|checkin|plan|household|manual],
+                    income_source[parents|bourse|job|other] (income only),
                     updated_at, deleted_at, hlc)
                     (balances are derived: a starting balance is an "adjustment";
-                    wallet and cycle must belong to the same user)
+                    wallet and cycle must belong to the same user; money received
+                    is an "income" transaction, so there's no separate incomes
+                    table, ADR 006)
 
 checkins           (id, user_id, wallet_id, reported_millimes, expected_millimes,
                     difference_millimes, created_at)
@@ -253,7 +258,7 @@ Default categories (with AR/FR/EN names): Rent, Electricity (STEG), Water (SONED
 
 ## 8. Phases (~10 weeks part-time, ~15–20h/week)
 
-Each phase ends with tests passing, CI green and a deploy. **Real students use the app from Phase 4 onward.**
+Each phase ends with tests passing, CI green and a deploy. **Real students use the app from the pilot, right after Phase 3.**
 
 ### Phase 0: Foundation (3–4 days)
 
@@ -284,18 +289,44 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 3: The core loop (1.5 weeks)
 
-- [ ] "I received money" flow
-- [ ] Month plan screen with suggestions from the previous cycle
-- [ ] Home screen: today's amount, days left, status, week progress
-- [ ] Quick log (under 3 taps)
-- [ ] Evening check-in
-- [ ] Mark fixed costs as paid
-- [ ] This month by category vs last month
-- [ ] Store a snapshot of the week's allowance at week start (see ADR 003).
-- [ ] Word big warnings kindly and link them to the 'ask for money' feature.
+How the numbers come from the data (daily money, reserved, week snapshots, late transfers): ADR 006. One PR per line, in this order:
+
+- [x] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress; tapping the amount shows how it's calculated. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
+- [ ] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
+- [ ] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
+- [ ] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
+- [ ] **"I received money" + late transfer:** new month or extra money; the new month's plan is suggested from the previous cycle; "Did the money arrive? / Not yet → new date". _Done when:_ a new month is ready in under a minute, and a passed expected date shows the question instead of a huge number.
+- [ ] **Evening check-in:** cash, from 18:00 (or the user's check-in time). _Done when:_ after counting, the cash wallet matches and the difference shows as unlogged spending.
+- [ ] **This month by category vs last month,** and run-out warnings worded kindly. _Done when:_ categories match what you spent, and a fast pace shows when you'll run out and how much less per day fixes it.
 - **Done when:** you use it yourself for a full week and the daily number feels right.
 
-### Phase 4: Offline-first + pilot (1.5 weeks)
+Decisions (accepted 2026-10-09):
+
+1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = groceries, studies, health, clothes; fixed = rent, bills, phone recharge, trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default.
+2. Reserved = unpaid fixed costs + envelope remainders (never below 0; overspending comes out of daily money) + savings at its full amount. One optional savings line now; savings goals in V1.
+3. "Mark paid" asks for the amount actually paid (pre-filled). Extra comes out of today's daily money; a saving goes back into it.
+4. Quick log uses cash by default, with a one-tap switch, and remembers the last wallet per category.
+5. The evening check-in asks about cash only; the other wallets are behind a "check all" link.
+6. Counted more than expected: "Did you receive money?" Yes records income; "No, I miscounted earlier" records a correction. Neither counts as spending.
+7. From the expected transfer date: "Did the money arrive?" Yes opens "I received money"; "Not yet" picks a new date (default +2 days). Reminders stay in Phase 6.
+8. "I received money" always asks: new month or extra money. Default "new month" within 5 days of the expected date.
+9. Leftover money stays in the wallets and becomes part of the new month. Moving it to savings comes with savings goals (V1).
+10. The income source is a column on transactions, not a separate `incomes` table.
+11. Warnings are worded kindly now; the link to "ask for money" comes with that feature in Phase 8.
+12. "This month by category" compares with the same point last month (day 12 with day 12).
+13. Tabs: Today, Plan, Wallets, with "+" on Today.
+
+### Pilot (2 weeks)
+
+The app is online-only until Phase 4: pilot testers need a connection to log and to see their numbers. Tell them before they start.
+
+- [ ] Before the pilot:
+  - [ ] Test Google sign-in in the installed app on a real iPhone
+  - [ ] Have 2 people who haven't seen the app finish onboarding in under 2 minutes
+- [ ] **Pilot: 10 students** use it for 2 weeks. Short feedback form + 3 quick interviews.
+- **Done when:** 10 students have used it for 2 weeks and you have real feedback.
+
+### Phase 4: Offline-first (1 week)
 
 - [ ] Dexie local DB; UI reads and writes locally first
 - [ ] Sync protocol in `packages/sync`: push/pull, client UUIDs, HLC, soft deletes, idempotent
@@ -303,11 +334,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Tests: two devices editing offline, syncing in different orders → same result
 - [ ] ADR: sync design and conflict strategy
 - [ ] Installed app opens offline: start URL must not depend on a server redirect; precache it and test in airplane mode.
-- [ ] Before the pilot:
-  - [ ] Test Google sign-in in the installed app on a real iPhone
-  - [ ] Have 2 people who haven't seen the app finish onboarding in under 2 minutes
-- [ ] **Pilot: 10 students** use it for 2 weeks. Short feedback form + 3 quick interviews.
-- **Done when:** expenses logged in airplane mode appear on another device after reconnecting, and you have real feedback.
+- **Done when:** expenses logged in airplane mode appear on another device after reconnecting.
 
 ### Phase 5: Fix what the pilot taught you (3–5 days)
 
@@ -316,8 +343,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 6: Warnings, late transfers, notifications (1 week)
 
-- [ ] Run-out warnings on the home screen
-- [ ] "Did the money arrive?" on the expected date; late transfer extension (extend the cycle if not)
+- [ ] Reminder when the expected transfer date passes (the "Did the money arrive? / Not yet" step itself is in Phase 3)
 - [ ] Cycle close: leftover → next month or savings
 - [ ] Savings goals
 - [ ] Push notifications: check-in reminder, fixed cost due, warnings (all toggleable)
@@ -337,6 +363,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] 100+ table-driven test cases, collected from real students during the pilot
 - [ ] Live preview while typing; user confirms before saving
 - [ ] "Ask for money" message generator (AR / FR / derja), copy to clipboard
+- [ ] Link big run-out warnings to "ask for money"
 - **Done when:** `قهوة ٢٫٥` and `9ahwa 2.5` both create the right expense.
 
 ### Phase 9: Hardening (1 week)

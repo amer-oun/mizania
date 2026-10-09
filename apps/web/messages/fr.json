@@ -6,13 +6,54 @@
   "Home": {
     "title": "Mizania",
     "tagline": "Combien tu peux dépenser aujourd'hui, jusqu'au prochain virement de la famille.",
-    "signedInAs": "Connecté·e en tant que {name}",
     "signOut": "Se déconnecter"
   },
   "Nav": {
     "label": "Navigation",
     "today": "Aujourd'hui",
     "wallets": "Portefeuilles"
+  },
+  "Today": {
+    "spendToday": "Tu peux dépenser aujourd'hui",
+    "leftToday": "Il te reste {amount} aujourd'hui",
+    "overToday": "Tu as dépensé {amount} de plus que le montant du jour. Demain sera un peu plus bas.",
+    "overWeek": "L'argent de la semaine est épuisé. Il revient {days, plural, =1 {demain} other {dans # jours}}.",
+    "overBudget": "Ton plan demande {amount} de plus que ce que tu as.",
+    "overBudgetHint": "Baisse une enveloppe ou ton épargne, ou ajoute l'argent reçu.",
+    "status": {
+      "on_track": "Dans les clous",
+      "over_today": "Dépassé aujourd'hui",
+      "over_week": "Semaine épuisée",
+      "over_budget": "Budget dépassé"
+    },
+    "daysLeft": "{days, plural, =1 {1 jour} other {# jours}} avant ton prochain virement",
+    "expected": "Prévu le {date}",
+    "week": "Cette semaine : il reste {amount} · {days, plural, =1 {1 jour} other {# jours}}",
+    "transferDue": "Ton virement était prévu le {date}.",
+    "transferDueHint": "Bientôt tu pourras l'enregistrer ici. En attendant, le montant du jour est en pause.",
+    "noCycle": "Aucun mois en cours. Bientôt tu pourras en commencer un ici quand ton argent arrive.",
+    "breakdownHint": "Voir le calcul",
+    "breakdown": {
+      "title": "Comment le montant du jour est calculé",
+      "wallets": "Argent dans tes portefeuilles",
+      "setAside": "Mis de côté",
+      "fixed": "Frais fixes pas encore payés",
+      "envelopes": "Enveloppes",
+      "savings": "Épargne",
+      "daily": "Argent du quotidien",
+      "weekAmount": "Montant de la semaine",
+      "weekDays": "Jours restants cette semaine",
+      "daysLeft": "Jours avant ton prochain virement",
+      "today": "Montant du jour",
+      "spent": "Dépensé aujourd'hui",
+      "left": "Reste aujourd'hui",
+      "close": "Fermer",
+      "weekly": "Le montant de la semaine est partagé entre ses jours. Le montant du jour est fixé avec l'argent de ce matin : tes dépenses d'aujourd'hui ne le changent pas.",
+      "normal": "L'argent du quotidien est partagé entre les jours restants. Le montant du jour est fixé avec l'argent de ce matin : tes dépenses d'aujourd'hui ne le changent pas."
+    },
+    "loadError": "Impossible de charger le montant du jour.",
+    "retry": "Réessayer",
+    "loading": "Chargement…"
   },
   "LanguageSwitcher": {
     "label": "Langue",

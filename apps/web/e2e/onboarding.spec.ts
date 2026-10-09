@@ -53,7 +53,8 @@ for (const locale of ["ar", "fr", "en"] as const) {
     await finish.click();
 
     await expect(page).toHaveURL(new RegExp(`/${locale}$`));
-    await expect(page.getByTestId("signed-in-as")).toContainText("Amel");
+    // Home is now the daily amount.
+    await expect(page.getByTestId("today-amount")).toBeVisible();
 
     // Done: the wizard sends finished students home.
     await page.goto(`/${locale}/onboarding`);

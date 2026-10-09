@@ -1,32 +1,56 @@
+import { todayInTunis } from "@mizania/core";
+import { getBudget } from "@mizania/db/budget";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
+import { getDb } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 
-// Placeholder until the daily amount (Phase 3).
-export default async function HomePage() {
+// The home screen: how much the student can spend today.
+export default async function TodayPage() {
   const { user } = await requireSession();
   const t = await getTranslations("Home");
+  const today = await getTranslations("Today");
   const locale = await getLocale();
+  const budget = await getBudget(getDb(), user.id, todayInTunis());
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[env(safe-area-inset-top)]">
       <header className="flex items-center justify-between gap-2 py-4">
-        <form action={signOut.bind(null, locale)}>
-          <Button type="submit" variant="ghost" size="sm">
-            {t("signOut")}
-          </Button>
-        </form>
-        <LanguageSwitcher />
+        <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <form action={signOut.bind(null, locale)}>
+            <Button type="submit" variant="ghost" size="sm">
+              {t("signOut")}
+            </Button>
+          </form>
+        </div>
       </header>
-      <main className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-primary">{t("title")}</h1>
-        <p className="max-w-xs text-balance text-muted-foreground">{t("tagline")}</p>
-        <p className="text-sm text-muted-foreground" data-testid="signed-in-as">
-          {t("signedInAs", { name: user.name })}
-        </p>
+      <main className="flex flex-1 flex-col justify-center pb-6">
+        {budget ? (
+          <TodayScreen
+            view={{
+              expectedNextOn: budget.cycle.expectedNextOn,
+              transferDue: budget.transferDue,
+              summary: {
+                available: budget.summary.available,
+                reserved: budget.summary.reserved,
+                poolNow: budget.summary.poolNow,
+                spentToday: budget.summary.spentToday,
+                spentThisWeekBeforeToday: budget.summary.spentThisWeekBeforeToday,
+              },
+              today: budget.today,
+            }}
+          />
+        ) : (
+          <p className="text-center text-muted-foreground" data-testid="no-cycle">
+            {today("noCycle")}
+          </p>
+        )}
       </main>
     </div>
   );
