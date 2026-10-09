@@ -181,3 +181,55 @@ test("another student's wallet IDs are ignored", async ({ page, browser }) => {
   for (const id of ids) expect(list).not.toContain(id);
   await other.close();
 });
+
+// Archiving a wallet and adding the same type again brings it back, without
+// the student having to know about "Archived".
+for (const locale of ["ar", "fr", "en"] as const) {
+  const t = messages[locale];
+  const w = t.Wallets;
+  const { cash, d17, flouci, card } = t.WalletTypes;
+
+  test(`${locale}: an archived Flouci can be added again with a balance`, async ({ page }) => {
+    await onboardedStudent(page, locale, { flouci: "20" });
+    await page.goto(`/${locale}/wallets`);
+    await expectBalances(page, locale, { [cash]: 10, [d17]: 0, [flouci]: 20, [card]: 120 });
+
+    // Archive Flouci, moving its 20 DT to cash.
+    await openMenu(page, locale, flouci);
+    await page.getByRole("menuitem", { name: w.archive }).click();
+    const archive = page.getByRole("dialog");
+    await expect(archive).toContainText(money(locale, 20));
+    await archive.getByRole("button", { name: w.archive }).click();
+    await expect(archive).toBeHidden();
+    await expectBalances(page, locale, { [cash]: 30, [d17]: 0, [card]: 120 });
+
+    // Archive D17 too: at 0, the dialog says it can be added again.
+    await openMenu(page, locale, d17);
+    await page.getByRole("menuitem", { name: w.archive }).click();
+    await expect(page.getByRole("dialog")).toContainText(w.archiveEmpty);
+    await page.getByRole("dialog").getByRole("button", { name: w.archive }).click();
+    await expectBalances(page, locale, { [cash]: 30, [card]: 120 });
+
+    // "Add a wallet" offers Flouci and D17 again, but not cash or the card.
+    await page.getByRole("button", { name: w.add }).click();
+    const add = page.getByRole("dialog");
+    await expect(add.getByRole("radio", { name: flouci })).toHaveCount(1);
+    await expect(add.getByRole("radio", { name: d17 })).toHaveCount(1);
+    await expect(add.getByRole("radio", { name: cash })).toHaveCount(0);
+    await expect(add.getByRole("radio", { name: card })).toHaveCount(0);
+    await add.getByRole("radio", { name: flouci }).check({ force: true });
+    await add.getByLabel(w.balanceLabel).fill("15");
+    await add.getByRole("button", { name: w.save }).click();
+    await expect(add).toBeHidden();
+
+    // The same Flouci is back, with 15 DT; only D17 is still archived.
+    await expectBalances(page, locale, { [cash]: 30, [card]: 120, [flouci]: 15 });
+    await expect(page.getByText(w.archived.replace("{count}", "1"))).toBeVisible();
+    await page.reload();
+    await expectBalances(page, locale, { [cash]: 30, [card]: 120, [flouci]: 15 });
+
+    // Now that it's back, Flouci isn't offered a second time.
+    await page.getByRole("button", { name: w.add }).click();
+    await expect(page.getByRole("dialog").getByRole("radio", { name: flouci })).toHaveCount(0);
+  });
+}
