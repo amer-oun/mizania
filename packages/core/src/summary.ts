@@ -66,6 +66,31 @@ export interface CycleSummary {
    * spending at all).
    */
   dailyParts: Map<string, number>;
+  /** Each fixed cost of the plan, in plan order. */
+  fixedCosts: FixedCostStatus[];
+  /** Each envelope category of the plan (and each envelope without one). */
+  envelopes: EnvelopeStatus[];
+}
+
+export interface FixedCostStatus {
+  id: string;
+  planned: number;
+  /** Everything paid towards it this cycle, even above what's planned. */
+  paidSoFar: number;
+  /** Still set aside for it: 0 once it's marked paid. */
+  left: number;
+  /** Marked paid ("that's everything for this month"). */
+  paid: boolean;
+}
+
+export interface EnvelopeStatus {
+  /** Null for an envelope without a category (nothing is spent from it). */
+  categoryId: string | null;
+  planned: number;
+  /** Spent in its category this cycle, even beyond what's planned. */
+  spent: number;
+  /** Still set aside: never below 0 (overspending is daily money). */
+  left: number;
 }
 
 function checkPlanItem(item: SummaryPlanItem): void {
@@ -101,39 +126,50 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     [...balances].filter(([id]) => active.has(id)).map(([, balance]) => balance),
   );
 
-  // What's still to pay for each fixed cost, and what's left in each
-  // envelope (matched to spending by category). A fixed cost marked paid
-  // reserves nothing, but its payments still use up its planned amount.
-  const fixedLeft = new Map<string, number>();
-  const paidFixed = new Set<string>();
-  const envelopeLeft = new Map<string, number>();
-  let unmatchedEnvelopes = 0; // envelopes without a category: always set aside
+  // Each fixed cost and each envelope category, as it's used up by spending
+  // (envelopes are matched by category). A fixed cost marked paid reserves
+  // nothing, but its payments still use up its planned amount.
+  interface Entry {
+    planned: number;
+    /** Still covered by the plan. */
+    left: number;
+    /** Everything spent against it, even beyond what's planned. */
+    used: number;
+  }
+  const fixedCosts = new Map<string, Entry & { paid: boolean }>();
+  const envelopeEntries = new Map<string, Entry>();
+  const unmatched: number[] = []; // envelopes without a category: always set aside
   let savings = 0;
   for (const item of input.planItems) {
     checkPlanItem(item);
+    const amount = item.amountMillimes;
     if (item.kind === "fixed") {
-      fixedLeft.set(item.id, item.amountMillimes);
-      if (item.paid) paidFixed.add(item.id);
+      fixedCosts.set(item.id, { planned: amount, left: amount, used: 0, paid: item.paid });
     } else if (item.kind === "savings") {
-      savings += item.amountMillimes;
+      savings += amount;
     } else if (item.categoryId === null) {
-      unmatchedEnvelopes += item.amountMillimes;
+      unmatched.push(amount);
     } else {
-      const planned = envelopeLeft.get(item.categoryId) ?? 0;
-      envelopeLeft.set(item.categoryId, planned + item.amountMillimes);
+      const entry = envelopeEntries.get(item.categoryId);
+      if (entry) {
+        entry.planned += amount;
+        entry.left += amount;
+      } else {
+        envelopeEntries.set(item.categoryId, { planned: amount, left: amount, used: 0 });
+      }
     }
   }
 
   /**
-   * Takes `amount` from what's left under `key`, and returns the part that
-   * didn't fit (daily spending). Null when `key` isn't in the plan.
+   * Takes `amount` from what's left of the plan entry under `key` and returns
+   * the part that didn't fit (daily spending). Null when `key` isn't in the plan.
    */
-  const cover = (left: Map<string, number>, key: string | null | undefined, amount: number) => {
-    if (!key) return null;
-    const remaining = left.get(key);
-    if (remaining === undefined) return null;
-    const covered = Math.min(remaining, amount);
-    left.set(key, remaining - covered);
+  const cover = (entries: Map<string, Entry>, key: string | null | undefined, amount: number) => {
+    const entry = key ? entries.get(key) : undefined;
+    if (!entry) return null;
+    const covered = Math.min(entry.left, amount);
+    entry.left -= covered;
+    entry.used += amount;
     return amount - covered;
   };
 
@@ -146,8 +182,8 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     let daily = 0;
     if (t.type === "expense") {
       daily =
-        cover(fixedLeft, t.planItemId, t.amountMillimes) ??
-        cover(envelopeLeft, t.categoryId, t.amountMillimes) ??
+        cover(fixedCosts, t.planItemId, t.amountMillimes) ??
+        cover(envelopeEntries, t.categoryId, t.amountMillimes) ??
         t.amountMillimes;
     } else if (t.type === "adjustment" && t.amountMillimes < 0) {
       daily = -t.amountMillimes;
@@ -156,10 +192,24 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     if (daily > 0) spending.set(t.day, (spending.get(t.day) ?? 0) + daily);
   }
 
-  const fixed = totalBalance(
-    [...fixedLeft].filter(([id]) => !paidFixed.has(id)).map(([, left]) => left),
-  );
-  const envelopes = totalBalance([...envelopeLeft.values(), unmatchedEnvelopes]);
+  const fixedStatuses = [...fixedCosts].map(([id, c]) => ({
+    id,
+    planned: c.planned,
+    paidSoFar: c.used,
+    left: c.paid ? 0 : c.left,
+    paid: c.paid,
+  }));
+  const envelopeStatuses: EnvelopeStatus[] = [
+    ...[...envelopeEntries].map(([categoryId, e]) => ({
+      categoryId,
+      planned: e.planned,
+      spent: e.used,
+      left: e.left,
+    })),
+    ...unmatched.map((planned) => ({ categoryId: null, planned, spent: 0, left: planned })),
+  ];
+  const fixed = totalBalance(fixedStatuses.map((c) => c.left));
+  const envelopes = totalBalance(envelopeStatuses.map((e) => e.left));
   const total = totalBalance([fixed, envelopes, savings]);
 
   const spendingByDay: CycleSummary["spendingByDay"] = [];
@@ -178,5 +228,7 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     spentThisWeekBeforeToday,
     spendingByDay,
     dailyParts,
+    fixedCosts: fixedStatuses,
+    envelopes: envelopeStatuses,
   };
 }

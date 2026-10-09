@@ -12,7 +12,10 @@ import { cn } from "@/lib/utils";
 export interface TodayView {
   expectedNextOn: IsoDate;
   transferDue: boolean;
-  summary: Omit<CycleSummary, "spendingByDay" | "dailyParts">;
+  summary: Pick<
+    CycleSummary,
+    "available" | "reserved" | "poolNow" | "spentToday" | "spentThisWeekBeforeToday"
+  >;
   today: TodayBudget;
 }
 
