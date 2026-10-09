@@ -39,13 +39,6 @@ export const defaultCategories: readonly DefaultCategory[] = [
     group: "fixed",
   },
   {
-    key: "phone_recharge",
-    names: { ar: "شحن التليفون", fr: "Recharge téléphone", en: "Phone recharge" },
-    icon: "smartphone",
-    color: "#14b8a6",
-    group: "fixed",
-  },
-  {
     key: "trip_home",
     names: { ar: "مرواحة للدار", fr: "Retour à la maison", en: "Trip home" },
     icon: "luggage",
@@ -83,6 +76,13 @@ export const defaultCategories: readonly DefaultCategory[] = [
     icon: "party-popper",
     color: "#ec4899",
     group: "daily",
+  },
+  {
+    key: "phone_recharge",
+    names: { ar: "شحن التليفون", fr: "Recharge téléphone", en: "Phone recharge" },
+    icon: "smartphone",
+    color: "#14b8a6",
+    group: "envelope",
   },
   {
     key: "groceries",

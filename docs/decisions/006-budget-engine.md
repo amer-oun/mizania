@@ -22,6 +22,10 @@ ADR 003 defines today's spendable amount from four inputs: `poolNow`, `spentToda
   - **savings**: the full amount for this cycle. The money stays in the wallets but is set aside.
 - **poolNow** = `dailyPool(available, reserved)` (ADR 003).
 
+Which categories are fixed costs: rent, electricity, water, internet and the trip home. Phone recharge is an **envelope** (since 2026-10-09): it's topped up several times a month at a kiosk and logged with quick log, so each top-up uses the envelope first and any overspend is daily money; without a phone recharge envelope in the plan, top-ups are daily money.
+
+A fixed cost can be paid in parts (rent in two halves): each payment uses up its planned amount, and an unpaid fixed cost reserves only what's left to pay. "That's everything for this month" marks it paid, which releases whatever is left into the daily money.
+
 Envelopes are matched to spending **by category when the numbers are computed**, not by a stored link, so editing the plan never leaves stale links. Fixed costs are paid only through "Mark paid", which records an expense linked to its plan item (`plan_item_id`) with the amount actually paid. Quick log doesn't offer fixed-cost categories.
 
 ### 3. What counts as daily-money spending

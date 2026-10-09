@@ -205,7 +205,8 @@
         "water": "Water (SONEDE)",
         "internet": "Internet",
         "phone_recharge": "Phone recharge"
-      }
+      },
+      "rechargeHint": "Planned for the month. Log each top-up with + when you make it."
     },
     "wallets": {
       "title": "Your wallets",

@@ -35,6 +35,8 @@ const answers: OnboardingAnswers = {
   fixedCosts: [
     { key: "rent", amountMillimes: 250_000, alreadyPaid: true },
     { key: "internet", amountMillimes: 35_000, alreadyPaid: false },
+    // An envelope: "already paid" doesn't apply to it.
+    { key: "phone_recharge", amountMillimes: 20_000, alreadyPaid: true },
   ],
   wallets: [
     { kind: "cash", balanceMillimes: 45_500 },
@@ -125,6 +127,7 @@ describe("saveOnboarding", () => {
         .sort((a, b) => a.key.localeCompare(b.key)),
     ).toEqual([
       { key: "internet", kind: "fixed", amount: 35_000, paid: null },
+      { key: "phone_recharge", kind: "envelope", amount: 20_000, paid: null },
       { key: "rent", kind: "fixed", amount: 250_000, paid: now },
     ]);
   });
@@ -182,7 +185,14 @@ describe("saveOnboarding", () => {
     // A plan that references a category that doesn't exist fails on the last step.
     const broken = {
       ...plan,
-      fixedCosts: [{ categoryKey: "missing" as "rent", amountMillimes: 1_000, paid: false }],
+      fixedCosts: [
+        {
+          categoryKey: "missing" as "rent",
+          kind: "fixed" as const,
+          amountMillimes: 1_000,
+          paid: false,
+        },
+      ],
     };
 
     await expect(saveOnboarding(test.db, userId, broken, now)).rejects.toThrow(/missing/);

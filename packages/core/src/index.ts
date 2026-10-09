@@ -36,6 +36,7 @@ export {
 } from "./money";
 export {
   type OnboardingAnswers,
+  onboardingEnvelopes,
   type OnboardingFixedCost,
   onboardingFixedCosts,
   type OnboardingPlan,

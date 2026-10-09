@@ -205,7 +205,8 @@
         "water": "Eau (SONEDE)",
         "internet": "Internet",
         "phone_recharge": "Recharge téléphone"
-      }
+      },
+      "rechargeHint": "Prévu pour le mois. Note chaque recharge avec + quand tu la fais."
     },
     "wallets": {
       "title": "Tes portefeuilles",

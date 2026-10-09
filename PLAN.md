@@ -40,7 +40,7 @@ Money arrives ──► Plan it (once, 1 minute) ──► Spend + check in dail
 
 1. **Money arrives.** Student taps "I received money": amount, source (parents / bourse / job / other), wallet (cash / D17 / Flouci / card), expected date of the next transfer.
 2. **Plan it.** The app suggests a split based on last month, the student adjusts:
-   - **Fixed costs** (paid once): rent share, STEG, SONEDE, internet, phone recharge, transport home
+   - **Fixed costs** (paid once, or in parts): rent share, STEG, SONEDE, internet, transport home
    - **Envelopes** (spent over the month): groceries, studies
    - **Savings goal** (optional): laptop, summer
    - **Daily money:** whatever is left = coffee, snacks, going out, small transport
@@ -302,7 +302,7 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 
 Decisions (accepted 2026-10-09):
 
-1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = groceries, studies, health, clothes; fixed = rent, bills, phone recharge, trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default. Quick log offers daily and envelope categories, most used in the last 30 days first; a new student sees coffee, transport, food out, going out, groceries, studies, health, clothes, then other (always last). Phone recharge stays a fixed cost.
+1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = phone recharge, groceries, studies, health, clothes; fixed = rent, bills (electricity, water, internet), trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default. Quick log offers daily and envelope categories, most used in the last 30 days first; a new student sees coffee, transport, food out, going out, phone recharge, groceries, studies, health, clothes, then other (always last). Phone recharge is an envelope (changed 2026-10-09): it's topped up several times a month at a kiosk, so it's logged with quick log. Planned, each top-up uses the envelope first and any overspend is daily money; unplanned, it's daily money. Onboarding's phone recharge answer becomes a phone recharge envelope.
 2. Reserved = unpaid fixed costs + envelope remainders (never below 0; overspending comes out of daily money) + savings at its full amount. One optional savings line now; savings goals in V1.
 3. "Mark paid" asks for the amount actually paid (pre-filled). Extra comes out of today's daily money; a saving goes back into it.
 4. Quick log uses cash by default, with a one-tap switch, and remembers the last wallet per category.
