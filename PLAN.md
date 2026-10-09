@@ -291,7 +291,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 How the numbers come from the data (daily money, reserved, week snapshots, late transfers): ADR 006. One PR per line, in this order:
 
-- [ ] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
+- [x] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress; tapping the amount shows how it's calculated. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
 - [ ] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
 - [ ] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
 - [ ] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
