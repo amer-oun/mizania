@@ -1,26 +1,6 @@
-import { formatTND, nextTransferDate, todayBudget, todayInTunis } from "@mizania/core";
+import { formatTND } from "@mizania/core";
 
-import { expect, messages, onboardedStudent, test } from "./support";
-
-// The onboarding in onboardedStudent: cash 10, card 120, D17 0 (130 DT in all),
-// money expected on the same day next month, weekly mode (the default).
-const today = todayInTunis();
-const arrivalDay = Number(today.slice(8));
-
-/** What core says for that student today, with `reserved` set aside and `spentToday` spent. */
-function expected(reserved: number, spentToday = 0) {
-  const available = 130_000 - spentToday;
-  const budget = todayBudget({
-    today,
-    startedOn: today,
-    nextTransferOn: nextTransferDate(today, arrivalDay),
-    poolNow: available - reserved,
-    spentToday,
-    spentThisWeekBeforeToday: 0,
-    weeklyMode: true,
-  });
-  return { available, poolNow: available - reserved, budget };
-}
+import { expect, expected, messages, onboardedStudent, test } from "./support";
 
 for (const locale of ["ar", "fr", "en"] as const) {
   const t = messages[locale].Today;
@@ -101,6 +81,6 @@ test("en: more set aside than exists is over budget", async ({ page }) => {
   await expect(page.getByTestId("today-status")).toHaveText(t.status.over_budget);
   await expect(page.getByText(t.overBudgetHint)).toBeVisible();
   // 500 DT of rent against 130 DT in the wallets.
-  await expect(page.getByRole("heading", { level: 2 })).toContainText(formatTND(370_000, "en"));
+  await expect(page.locator("#today-amount")).toContainText(formatTND(370_000, "en"));
   await expect(page.getByTestId("today-amount")).toHaveCount(0);
 });

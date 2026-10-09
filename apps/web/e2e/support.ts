@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { todayInTunis } from "@mizania/core";
+import { nextTransferDate, todayBudget, todayInTunis } from "@mizania/core";
 import { type APIRequestContext, expect, type Page, test as base } from "@playwright/test";
 
 import ar from "../messages/ar.json" with { type: "json" };
@@ -148,6 +148,25 @@ export async function onboardedStudent(
   await page.goto(`/${locale}/onboarding?step=4`);
   await page.getByRole("button", { name: messages[locale].Onboarding.finish }).click();
   await expect(page).toHaveURL(new RegExp(`/${locale}$`));
+}
+
+// The onboarding in onboardedStudent: cash 10, card 120, D17 0 (130 DT in all),
+// money expected on the same day next month, weekly mode (the default).
+
+/** What core says for that student today, with `reserved` set aside and `spentToday` spent. */
+export function expected(reserved: number, spentToday = 0) {
+  const available = 130_000 - spentToday;
+  const today = todayInTunis();
+  const budget = todayBudget({
+    today,
+    startedOn: today,
+    nextTransferOn: nextTransferDate(today, Number(today.slice(8))),
+    poolNow: available - reserved,
+    spentToday,
+    spentThisWeekBeforeToday: 0,
+    weeklyMode: true,
+  });
+  return { available, poolNow: available - reserved, budget };
 }
 
 // Subjects from packages/auth/src/email/messages.ts.
