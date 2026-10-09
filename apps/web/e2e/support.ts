@@ -105,7 +105,7 @@ export async function signedInNewUser(page: Page, locale: "ar" | "fr" | "en") {
  * A signed-in student who finished onboarding with cash 10, D17 at 0 and a
  * card with 120, and money expected on `arrivalDay` (default: the same day
  * next month, the longest cycle). Optionally a rent share, not yet paid,
- * and a Flouci wallet.
+ * bills (phone recharge becomes an envelope) and a Flouci wallet.
  * The wizard itself is tested in onboarding.spec.ts: here its saved draft is
  * filled in and only "Finish" is clicked.
  */
@@ -114,9 +114,15 @@ export async function onboardedStudent(
   locale: Locale,
   {
     rent,
+    bills = {},
     flouci,
     arrivalDay = Number(todayInTunis().slice(8)),
-  }: { rent?: string; flouci?: string; arrivalDay?: number } = {},
+  }: {
+    rent?: string;
+    bills?: Partial<Record<"electricity" | "water" | "internet" | "phone_recharge", string>>;
+    flouci?: string;
+    arrivalDay?: number;
+  } = {},
 ) {
   await signedInNewUser(page, locale);
   const session = await page.request.get("/api/auth/get-session");
@@ -124,12 +130,19 @@ export async function onboardedStudent(
 
   await page.goto(`/${locale}/onboarding`);
   const cost = { enabled: false, amount: "", paid: false };
+  const bill = (amount: string | undefined) =>
+    amount === undefined ? cost : { enabled: true, amount, paid: false };
   const draft = {
     version: 1,
     monthly: "600",
     arrivalDay,
     rent: rent ? { enabled: true, amount: rent, paid: false } : cost,
-    bills: { electricity: cost, water: cost, internet: cost, phone_recharge: cost },
+    bills: {
+      electricity: bill(bills.electricity),
+      water: bill(bills.water),
+      internet: bill(bills.internet),
+      phone_recharge: bill(bills.phone_recharge),
+    },
     cash: { balance: "10" },
     wallets: {
       d17: { enabled: true, balance: "" },
@@ -153,14 +166,21 @@ export async function onboardedStudent(
 // The onboarding in onboardedStudent: cash 10, card 120, D17 0 (130 DT in all),
 // money expected on the same day next month, weekly mode (the default).
 
-/** What core says for that student today, with `reserved` set aside and `spentToday` spent. */
-export function expected(reserved: number, spentToday = 0) {
-  const available = 130_000 - spentToday;
+/** The first cycle of that student: from today until the same day next month. */
+export function onboardedCycle() {
   const today = todayInTunis();
-  const budget = todayBudget({
+  return {
     today,
     startedOn: today,
     nextTransferOn: nextTransferDate(today, Number(today.slice(8))),
+  };
+}
+
+/** What core says for that student today, with `reserved` set aside and `spentToday` spent. */
+export function expected(reserved: number, spentToday = 0) {
+  const available = 130_000 - spentToday;
+  const budget = todayBudget({
+    ...onboardedCycle(),
     poolNow: available - reserved,
     spentToday,
     spentThisWeekBeforeToday: 0,
