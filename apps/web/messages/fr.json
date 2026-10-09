@@ -98,6 +98,24 @@
     "loading": "Chargement…",
     "noCycle": "Aucun mois en cours."
   },
+  "PayFixed": {
+    "pay": "Payer",
+    "undo": "Annuler",
+    "title": "Payer : {name}",
+    "amount": "Montant vraiment payé",
+    "final": "C'est tout pour ce mois-ci",
+    "finalHint": "Désactive si tu paies le reste plus tard, par exemple le loyer en deux fois.",
+    "confirm": "Payer",
+    "markPaid": "Marquer payé sans payer plus",
+    "paid": "{name} payé",
+    "paidPart": "{amount} payé pour {name}",
+    "undone": "Paiement annulé",
+    "markedPaid": "{name} marqué payé",
+    "saving": "Enregistrement…",
+    "close": "Fermer",
+    "undoLabel": "Annuler le paiement : {name}",
+    "payLabel": "Payer : {name}"
+  },
   "LanguageSwitcher": {
     "label": "Langue",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"
@@ -285,7 +303,8 @@
       "wallet-archived": "Impossible d'annuler : un de ses portefeuilles est archivé. Restaure-le d'abord.",
       "invalid": "Vérifie ce que tu as saisi.",
       "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
-      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
+      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie.",
+      "already-paid": "C'est déjà payé. Annule d'abord le paiement pour le modifier."
     },
     "transferTitle": "Transfert entre portefeuilles",
     "transferSubtitle": "Par exemple, du cash retiré au distributeur.",

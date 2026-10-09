@@ -8,7 +8,7 @@ export interface SnackbarMessage {
   /** Changes for every new message, so the timer starts again. */
   id: number;
   text: string;
-  action?: { label: string; run: () => void };
+  action?: { label: string; run: () => void } | undefined;
 }
 
 const VISIBLE_MS = 5_000;

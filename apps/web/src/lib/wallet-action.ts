@@ -14,6 +14,7 @@ export type WalletActionError =
   | "type-taken"
   | "last-wallet"
   | "wallet-archived"
+  | "already-paid"
   | "server";
 export type WalletActionResult = { ok: true } | { ok: false; error: WalletActionError };
 
