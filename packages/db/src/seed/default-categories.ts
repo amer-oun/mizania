@@ -4,6 +4,8 @@ type DefaultCategory = Pick<NewCategory, "key" | "names" | "icon" | "color" | "g
 
 /**
  * Default categories from PLAN.md §7. `icon` is a lucide-react icon name.
+ * The order is `position`: fixed costs first, then what quick log offers a
+ * new student, most frequent first (coffee, transport, food out), "other" last.
  * `key` is stable and must never change once released: clients and
  * user data refer to it.
  */
@@ -44,24 +46,17 @@ export const defaultCategories: readonly DefaultCategory[] = [
     group: "fixed",
   },
   {
-    key: "groceries",
-    names: { ar: "القضية", fr: "Courses", en: "Groceries" },
-    icon: "shopping-basket",
-    color: "#22c55e",
-    group: "envelope",
+    key: "trip_home",
+    names: { ar: "مرواحة للدار", fr: "Retour à la maison", en: "Trip home" },
+    icon: "luggage",
+    color: "#0891b2",
+    group: "fixed",
   },
   {
     key: "coffee",
     names: { ar: "القهوة", fr: "Café", en: "Coffee" },
     icon: "coffee",
     color: "#92400e",
-    group: "daily",
-  },
-  {
-    key: "food_out",
-    names: { ar: "ماكلة برّا", fr: "Repas dehors", en: "Food out" },
-    icon: "utensils",
-    color: "#ef4444",
     group: "daily",
   },
   {
@@ -76,11 +71,25 @@ export const defaultCategories: readonly DefaultCategory[] = [
     group: "daily",
   },
   {
-    key: "trip_home",
-    names: { ar: "مرواحة للدار", fr: "Retour à la maison", en: "Trip home" },
-    icon: "luggage",
-    color: "#0891b2",
-    group: "fixed",
+    key: "food_out",
+    names: { ar: "ماكلة برّا", fr: "Repas dehors", en: "Food out" },
+    icon: "utensils",
+    color: "#ef4444",
+    group: "daily",
+  },
+  {
+    key: "going_out",
+    names: { ar: "الخرجات", fr: "Sorties", en: "Going out" },
+    icon: "party-popper",
+    color: "#ec4899",
+    group: "daily",
+  },
+  {
+    key: "groceries",
+    names: { ar: "القضية", fr: "Courses", en: "Groceries" },
+    icon: "shopping-basket",
+    color: "#22c55e",
+    group: "envelope",
   },
   {
     key: "studies",
@@ -92,13 +101,6 @@ export const defaultCategories: readonly DefaultCategory[] = [
     icon: "book-open",
     color: "#a855f7",
     group: "envelope",
-  },
-  {
-    key: "going_out",
-    names: { ar: "الخرجات", fr: "Sorties", en: "Going out" },
-    icon: "party-popper",
-    color: "#ec4899",
-    group: "daily",
   },
   {
     key: "health",

@@ -107,7 +107,31 @@ describe("cycleSummary", () => {
       spentToday: 0,
       spentThisWeekBeforeToday: 0,
       spendingByDay: [{ day: "2026-10-08", amount: 0 }],
+      dailyParts: new Map(),
     });
+  });
+
+  it("gives each transaction with an ID its daily part", () => {
+    const summary = cycleSummary({
+      ...input,
+      transactions: [
+        ...history,
+        { ...expense("2026-10-10", "cash", 4_000, { categoryId: "coffee" }), id: "coffee" },
+        { ...expense("2026-10-10", "cash", 1_000, { categoryId: "groceries" }), id: "food" },
+        { ...expense("2026-09-30", "cash", 1_000, { categoryId: "coffee" }), id: "before" },
+        {
+          ...tx("2026-10-10", {
+            type: "transfer",
+            walletId: "cash",
+            toWalletId: "card",
+            amountMillimes: 1,
+          }),
+          id: "move",
+        },
+      ],
+    });
+    // The groceries envelope is already used up, so all of it is daily money.
+    expect(Object.fromEntries(summary.dailyParts)).toEqual({ coffee: 4_000, food: 1_000, move: 0 });
   });
 
   it("adds up two envelopes for the same category", () => {
@@ -242,6 +266,23 @@ describe("cycleSummary properties", () => {
         expect(sum(s.spendingByDay.map((d) => d.amount)) + fixedUsed + envelopesUsed).toBe(spent);
         expect(s.reserved.savings).toBe(p.savings);
         expect(s.poolNow).toBe(s.available - s.reserved.total);
+      }),
+    );
+  });
+
+  it("gives daily parts that add up to each day's spending", () => {
+    fc.assert(
+      fc.property(randomPlan, randomHistory, (p, h) => {
+        const s = summarize(
+          planItemsOf(p),
+          h.map((t, i) => ({ ...t, id: String(i) })),
+        );
+        for (const { day, amount } of s.spendingByDay) {
+          const parts = h.flatMap((t, i) =>
+            t.day === day ? [s.dailyParts.get(String(i)) ?? 0] : [],
+          );
+          expect(sum(parts)).toBe(amount);
+        }
       }),
     );
   });

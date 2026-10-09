@@ -55,6 +55,30 @@
     "retry": "عاود جرّب",
     "loading": "قاعد يحمّل…"
   },
+  "QuickLog": {
+    "title": "زيد مصروف",
+    "close": "سكّر",
+    "amount": "المبلغ",
+    "currency": "د.ت",
+    "from": "من",
+    "didYouMean": "تحب تقول {amount}؟",
+    "pickCategory": "وبعد اضغط على شنوة كان:",
+    "envelope": "ظرف",
+    "saved": "{category} {amount} تسجّل",
+    "undo": "بطّل",
+    "deleted": "تفسخ",
+    "back": "امسح آخر رقم",
+    "decimal": "فاصلة",
+    "offline": "ماكش متصل بالأنترنات. اتصل باش تسجّل."
+  },
+  "TodayList": {
+    "title": "اليوم",
+    "empty": "ما سجّلت شي اليوم. اضغط + باش تزيد قهوة.",
+    "unlogged": "مصروف ما تسجّلش",
+    "covered": "من البلان متاعك",
+    "partial": "{amount} من فلوس اليوم",
+    "delete": "افسخ {category} {amount}"
+  },
   "LanguageSwitcher": {
     "label": "اللغة",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {غير معروفة}}"

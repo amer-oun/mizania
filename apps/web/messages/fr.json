@@ -55,6 +55,30 @@
     "retry": "Réessayer",
     "loading": "Chargement…"
   },
+  "QuickLog": {
+    "title": "Ajouter une dépense",
+    "close": "Fermer",
+    "amount": "Montant",
+    "currency": "DT",
+    "from": "Depuis",
+    "didYouMean": "Tu voulais dire {amount} ?",
+    "pickCategory": "Puis appuie sur ce que c'était :",
+    "envelope": "Enveloppe",
+    "saved": "{category} {amount} enregistré",
+    "undo": "Annuler",
+    "deleted": "Supprimé",
+    "back": "Effacer le dernier chiffre",
+    "decimal": "Virgule",
+    "offline": "Tu es hors ligne. Connecte-toi à Internet pour enregistrer."
+  },
+  "TodayList": {
+    "title": "Aujourd'hui",
+    "empty": "Rien d'enregistré aujourd'hui. Appuie sur + pour ajouter un café.",
+    "unlogged": "Dépense non notée",
+    "covered": "Couvert par ton plan",
+    "partial": "{amount} sur l'argent du jour",
+    "delete": "Supprimer {category} {amount}"
+  },
   "LanguageSwitcher": {
     "label": "Langue",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Inconnue}}"

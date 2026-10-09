@@ -292,7 +292,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 How the numbers come from the data (daily money, reserved, week snapshots, late transfers): ADR 006. One PR per line, in this order:
 
 - [x] **Home screen + budget engine:** core `cycleSummary`; week snapshot (`week_snapshots`); today's amount, days left, status, week progress; tapping the amount shows how it's calculated. _Done when:_ your number equals (wallets − unpaid fixed costs) shared out per ADR 003 and survives a reload.
-- [ ] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
+- [x] **Quick log (under 3 taps):** "+" → amount → category; today's list with delete. _Done when:_ a coffee lowers "left today" but not today's amount.
 - [ ] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
 - [ ] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
 - [ ] **"I received money" + late transfer:** new month or extra money; the new month's plan is suggested from the previous cycle; "Did the money arrive? / Not yet → new date". _Done when:_ a new month is ready in under a minute, and a passed expected date shows the question instead of a huge number.
@@ -302,7 +302,7 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 
 Decisions (accepted 2026-10-09):
 
-1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = groceries, studies, health, clothes; fixed = rent, bills, phone recharge, trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default.
+1. Category groups as seeded: daily = coffee, food out, transport, going out, other; envelope = groceries, studies, health, clothes; fixed = rent, bills, phone recharge, trip home. An envelope category counts as an envelope only when it's in this month's plan; the plan suggests only a groceries envelope by default. Quick log offers daily and envelope categories, most used in the last 30 days first; a new student sees coffee, transport, food out, going out, groceries, studies, health, clothes, then other (always last). Phone recharge stays a fixed cost.
 2. Reserved = unpaid fixed costs + envelope remainders (never below 0; overspending comes out of daily money) + savings at its full amount. One optional savings line now; savings goals in V1.
 3. "Mark paid" asks for the amount actually paid (pre-filled). Extra comes out of today's daily money; a saving goes back into it.
 4. Quick log uses cash by default, with a one-tap switch, and remembers the last wallet per category.

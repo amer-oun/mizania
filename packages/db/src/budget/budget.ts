@@ -10,11 +10,30 @@ import {
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 
 import type { Db } from "../client";
-import { cycles, planItems, transactions, wallets, weekSnapshots } from "../schema";
+import {
+  cycles,
+  planItems,
+  type Transaction,
+  transactions,
+  wallets,
+  weekSnapshots,
+} from "../schema";
 
 // Today's spendable amount for one user (ADR 003, ADR 006). This only loads
 // rows, scoped by the user's ID from the session; every number comes from
 // packages/core.
+
+/** One of today's expenses, for the list under the number. */
+export interface TodayExpense {
+  id: string;
+  amountMillimes: number;
+  categoryId: string | null;
+  walletId: string;
+  occurredAt: Date;
+  source: Transaction["source"];
+  /** How much of it came out of the daily money (ADR 006). */
+  dailyPart: number;
+}
 
 export interface Budget {
   cycle: { id: string; startedOn: IsoDate; expectedNextOn: IsoDate; weeklyMode: boolean };
@@ -22,6 +41,8 @@ export interface Budget {
   transferDue: boolean;
   summary: CycleSummary;
   today: TodayBudget;
+  /** Today's expenses, newest first. */
+  todayExpenses: TodayExpense[];
 }
 
 /**
@@ -58,6 +79,8 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
     .where(and(eq(planItems.cycleId, cycle.id), isNull(planItems.deletedAt)));
   const rows = await db
     .select({
+      id: transactions.id,
+      source: transactions.source,
       type: transactions.type,
       walletId: transactions.walletId,
       toWalletId: transactions.toWalletId,
@@ -94,11 +117,25 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
     ? await storedWeekAllowance(db, userId, cycle.id, weekStartAllowance(input))
     : undefined;
 
+  const todayExpenses = rows
+    .filter((t) => t.type === "expense" && t.day === today)
+    .reverse()
+    .map((t) => ({
+      id: t.id,
+      amountMillimes: t.amountMillimes,
+      categoryId: t.categoryId,
+      walletId: t.walletId,
+      occurredAt: t.occurredAt,
+      source: t.source,
+      dailyPart: summary.dailyParts.get(t.id) ?? 0,
+    }));
+
   return {
     cycle,
     transferDue: isTransferDue(today, cycle.expectedNextOn),
     summary,
     today: todayBudget({ ...input, weeklyMode: cycle.weeklyMode, weekAllowance }),
+    todayExpenses,
   };
 }
 

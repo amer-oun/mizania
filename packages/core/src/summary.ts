@@ -27,6 +27,8 @@ export interface SummaryPlanItem {
 }
 
 export interface SummaryTransaction extends BalanceTransaction {
+  /** Set to get this transaction's daily part back in `dailyParts`. */
+  id?: string | undefined;
   categoryId?: string | null | undefined;
   /** A fixed-cost payment: the plan item it pays. */
   planItemId?: string | null | undefined;
@@ -58,6 +60,12 @@ export interface CycleSummary {
   spentThisWeekBeforeToday: number;
   /** Daily-money spending on each day from the cycle's start to today. */
   spendingByDay: { day: IsoDate; amount: number }[];
+  /**
+   * For each transaction of the cycle that has an `id`: how much of it came
+   * out of the daily money (0 when it was covered by the plan, or isn't
+   * spending at all).
+   */
+  dailyParts: Map<string, number>;
 }
 
 function checkPlanItem(item: SummaryPlanItem): void {
@@ -130,6 +138,7 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
   };
 
   const spending = new Map<IsoDate, number>();
+  const dailyParts = new Map<string, number>();
   const inCycle = input.transactions
     .filter((t) => daysBetween(startedOn, t.day) >= 0 && daysBetween(t.day, today) >= 0)
     .sort((a, b) => a.at - b.at);
@@ -143,6 +152,7 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     } else if (t.type === "adjustment" && t.amountMillimes < 0) {
       daily = -t.amountMillimes;
     }
+    if (t.id !== undefined) dailyParts.set(t.id, daily);
     if (daily > 0) spending.set(t.day, (spending.get(t.day) ?? 0) + daily);
   }
 
@@ -167,5 +177,6 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
     spentToday: spending.get(today) ?? 0,
     spentThisWeekBeforeToday,
     spendingByDay,
+    dailyParts,
   };
 }

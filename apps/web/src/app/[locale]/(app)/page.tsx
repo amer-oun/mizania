@@ -1,9 +1,12 @@
 import { todayInTunis } from "@mizania/core";
 import { getBudget } from "@mizania/db/budget";
+import { getCategories, getQuickLogOptions } from "@mizania/db/expenses";
+import { getWalletsOverview } from "@mizania/db/wallets";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { TodayLog } from "@/components/quick-log/today-log";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
 import { getDb } from "@/lib/db";
@@ -15,7 +18,13 @@ export default async function TodayPage() {
   const t = await getTranslations("Home");
   const today = await getTranslations("Today");
   const locale = await getLocale();
-  const budget = await getBudget(getDb(), user.id, todayInTunis());
+  const db = getDb();
+  const [budget, quickLog, categories, { wallets }] = await Promise.all([
+    getBudget(db, user.id, todayInTunis()),
+    getQuickLogOptions(db, user.id),
+    getCategories(db, user.id),
+    getWalletsOverview(db, user.id),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[env(safe-area-inset-top)]">
@@ -30,7 +39,8 @@ export default async function TodayPage() {
           </form>
         </div>
       </header>
-      <main className="flex flex-1 flex-col justify-center pb-6">
+      {/* Room at the bottom so the "+" button never covers the last row. */}
+      <main className="flex flex-1 flex-col pt-2 pb-24">
         {budget ? (
           <TodayScreen
             view={{
@@ -51,6 +61,10 @@ export default async function TodayPage() {
             {today("noCycle")}
           </p>
         )}
+        <TodayLog
+          options={quickLog}
+          list={budget && { expenses: budget.todayExpenses, categories, wallets }}
+        />
       </main>
     </div>
   );
