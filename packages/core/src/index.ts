@@ -35,4 +35,12 @@ export {
   type WalletKind,
   walletKinds,
 } from "./onboarding";
+export {
+  type ArchiveChoice,
+  archiveSettlement,
+  type BalanceTransaction,
+  totalBalance,
+  type TransactionType,
+  walletBalances,
+} from "./wallets";
 export { type RunOutForecast, runOutForecast, type RunOutInput } from "./warnings";
