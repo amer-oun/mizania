@@ -5,14 +5,14 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Button } from "@/components/ui/button";
 import { requireSession } from "@/lib/session";
 
-// Placeholder until onboarding and the daily amount (PR 3).
+// Placeholder until the daily amount (Phase 3).
 export default async function HomePage() {
   const { user } = await requireSession();
   const t = await getTranslations("Home");
   const locale = await getLocale();
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[env(safe-area-inset-top)]">
       <header className="flex items-center justify-between gap-2 py-4">
         <form action={signOut.bind(null, locale)}>
           <Button type="submit" variant="ghost" size="sm">

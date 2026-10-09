@@ -6,14 +6,13 @@ import {
 } from "@mizania/core";
 import { z } from "zod";
 
-const millimes = z.number().int().refine(Number.isSafeInteger, "Too large");
-const positiveMillimes = millimes.refine((v) => v > 0, "Must be more than 0");
+import { notNegativeMillimes, positiveMillimes } from "./money";
 
 const walletSchema = z
   .object({
     kind: z.enum(walletKinds),
     name: z.string().trim().max(WALLET_NAME_MAX_LENGTH).optional(),
-    balanceMillimes: millimes.refine((v) => v >= 0, "Can't be negative"),
+    balanceMillimes: notNegativeMillimes,
   })
   .strict()
   .refine((w) => w.kind !== "other" || (w.name !== undefined && w.name !== ""), {

@@ -83,6 +83,30 @@ describe("wallets", () => {
       test.db.insert(wallets).values({ userId, type: "other", name: "   " }),
     ).rejects.toThrow();
   });
+
+  // Migration 0003.
+  it("allow one wallet of each type, archived or not, but several 'other' wallets", async () => {
+    const { id: userId } = await newUser();
+    const cash = await newWallet(userId, "cash");
+    await test.db
+      .update(wallets)
+      .set({ archived: true })
+      .where(sql`id = ${cash.id}`);
+
+    await expect(newWallet(userId, "cash")).rejects.toThrow();
+    await expect(newWallet((await newUser()).id, "cash")).resolves.toBeDefined();
+    await test.db.insert(wallets).values([
+      { userId, type: "other", name: "Tirelire" },
+      { userId, type: "other", name: "Tirelire 2" },
+    ]);
+
+    // A soft-deleted wallet no longer counts.
+    await test.db
+      .update(wallets)
+      .set({ deletedAt: new Date() })
+      .where(sql`id = ${cash.id}`);
+    await expect(newWallet(userId, "cash")).resolves.toBeDefined();
+  });
 });
 
 describe("transactions", () => {

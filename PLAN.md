@@ -83,6 +83,7 @@ Because money arrives monthly, the daily money is split into **weekly portions**
 - **Derja quick entry:** `9ahwa 2.5`, `louage sousse 12`, `قهوة ٢٫٥`
 - **"Ask for money" message:** writes a polite message for parents with a short summary of what the last transfer covered; student copies it into WhatsApp/Messenger (nothing is sent automatically)
 - Export CSV, delete account
+- Consider several card wallets with nicknames (e.g. BIAT card, Poste card). For now, a second card is added as Other.
 
 ### Stretch (only after V1 ships)
 
@@ -204,6 +205,9 @@ wallets            (id, user_id, type[cash|d17|flouci|card|other],
                     name (only for "other", required there; the others are named
                     in the UI from their type), archived, position,
                     created_at, updated_at, deleted_at)
+                    (one cash, D17, Flouci and card wallet per user, archived or
+                    not; "other" can repeat. An archived wallet is always at 0:
+                    its balance is moved to another wallet or zeroed first)
 
 cycles             (id, user_id, started_on, expected_next_on, actual_end_on,
                     status[active|closed] (at most one active per user), weekly_mode,
@@ -275,7 +279,7 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 - [ ] Auth (email + Google)
 - [ ] Onboarding wizard: language → monthly amount + arrival day → rent + bills → wallets with starting balances
-- [ ] Wallet list, manual transfers between wallets (e.g. cash withdrawal from card)
+- [x] Wallet list, manual transfers between wallets (e.g. cash withdrawal from card)
 - **Done when:** a new user finishes onboarding in under 2 minutes in any language.
 
 ### Phase 3: The core loop (1.5 weeks)

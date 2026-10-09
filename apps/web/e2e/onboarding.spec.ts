@@ -1,20 +1,6 @@
 import type { Page } from "@playwright/test";
 
-import { createVerifiedUser, expect, messages, newEmail, PASSWORD, test } from "./support";
-
-type Locale = "ar" | "fr" | "en";
-
-/** A verified account, signed in through the API in this page's browser. */
-async function signedInNewUser(page: Page, locale: Locale) {
-  const email = newEmail();
-  await createVerifiedUser(page.request, { email, locale });
-  const res = await page.request.post("/api/auth/sign-in/email", {
-    headers: { origin: "http://localhost:3000" },
-    data: { email, password: PASSWORD },
-  });
-  expect(res.ok()).toBe(true);
-  return email;
-}
+import { expect, messages, signedInNewUser, test } from "./support";
 
 const section = (page: Page, title: string) => page.locator("section").filter({ hasText: title });
 

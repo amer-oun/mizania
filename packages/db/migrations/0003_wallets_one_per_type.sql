@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "wallets_one_per_type" ON "wallets" USING btree ("user_id","type") WHERE "wallets"."type" <> 'other' and "wallets"."deleted_at" is null;

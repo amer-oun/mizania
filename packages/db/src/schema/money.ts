@@ -59,6 +59,11 @@ export const wallets = pgTable(
   (t) => [
     index("wallets_user_id_idx").on(t.userId),
     unique("wallets_id_user_id_unique").on(t.id, t.userId),
+    // One cash, D17, Flouci and card wallet per user, archived or not (an
+    // archived one is restored instead of added again). "Other" can repeat.
+    uniqueIndex("wallets_one_per_type")
+      .on(t.userId, t.type)
+      .where(sql`${t.type} <> 'other' and ${t.deletedAt} is null`),
     check(
       "wallets_name_only_for_other",
       sql`(${t.type} = 'other' and ${t.name} is not null and btrim(${t.name}) <> '')
