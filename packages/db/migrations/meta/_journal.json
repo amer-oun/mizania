@@ -22,6 +22,13 @@
       "when": 1791478300267,
       "tag": "0002_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791531539951,
+      "tag": "0003_wallets_one_per_type",
+      "breakpoints": true
     }
   ]
 }
