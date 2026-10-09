@@ -10,7 +10,8 @@
     "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/test/test-database.ts",
-    "./testing/global-setup": "./src/test/global-setup.ts"
+    "./testing/global-setup": "./src/test/global-setup.ts",
+    "./wallets": "./src/wallets/wallets.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
