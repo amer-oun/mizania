@@ -35,6 +35,7 @@ describe("migrations", () => {
       "users",
       "verifications",
       "wallets",
+      "week_snapshots",
     ]);
   });
 

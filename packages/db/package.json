@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./budget": "./src/budget/budget.ts",
     "./client": "./src/client.ts",
     "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./schema": "./src/schema/index.ts",
