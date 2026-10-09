@@ -1,7 +1,7 @@
 import type { EnvelopeStatus, FixedCostStatus, IsoDate } from "@mizania/core";
 import { and, asc, desc, eq, isNull } from "drizzle-orm";
 
-import { getBudget } from "../budget/budget";
+import { type Budget, getBudget } from "../budget/budget";
 import type { Db } from "../client";
 import {
   categories,
@@ -42,13 +42,18 @@ export interface Plan {
   envelopes: PlanEnvelope[];
   /** Everything still set aside for fixed costs (the Today breakdown's line). */
   stillToPay: number;
+  /** Set aside for savings this month (0 without a savings line). */
+  savings: number;
 }
 
 /** The active cycle's plan with what's paid and left (from packages/core), or null. */
 export async function getPlan(db: Db, userId: string, today: IsoDate): Promise<Plan | null> {
   const budget = await getBudget(db, userId, today);
-  if (!budget) return null;
+  return budget && planOf(db, userId, budget);
+}
 
+/** The plan of `budget`, the user's (from getBudget). */
+export async function planOf(db: Db, userId: string, budget: Budget): Promise<Plan> {
   const items = await db
     .select({
       id: planItems.id,
@@ -103,6 +108,7 @@ export async function getPlan(db: Db, userId: string, today: IsoDate): Promise<P
       ),
     })),
     stillToPay: budget.summary.reserved.fixed,
+    savings: budget.summary.reserved.savings,
   };
 }
 

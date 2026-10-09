@@ -10,7 +10,7 @@
     "./client": "./src/client.ts",
     "./expenses": "./src/expenses/expenses.ts",
     "./onboarding": "./src/onboarding/save-onboarding.ts",
-    "./plan": "./src/plan/fixed-costs.ts",
+    "./plan": "./src/plan/index.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/test/test-database.ts",
     "./testing/global-setup": "./src/test/global-setup.ts",
