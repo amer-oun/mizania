@@ -3,27 +3,29 @@
 import type { QuickLogOptions } from "@mizania/db/expenses";
 import { PlusIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { type ReactNode, useCallback, useState } from "react";
+import { type ComponentProps, useCallback, useState } from "react";
 
 import { deleteExpenseAction, logExpenseAction } from "@/app/actions/expenses";
 import { Snackbar, type SnackbarMessage } from "@/components/ui/snackbar";
 import { useFormatAmount, useWalletAction } from "@/components/wallets/shared";
 
 import { type QuickLogEntry, QuickLogSheet } from "./quick-log-sheet";
+import { TodayList } from "./today-list";
 
 /** Lets the list under the number show a message in the same snackbar. */
 export type ShowMessage = (message: Omit<SnackbarMessage, "id">) => void;
 
 /**
- * The "+" button, the quick log sheet, and the snackbar that confirms a save
- * (with Undo). `children` renders today's list.
+ * Today's list, the "+" button, the quick log sheet, and the snackbar that
+ * confirms a save or a delete (with Undo).
  */
 export function TodayLog({
   options,
-  children,
+  list,
 }: {
   options: QuickLogOptions;
-  children?: (show: ShowMessage) => ReactNode;
+  /** Null without an active cycle: no list then. */
+  list: Omit<ComponentProps<typeof TodayList>, "show"> | null;
 }) {
   const t = useTranslations("QuickLog");
   const locale = useLocale();
@@ -72,7 +74,11 @@ export function TodayLog({
 
   return (
     <>
-      {children?.(show)}
+      {list && (
+        <div className="mt-6">
+          <TodayList {...list} show={show} />
+        </div>
+      )}
       {options.wallets.length > 0 && (
         <button
           type="button"

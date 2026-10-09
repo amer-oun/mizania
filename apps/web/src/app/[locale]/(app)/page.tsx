@@ -6,7 +6,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { TodayList } from "@/components/quick-log/today-list";
 import { TodayLog } from "@/components/quick-log/today-log";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
@@ -62,20 +61,10 @@ export default async function TodayPage() {
             {today("noCycle")}
           </p>
         )}
-        <TodayLog options={quickLog}>
-          {(show) =>
-            budget && (
-              <div className="mt-6">
-                <TodayList
-                  expenses={budget.todayExpenses}
-                  categories={categories}
-                  wallets={wallets}
-                  show={show}
-                />
-              </div>
-            )
-          }
-        </TodayLog>
+        <TodayLog
+          options={quickLog}
+          list={budget && { expenses: budget.todayExpenses, categories, wallets }}
+        />
       </main>
     </div>
   );
