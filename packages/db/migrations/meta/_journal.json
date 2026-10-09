@@ -43,6 +43,13 @@
       "when": 1791541075405,
       "tag": "0005_phone_recharge_envelope",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791583137023,
+      "tag": "0006_month_plan",
+      "breakpoints": true
     }
   ]
 }
