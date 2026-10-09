@@ -47,6 +47,21 @@ export {
   walletKinds,
 } from "./onboarding";
 export {
+  applyPlanDraft,
+  checkPlanChange,
+  envelopeLimits,
+  fixedCostLimits,
+  type PlanChangeProblem,
+  type PlanDraftItem,
+  type PlanItemLimits,
+  type PlanNumbers,
+  type PlanPreview,
+  type PlanPreviewInput,
+  previewPlan,
+  suggestGroceries,
+  weekAfterPlanChange,
+} from "./plan";
+export {
   type CycleSummary,
   cycleSummary,
   type CycleSummaryInput,
