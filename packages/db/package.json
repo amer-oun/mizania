@@ -8,6 +8,7 @@
     ".": "./src/index.ts",
     "./budget": "./src/budget/budget.ts",
     "./client": "./src/client.ts",
+    "./expenses": "./src/expenses/expenses.ts",
     "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/test/test-database.ts",
