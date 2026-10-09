@@ -277,8 +277,8 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 
 ### Phase 2: Auth, onboarding, wallets (1 week)
 
-- [ ] Auth (email + Google)
-- [ ] Onboarding wizard: language → monthly amount + arrival day → rent + bills → wallets with starting balances
+- [x] Auth (email + Google)
+- [x] Onboarding wizard: language → monthly amount + arrival day → rent + bills → wallets with starting balances
 - [x] Wallet list, manual transfers between wallets (e.g. cash withdrawal from card)
 - **Done when:** a new user finishes onboarding in under 2 minutes in any language.
 
@@ -303,6 +303,9 @@ Each phase ends with tests passing, CI green and a deploy. **Real students use t
 - [ ] Tests: two devices editing offline, syncing in different orders → same result
 - [ ] ADR: sync design and conflict strategy
 - [ ] Installed app opens offline: start URL must not depend on a server redirect; precache it and test in airplane mode.
+- [ ] Before the pilot:
+  - [ ] Test Google sign-in in the installed app on a real iPhone
+  - [ ] Have 2 people who haven't seen the app finish onboarding in under 2 minutes
 - [ ] **Pilot: 10 students** use it for 2 weeks. Short feedback form + 3 quick interviews.
 - **Done when:** expenses logged in airplane mode appear on another device after reconnecting, and you have real feedback.
 
