@@ -139,6 +139,21 @@ export function PlanScreen({
           </ul>
         </section>
       )}
+
+      {plan.savings > 0 && (
+        <section aria-labelledby="plan-savings" className="flex flex-col gap-2">
+          <h2 id="plan-savings" className="text-sm font-medium text-muted-foreground">
+            {t("savingsTitle")}
+          </h2>
+          <p
+            className="flex min-h-12 items-center justify-between rounded-xl border px-4 text-sm"
+            data-testid="plan-savings"
+          >
+            <span>{t("savingsLine")}</span>
+            <Amount millimes={plan.savings} className="font-semibold" />
+          </p>
+        </section>
+      )}
     </div>
   );
 }
