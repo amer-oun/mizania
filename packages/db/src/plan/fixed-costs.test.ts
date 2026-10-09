@@ -229,6 +229,21 @@ describe("undoFixedCostPayment", () => {
     expect(await budget(userId)).toMatchObject({ allowance: 10_000, left: 10_000 });
   });
 
+  it("after 'mark paid', only unmarks it: the payments stay", async () => {
+    const { userId, cash, rent } = await student();
+    await payFixedCost(test.db, userId, payment(rent, cash, 80_000, false), now);
+    await markFixedCostPaid(test.db, userId, rent, new Date("2026-10-11T11:00:00Z"));
+
+    expect(await undoFixedCostPayment(test.db, userId, rent, now)).toBe("done");
+    let rentNow = (await getPlan(test.db, userId, today))?.fixedCosts.find((c) => c.id === rent);
+    expect(rentNow).toMatchObject({ paidSoFar: 80_000, left: 20_000, paid: false });
+
+    // Undoing again removes the partial payment.
+    expect(await undoFixedCostPayment(test.db, userId, rent, now)).toBe("done");
+    rentNow = (await getPlan(test.db, userId, today))?.fixedCosts.find((c) => c.id === rent);
+    expect(rentNow).toMatchObject({ paidSoFar: 0, left: 100_000, paid: false });
+  });
+
   it("marks an onboarding 'already paid' cost unpaid, with no payment to undo", async () => {
     const { userId, internet } = await student();
     expect(await undoFixedCostPayment(test.db, userId, internet)).toBe("done");

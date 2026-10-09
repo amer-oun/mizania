@@ -221,10 +221,14 @@ export async function markFixedCostPaid(
 export type UndoFixedCostPaymentResult = "done" | "not-found" | "wallet-archived";
 
 /**
- * Undoes the latest payment of a fixed cost (a soft delete) and marks it
- * unpaid again, so its amount is set aside again. A cost marked "already
- * paid" during onboarding has no payment: it's only marked unpaid. Refused
- * when the payment's wallet is archived, since it must stay at 0.
+ * Undoes the last thing done to a fixed cost:
+ * - paid by a final payment: that payment is undone (a soft delete) and the
+ *   cost is unpaid again;
+ * - marked paid without a payment (or "already paid" at onboarding): it's
+ *   only unpaid again, earlier payments stay;
+ * - partly paid: its latest payment is undone.
+ * Whatever is no longer paid is set aside again. Refused when the payment's
+ * wallet is archived, since it must stay at 0.
  */
 export async function undoFixedCostPayment(
   db: Db,
@@ -237,7 +241,11 @@ export async function undoFixedCostPayment(
     if (!item) return "not-found";
 
     const [payment] = await tx
-      .select({ id: transactions.id, archived: wallets.archived })
+      .select({
+        id: transactions.id,
+        occurredAt: transactions.occurredAt,
+        archived: wallets.archived,
+      })
       .from(transactions)
       .innerJoin(wallets, eq(wallets.id, transactions.walletId))
       .where(
@@ -250,8 +258,12 @@ export async function undoFixedCostPayment(
       )
       .orderBy(desc(transactions.occurredAt), desc(transactions.createdAt))
       .limit(1);
-    if (payment?.archived) return "wallet-archived";
-    if (payment) {
+    // A final payment sets paid_at to its own time; "mark paid" doesn't.
+    const undoPayment =
+      payment !== undefined &&
+      (item.paidAt === null || item.paidAt.getTime() === payment.occurredAt.getTime());
+    if (undoPayment && payment.archived) return "wallet-archived";
+    if (undoPayment) {
       await tx
         .update(transactions)
         .set({ deletedAt: now })
