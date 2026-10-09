@@ -104,7 +104,8 @@ export async function signedInNewUser(page: Page, locale: "ar" | "fr" | "en") {
 /**
  * A signed-in student who finished onboarding with cash 10, D17 at 0 and a
  * card with 120, and money expected on `arrivalDay` (default: the same day
- * next month, the longest cycle). Optionally a rent share, not yet paid.
+ * next month, the longest cycle). Optionally a rent share, not yet paid,
+ * and a Flouci wallet.
  * The wizard itself is tested in onboarding.spec.ts: here its saved draft is
  * filled in and only "Finish" is clicked.
  */
@@ -113,8 +114,9 @@ export async function onboardedStudent(
   locale: Locale,
   {
     rent,
+    flouci,
     arrivalDay = Number(todayInTunis().slice(8)),
-  }: { rent?: string; arrivalDay?: number } = {},
+  }: { rent?: string; flouci?: string; arrivalDay?: number } = {},
 ) {
   await signedInNewUser(page, locale);
   const session = await page.request.get("/api/auth/get-session");
@@ -131,7 +133,7 @@ export async function onboardedStudent(
     cash: { balance: "10" },
     wallets: {
       d17: { enabled: true, balance: "" },
-      flouci: { enabled: false, balance: "" },
+      flouci: { enabled: flouci !== undefined, balance: flouci ?? "" },
       card: { enabled: true, balance: "120" },
       other: { enabled: false, balance: "" },
     },

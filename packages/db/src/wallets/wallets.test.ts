@@ -183,7 +183,7 @@ describe("addWallet", () => {
       name: "Poste",
       balanceMillimes: 15_000,
     });
-    expect(result.status).toBe("added");
+    expect(result).toMatchObject({ status: "added", restored: false });
 
     const { wallets: list } = await getWalletsOverview(test.db, userId);
     expect(list.at(-1)).toMatchObject({
@@ -196,18 +196,41 @@ describe("addWallet", () => {
     expect(await balances(userId)).toMatchObject({ Poste: 15_000, Tirelire: 0 });
   });
 
-  it("refuses a second wallet of the same type, even archived", async () => {
-    const { userId, d17 } = await student();
+  it("refuses a second wallet of a type that's active", async () => {
+    const { userId } = await student();
     expect(
       await addWallet(test.db, userId, { kind: "card", name: null, balanceMillimes: 0 }),
-    ).toEqual({ status: "type-taken" });
-    await archiveWallet(test.db, userId, d17, { kind: "zero" });
-    expect(
-      await addWallet(test.db, userId, { kind: "d17", name: null, balanceMillimes: 0 }),
     ).toEqual({ status: "type-taken" });
     expect(
       (await addWallet(test.db, userId, { kind: "flouci", name: null, balanceMillimes: 0 })).status,
     ).toBe("added");
+  });
+
+  it("restores an archived wallet of that type, with the balance entered", async () => {
+    const { userId, card, d17 } = await student();
+    await transfer(test.db, userId, transferInput(card, d17, 30_000));
+    await archiveWallet(test.db, userId, d17, { kind: "move", toWalletId: card });
+
+    const result = await addWallet(test.db, userId, {
+      kind: "d17",
+      name: null,
+      balanceMillimes: 25_000,
+    });
+    expect(result).toEqual({ status: "added", walletId: d17, restored: true });
+
+    // The same wallet, active again at the end of the list, with 25 DT.
+    const { wallets: list } = await getWalletsOverview(test.db, userId);
+    expect(list.map((w) => [w.id, w.archived, w.position, w.balanceMillimes])).toEqual([
+      [card, false, 0, 120_000],
+      [expect.any(String), false, 1, 10_000],
+      [d17, false, 2, 25_000],
+    ]);
+    expect(await test.db.$count(wallets, eq(wallets.userId, userId))).toBe(3);
+
+    // Active again, so a second one is refused.
+    expect(
+      await addWallet(test.db, userId, { kind: "d17", name: null, balanceMillimes: 0 }),
+    ).toEqual({ status: "type-taken" });
   });
 
   it("never stores a name for a default wallet", async () => {

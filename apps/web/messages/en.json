@@ -225,7 +225,7 @@
     "allTypesTaken": "You already have cash, D17, Flouci and a card. Another card or account? Add it as Other.",
     "renameTitle": "Rename {name}",
     "archiveTitle": "Archive {name}?",
-    "archiveEmpty": "It's at 0. You can restore it later.",
+    "archiveEmpty": "It's at 0. You can add it again any time with “Add a wallet”.",
     "archiveBalance": "{name} still has {amount}. An archived wallet is always at 0, so first:",
     "archiveMove": "Move the money to",
     "archiveZero": "I don't have this money any more (set it to 0)",
@@ -236,7 +236,7 @@
     "offline": "You're offline. Connect to the internet to save changes.",
     "errors": {
       "not-found": "This wallet has changed. Refresh the page and try again.",
-      "type-taken": "You already have this wallet. Look in Archived to restore it.",
+      "type-taken": "You already have this wallet.",
       "last-wallet": "Keep at least one wallet.",
       "wallet-archived": "Can't undo: one of its wallets is archived. Restore it first.",
       "invalid": "Check what you entered.",
