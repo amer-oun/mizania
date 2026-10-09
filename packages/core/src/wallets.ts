@@ -70,6 +70,25 @@ export function totalBalance(balances: Iterable<number>): number {
   return total;
 }
 
+/** Both balances once a transfer is saved, for the preview before confirming. */
+export function previewTransfer(
+  fromBalance: number,
+  toBalance: number,
+  amountMillimes: number,
+): { from: number; to: number } {
+  assertMillimes(fromBalance);
+  assertMillimes(toBalance);
+  assertMillimes(amountMillimes);
+  if (amountMillimes <= 0) {
+    throw new RangeError(`Invalid transfer amount: ${amountMillimes} millimes.`);
+  }
+  const from = fromBalance - amountMillimes;
+  const to = toBalance + amountMillimes;
+  assertMillimes(from);
+  assertMillimes(to);
+  return { from, to };
+}
+
 /** How a student empties a wallet before archiving it. */
 export type ArchiveChoice =
   | { kind: "move"; toWalletId: string }

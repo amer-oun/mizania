@@ -25,7 +25,7 @@ import {
 import { useOnline } from "@/hooks/use-online";
 import { Link } from "@/i18n/navigation";
 
-import { Amount, useWalletAction, useWalletName, WalletTypeIcon,type WalletView } from "./shared";
+import { Amount, useWalletAction, useWalletName, WalletTypeIcon, type WalletView } from "./shared";
 import { AddWalletDialog, ArchiveWalletDialog, RenameWalletDialog } from "./wallet-dialogs";
 
 type OpenDialog =

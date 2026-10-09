@@ -39,6 +39,7 @@ export {
   type ArchiveChoice,
   archiveSettlement,
   type BalanceTransaction,
+  previewTransfer,
   totalBalance,
   type TransactionType,
   walletBalances,

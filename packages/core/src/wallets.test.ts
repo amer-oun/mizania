@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   archiveSettlement,
   type BalanceTransaction,
+  previewTransfer,
   totalBalance,
   walletBalances,
 } from "./wallets";
@@ -167,6 +168,47 @@ describe("totalBalance", () => {
   it("refuses invalid or overflowing amounts", () => {
     expect(() => totalBalance([1.5])).toThrow(RangeError);
     expect(() => totalBalance([Number.MAX_SAFE_INTEGER, 1])).toThrow(RangeError);
+  });
+});
+
+describe("previewTransfer", () => {
+  it("takes the amount from one wallet and adds it to the other", () => {
+    expect(previewTransfer(120_000, 10_000, 50_000)).toEqual({ from: 70_000, to: 60_000 });
+    expect(previewTransfer(0, 0, 5_000)).toEqual({ from: -5_000, to: 5_000 });
+  });
+
+  it("refuses an amount of 0 or less, decimals, or overflow", () => {
+    expect(() => previewTransfer(1, 1, 0)).toThrow(RangeError);
+    expect(() => previewTransfer(1, 1, -1)).toThrow(RangeError);
+    expect(() => previewTransfer(1, 1.5, 1)).toThrow(RangeError);
+    expect(() => previewTransfer(1, Number.MAX_SAFE_INTEGER, 1)).toThrow(RangeError);
+    expect(() => previewTransfer(-Number.MAX_SAFE_INTEGER, 0, 1)).toThrow(RangeError);
+  });
+
+  it("matches walletBalances after the same transfer", () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: -1e9, max: 1e9 }),
+        fc.integer({ min: -1e9, max: 1e9 }),
+        fc.integer({ min: 1, max: 1e9 }),
+        (fromBalance, toBalance, amount) => {
+          const start = [
+            { walletId: "card", amountMillimes: fromBalance },
+            { walletId: "cash", amountMillimes: toBalance },
+          ]
+            .filter((t) => t.amountMillimes !== 0)
+            .map((t) => ({ ...t, type: "adjustment" as const }));
+          const after = walletBalances(ids, [
+            ...start,
+            { type: "transfer", walletId: "card", toWalletId: "cash", amountMillimes: amount },
+          ]);
+          expect(previewTransfer(fromBalance, toBalance, amount)).toEqual({
+            from: after.get("card"),
+            to: after.get("cash"),
+          });
+        },
+      ),
+    );
   });
 });
 
