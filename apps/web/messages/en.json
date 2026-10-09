@@ -55,6 +55,22 @@
     "retry": "Try again",
     "loading": "Loading…"
   },
+  "QuickLog": {
+    "title": "Add an expense",
+    "close": "Close",
+    "amount": "Amount",
+    "currency": "DT",
+    "from": "From",
+    "didYouMean": "Did you mean {amount}?",
+    "pickCategory": "Then tap what it was:",
+    "envelope": "Envelope",
+    "saved": "{category} {amount} saved",
+    "undo": "Undo",
+    "deleted": "Deleted",
+    "back": "Delete last digit",
+    "decimal": "Decimal point",
+    "offline": "You're offline. Connect to the internet to save it."
+  },
   "LanguageSwitcher": {
     "label": "Language",
     "locale": "{locale, select, ar {العربية} fr {Français} en {English} other {Unknown}}"

@@ -1,9 +1,11 @@
 import { todayInTunis } from "@mizania/core";
 import { getBudget } from "@mizania/db/budget";
+import { getQuickLogOptions } from "@mizania/db/expenses";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { TodayLog } from "@/components/quick-log/today-log";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
 import { getDb } from "@/lib/db";
@@ -15,7 +17,10 @@ export default async function TodayPage() {
   const t = await getTranslations("Home");
   const today = await getTranslations("Today");
   const locale = await getLocale();
-  const budget = await getBudget(getDb(), user.id, todayInTunis());
+  const [budget, quickLog] = await Promise.all([
+    getBudget(getDb(), user.id, todayInTunis()),
+    getQuickLogOptions(getDb(), user.id),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[env(safe-area-inset-top)]">
@@ -51,6 +56,7 @@ export default async function TodayPage() {
             {today("noCycle")}
           </p>
         )}
+        {quickLog.wallets.length > 0 && <TodayLog options={quickLog} />}
       </main>
     </div>
   );
