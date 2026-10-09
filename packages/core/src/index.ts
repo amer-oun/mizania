@@ -26,7 +26,14 @@ export {
   type WeekStart,
   weekStartAllowance,
 } from "./daily";
-export { assertMillimes, formatTND, type Locale, parseTND, splitEven } from "./money";
+export {
+  assertMillimes,
+  formatTND,
+  type Locale,
+  millimesReading,
+  parseTND,
+  splitEven,
+} from "./money";
 export {
   type OnboardingAnswers,
   type OnboardingFixedCost,

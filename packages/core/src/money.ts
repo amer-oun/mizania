@@ -21,16 +21,37 @@ const ARABIC_DECIMAL_SEPARATOR = "٫"; // ٫
 // Nothing else: no sign, no spaces inside, no thousands separators, no units.
 const AMOUNT_PATTERN = /^([0-9]*)(?:[.,]([0-9]{1,3}))?$/;
 
+/** Western digits and "." for whatever was typed: "٢٫٥ " → "2.5". */
+function normalizeDigits(input: string): string {
+  return input
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - ARABIC_INDIC_ZERO))
+    .replaceAll(ARABIC_DECIMAL_SEPARATOR, ".")
+    .trim();
+}
+
+/** Below this, a whole number is surely dinars ("15" is 15 DT, not 15 millimes). */
+const MILLIMES_HINT_FROM = 1000;
+
+/**
+ * Many people count in millimes: "2500" for 2.5 DT. For a whole number of at
+ * least 1000 typed without a separator, returns that number read as millimes
+ * (2500 → 2500 millimes = 2.500 DT), to offer "Did you mean 2.500 DT?".
+ * Returns null for anything else, which parseTND reads as dinars.
+ */
+export function millimesReading(input: string): number | null {
+  const normalized = normalizeDigits(input);
+  if (!/^[0-9]+$/.test(normalized)) return null;
+  const millimes = Number(normalized);
+  return millimes >= MILLIMES_HINT_FROM && Number.isSafeInteger(millimes) ? millimes : null;
+}
+
 /**
  * Parses a typed amount in dinars ("2.5", "2,500", "٢٫٥", ".5") into millimes.
  * Returns null for anything that isn't a valid positive amount.
  * Works on strings only: no floating-point arithmetic is involved.
  */
 export function parseTND(input: string): number | null {
-  const normalized = input
-    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - ARABIC_INDIC_ZERO))
-    .replaceAll(ARABIC_DECIMAL_SEPARATOR, ".")
-    .trim();
+  const normalized = normalizeDigits(input);
 
   const match = AMOUNT_PATTERN.exec(normalized);
   if (!match) return null;

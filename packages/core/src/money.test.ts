@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
-import { assertMillimes, formatTND, parseTND, splitEven } from "./money";
+import { assertMillimes, formatTND, millimesReading, parseTND, splitEven } from "./money";
 
 // Money is always an integer number of millimes: 1 TND = 1000 millimes.
 
@@ -155,6 +155,35 @@ describe("splitEven", () => {
         const shares = splitEven(t, n);
         const sorted = [...shares].sort((a, b) => b - a);
         expect(shares).toEqual(sorted);
+      }),
+    );
+  });
+});
+
+describe("millimesReading", () => {
+  it("reads a whole number of 1000 or more as millimes", () => {
+    expect(millimesReading("2500")).toBe(2_500);
+    expect(millimesReading(" ٢٥٠٠ ")).toBe(2_500);
+    expect(millimesReading("1000")).toBe(1_000);
+    expect(millimesReading("12000")).toBe(12_000);
+  });
+
+  it("offers nothing for small numbers, decimals, other input or huge numbers", () => {
+    expect(millimesReading("999")).toBeNull();
+    expect(millimesReading("15")).toBeNull();
+    expect(millimesReading("2.5")).toBeNull();
+    expect(millimesReading("2500.0")).toBeNull();
+    expect(millimesReading("٢٫٥")).toBeNull();
+    expect(millimesReading("")).toBeNull();
+    expect(millimesReading("abc")).toBeNull();
+    expect(millimesReading("99999999999999999999")).toBeNull();
+  });
+
+  it("is exactly the typed number, which parseTND reads as 1000 times more", () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 1000, max: 1_000_000_000 }), (n) => {
+        expect(millimesReading(String(n))).toBe(n);
+        expect(parseTND(String(n))).toBe(n * 1000);
       }),
     );
   });
