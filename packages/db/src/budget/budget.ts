@@ -106,6 +106,7 @@ export async function loadCycleData(
       toWalletId: transactions.toWalletId,
       categoryId: transactions.categoryId,
       planItemId: transactions.planItemId,
+      cycleId: transactions.cycleId,
       amountMillimes: transactions.amountMillimes,
       occurredAt: transactions.occurredAt,
       // The calendar day it happened in Tunisia.
@@ -116,6 +117,7 @@ export async function loadCycleData(
     .orderBy(asc(transactions.occurredAt), asc(transactions.createdAt), asc(transactions.id));
 
   const input: CycleSummaryInput = {
+    cycleId: cycle.id,
     today,
     startedOn: cycle.startedOn,
     nextTransferOn: cycle.expectedNextOn,
@@ -136,6 +138,7 @@ export async function loadCycleData(
       toWalletId: t.toWalletId,
       categoryId: t.categoryId,
       planItemId: t.planItemId,
+      cycleId: t.cycleId,
       amountMillimes: t.amountMillimes,
       day: t.day,
       at: t.occurredAt.getTime(),
@@ -173,7 +176,8 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
     : undefined;
 
   const todayExpenses = rows
-    .filter((t) => t.type === "expense" && t.day === today)
+    // Spending logged in the last month this morning isn't this month's.
+    .filter((t) => t.type === "expense" && t.day === today && (t.cycleId ?? cycle.id) === cycle.id)
     .reverse()
     .map((t) => ({
       id: t.id,

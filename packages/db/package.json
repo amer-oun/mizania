@@ -11,6 +11,7 @@
     "./expenses": "./src/expenses/expenses.ts",
     "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./plan": "./src/plan/index.ts",
+    "./received": "./src/received/received.ts",
     "./schema": "./src/schema/index.ts",
     "./testing": "./src/test/test-database.ts",
     "./testing/global-setup": "./src/test/global-setup.ts",

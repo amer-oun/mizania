@@ -95,6 +95,50 @@ export async function getPlanEditor(
   };
 }
 
+type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
+
+/**
+ * Checks plan items about to be added: their IDs must be new ("not-found"
+ * for another user's or a removed item's), and their category one of the
+ * user's (or a default) of their kind ("invalid"). Null when they're fine.
+ */
+export async function checkNewItems(
+  tx: Tx,
+  userId: string,
+  added: readonly PlanDraftItem[],
+): Promise<"not-found" | "invalid" | null> {
+  if (added.length === 0) return null;
+  const taken = await tx
+    .select({ id: planItems.id })
+    .from(planItems)
+    .where(
+      inArray(
+        planItems.id,
+        added.map((i) => i.id),
+      ),
+    );
+  if (taken.length > 0) return "not-found";
+
+  const categoryIds = added.flatMap((i) => (i.categoryId ? [i.categoryId] : []));
+  const groups =
+    categoryIds.length === 0
+      ? []
+      : await tx
+          .select({ id: categories.id, group: categories.group })
+          .from(categories)
+          .where(
+            and(
+              inArray(categories.id, categoryIds),
+              or(isNull(categories.userId), eq(categories.userId, userId)),
+              isNull(categories.deletedAt),
+            ),
+          );
+  const ofItsKind = added.every(
+    (i) => i.kind === "savings" || groups.some((c) => c.id === i.categoryId && c.group === i.kind),
+  );
+  return ofItsKind ? null : "invalid";
+}
+
 export type SavePlanResult = "saved" | "not-found" | "invalid";
 
 /**
@@ -146,37 +190,8 @@ export async function savePlan(
     const current = new Map(data.planItems.map((i) => [i.id, i]));
     const added = input.items.filter((i) => !current.has(i.id));
     if (added.length > 0) {
-      // A new item's ID must be new: another user's, or a removed item's, is refused.
-      const taken = await tx
-        .select({ id: planItems.id })
-        .from(planItems)
-        .where(
-          inArray(
-            planItems.id,
-            added.map((i) => i.id),
-          ),
-        );
-      if (taken.length > 0) return "not-found";
-
-      const categoryIds = added.flatMap((i) => (i.categoryId ? [i.categoryId] : []));
-      const groups =
-        categoryIds.length === 0
-          ? []
-          : await tx
-              .select({ id: categories.id, group: categories.group })
-              .from(categories)
-              .where(
-                and(
-                  inArray(categories.id, categoryIds),
-                  or(isNull(categories.userId), eq(categories.userId, userId)),
-                  isNull(categories.deletedAt),
-                ),
-              );
-      const ofItsKind = added.every(
-        (i) =>
-          i.kind === "savings" || groups.some((c) => c.id === i.categoryId && c.group === i.kind),
-      );
-      if (!ofItsKind) return "invalid";
+      const problem = await checkNewItems(tx, userId, added);
+      if (problem) return problem;
 
       await tx.insert(planItems).values(
         added.map((i) => ({
