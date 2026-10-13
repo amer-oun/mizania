@@ -18,6 +18,7 @@ import {
   type CycleSummaryInput,
   type EnvelopeStatus,
   type FixedCostStatus,
+  isThisMonths,
   type PlanItemKind,
   type SummaryPlanItem,
 } from "./summary";
@@ -244,25 +245,30 @@ export function previewPlan(input: PlanPreviewInput): PlanPreview {
 const SUGGESTION_STEP = 5_000; // 5 DT
 const SUGGESTION_SHARE_PERCENT = 20;
 
+/** Everything spent in `categoryId` this month (all of it, planned or not). */
+export function spentInCategory(input: CycleSummaryInput, categoryId: string): number {
+  return totalBalance(
+    input.transactions
+      .filter((t) => t.type === "expense" && t.categoryId === categoryId && isThisMonths(input, t))
+      .map((t) => t.amountMillimes),
+  );
+}
+
 /**
  * A groceries envelope for the rest of the cycle, for a plan without one.
  * With groceries logged this cycle: the same pace until the next transfer,
- * rounded up to 5 DT. Without: 20% of this morning's daily money, rounded
- * down to 5 DT. Null when that's nothing.
+ * rounded up to 5 DT. Else, in a new month, what groceries cost last month
+ * (`lastMonth`), rounded up to 5 DT. Else 20% of this morning's daily money,
+ * rounded down to 5 DT. Null when that's nothing.
  */
-export function suggestGroceries(input: CycleSummaryInput, groceriesId: string): number | null {
+export function suggestGroceries(
+  input: CycleSummaryInput,
+  groceriesId: string,
+  lastMonth = 0,
+): number | null {
   const { startedOn, nextTransferOn, today } = input;
-  const spent = totalBalance(
-    input.transactions
-      .filter(
-        (t) =>
-          t.type === "expense" &&
-          t.categoryId === groceriesId &&
-          daysBetween(startedOn, t.day) >= 0 &&
-          daysBetween(t.day, today) >= 0,
-      )
-      .map((t) => t.amountMillimes),
-  );
+  assertMillimes(lastMonth);
+  const spent = spentInCategory(input, groceriesId);
   let amount: number;
   if (spent > 0) {
     const pace = mulDivFloor(
@@ -271,6 +277,8 @@ export function suggestGroceries(input: CycleSummaryInput, groceriesId: string):
       daysBetween(startedOn, today) + 1,
     );
     amount = ceilDiv(pace, SUGGESTION_STEP) * SUGGESTION_STEP;
+  } else if (lastMonth > 0) {
+    amount = ceilDiv(lastMonth, SUGGESTION_STEP) * SUGGESTION_STEP;
   } else {
     const summary = cycleSummary(input);
     const morning = Math.max(0, summary.poolNow + summary.spentToday);
