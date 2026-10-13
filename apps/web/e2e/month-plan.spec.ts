@@ -1,7 +1,7 @@
-import { formatTND, todayBudget } from "@mizania/core";
+import { formatTND } from "@mizania/core";
 import type { Locator, Page } from "@playwright/test";
 
-import { expect, expected, messages, onboardedCycle, onboardedStudent, test } from "./support";
+import { expect, expected, messages, onboardedStudent, test } from "./support";
 
 type Locale = "ar" | "fr" | "en";
 
@@ -152,7 +152,7 @@ test("fr: a partly paid rent and a used envelope can't go below what's used", as
   await expect(page.getByTestId("today-amount")).toHaveText(todayAmount);
 });
 
-test("en: over budget, 'Adjust my plan' fixes the plan; the week's amount waits for next week", async ({
+test("en: over budget, 'Adjust my plan' fixes the plan and gives money this week", async ({
   page,
 }) => {
   const t = messages.en;
@@ -165,25 +165,23 @@ test("en: over budget, 'Adjust my plan' fixes the plan; the week's amount waits 
   // 500 DT of rent against 130 DT in the wallets.
   await expect(page.getByTestId("preview-over")).toContainText(money(370_000));
 
+  // This week was stored at 0 while over budget; fixing the plan rebuilds it
+  // from the 30 DT of daily money left.
+  const after = expected(100_000).budget;
+  expect(after.allowance).toBeGreaterThan(0);
   await editItem(page, "en", rent.en);
   const sheet = page.getByTestId("plan-amount-sheet");
   await typeAmount(sheet, "en", "100");
   await sheet.getByRole("button", { name: t.PlanEdit.ok, exact: true }).click();
   await expect(page.getByTestId("preview-over")).toHaveCount(0);
-  await expect(page.getByTestId("preview-next-week")).toHaveText(t.PlanEdit.fromNextWeek);
+  await expect(page.getByTestId("plan-preview").getByTestId("preview-today")).toContainText(
+    money(after.allowance),
+  );
+  await expect(page.getByTestId("preview-next-week")).toHaveCount(0);
 
   await page.getByRole("button", { name: t.PlanEdit.save }).click();
   await expect(page).toHaveURL(/\/en$/);
-  // This week was stored at 0 while over budget; a plan change never raises it.
-  const today = todayBudget({
-    ...onboardedCycle(),
-    poolNow: 30_000,
-    spentToday: 0,
-    spentThisWeekBeforeToday: 0,
-    weeklyMode: true,
-    weekAllowance: 0,
-  });
-  expect(today.status).toBe("on_track");
+  expect(after.status).toBe("on_track");
   await expect(page.getByTestId("today-status")).toHaveText(t.Today.status.on_track);
-  await expect(page.getByTestId("today-amount")).toContainText(money(today.allowance));
+  await expect(page.getByTestId("today-amount")).toContainText(money(after.allowance));
 });
