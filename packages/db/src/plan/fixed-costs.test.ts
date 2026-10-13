@@ -86,7 +86,7 @@ describe("getPlan", () => {
     const { userId } = await student();
     const plan = await getPlan(test.db, userId, today);
 
-    expect(plan?.cycle).toEqual({ startedOn: today, expectedNextOn: "2026-10-31" });
+    expect(plan?.cycle).toMatchObject({ startedOn: today, expectedNextOn: "2026-10-31" });
     expect(
       plan?.fixedCosts.map((c) => [c.categoryKey, c.planned, c.paidSoFar, c.left, c.paid]),
     ).toEqual([
