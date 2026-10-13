@@ -31,6 +31,10 @@
     "daysLeft": "{days, plural, =1 {1 jour} other {# jours}} avant ton prochain virement",
     "expected": "Prévu le {date}",
     "week": "Cette semaine : il reste {amount} · {days, plural, =1 {1 jour} other {# jours}}",
+    "arrivedTitle": "Ton argent est arrivé ?",
+    "arrivedText": "Il était attendu le {date}.",
+    "arrivedYes": "Oui, il est arrivé",
+    "arrivedNotYet": "Pas encore",
     "transferDue": "Ton virement était prévu le {date}.",
     "transferDueHint": "Bientôt tu pourras l'enregistrer ici. En attendant, le montant du jour est en pause.",
     "noCycle": "Aucun mois en cours. Bientôt tu pourras en commencer un ici quand ton argent arrive.",
@@ -162,6 +166,65 @@
     "errors": {
       "invalid": "Ce changement n'est plus possible. Actualise la page et réessaie.",
       "not-found": "Ton mois a changé. Actualise la page et réessaie.",
+      "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
+      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
+    }
+  },
+  "Received": {
+    "open": "J'ai reçu de l'argent",
+    "title": "J'ai reçu de l'argent",
+    "amountLabel": "Combien as-tu reçu ?",
+    "wallet": "Sur",
+    "kindLabel": "C'est quel argent ?",
+    "kindMonth": "Mon argent du mois",
+    "kindMonthHint": "Commence un nouveau mois",
+    "kindExtra": "De l'argent en plus",
+    "kindExtraHint": "Ajouté à ce mois-ci",
+    "sourceLabel": "De",
+    "sources": {
+      "parents": "Parents",
+      "bourse": "Bourse",
+      "job": "Job",
+      "other": "Autre"
+    },
+    "next": "Suivant",
+    "save": "Ajouter l'argent",
+    "saving": "Ajout…",
+    "reviewTitle": "Ton nouveau mois",
+    "reviewReceived": "{amount} reçus",
+    "expectedLabel": "Prochain argent attendu le",
+    "leftover": "Reste du mois dernier : {amount}",
+    "leftoverHint": "Il est déjà dans tes portefeuilles et reste à toi ce mois-ci.",
+    "unpaid": "Pas payé le mois dernier : {name}, {amount}. Si tu le dois encore, augmente le montant de ce mois-ci.",
+    "start": "Commencer mon nouveau mois",
+    "starting": "Démarrage…",
+    "back": "Retour",
+    "added": "{amount} ajoutés",
+    "undo": "Annuler",
+    "undone": "Argent retiré",
+    "offline": "Tu es hors ligne. Connecte-toi à Internet pour enregistrer.",
+    "noCycle": "Aucun mois en cours.",
+    "errors": {
+      "invalid": "Vérifie ce que tu as saisi.",
+      "not-found": "Ton mois ou ton portefeuille a changé. Actualise la page et réessaie.",
+      "wallet-archived": "Cet argent est dans un portefeuille archivé. Restaure-le d'abord.",
+      "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
+      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
+    }
+  },
+  "ExpectedDate": {
+    "title": "Quand attends-tu ton argent ?",
+    "label": "Attendu le",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "close": "Fermer",
+    "change": "Modifier",
+    "changeLabel": "Modifier la date où ton argent est attendu",
+    "expectedOn": "Argent attendu le {date}",
+    "errors": {
+      "invalid": "Vérifie ce que tu as saisi.",
+      "not-found": "Ton mois ou ton portefeuille a changé. Actualise la page et réessaie.",
+      "wallet-archived": "Cet argent est dans un portefeuille archivé. Restaure-le d'abord.",
       "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
       "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
     }

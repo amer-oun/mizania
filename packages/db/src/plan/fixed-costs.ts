@@ -37,7 +37,7 @@ export interface PlanFixedCost extends FixedCostStatus, Named {
 export interface PlanEnvelope extends EnvelopeStatus, Named {}
 
 export interface Plan {
-  cycle: { startedOn: IsoDate; expectedNextOn: IsoDate };
+  cycle: { id: string; startedOn: IsoDate; expectedNextOn: IsoDate };
   fixedCosts: PlanFixedCost[];
   envelopes: PlanEnvelope[];
   /** Everything still set aside for fixed costs (the Today breakdown's line). */
@@ -89,7 +89,11 @@ export async function planOf(db: Db, userId: string, budget: Budget): Promise<Pl
   });
 
   return {
-    cycle: { startedOn: budget.cycle.startedOn, expectedNextOn: budget.cycle.expectedNextOn },
+    cycle: {
+      id: budget.cycle.id,
+      startedOn: budget.cycle.startedOn,
+      expectedNextOn: budget.cycle.expectedNextOn,
+    },
     fixedCosts: budget.summary.fixedCosts.map((status) => {
       const item = items.find((i) => i.id === status.id);
       return {

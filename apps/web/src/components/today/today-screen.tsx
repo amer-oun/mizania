@@ -1,10 +1,17 @@
 "use client";
 
-import type { CycleSummary, IsoDate, TodayBudget } from "@mizania/core";
-import { ChevronRightIcon } from "lucide-react";
+import {
+  type CycleSummary,
+  type IsoDate,
+  lateDateRange,
+  lateTransferDefault,
+  type TodayBudget,
+} from "@mizania/core";
+import { ChevronRightIcon, WalletIcon } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
 
+import { ExpectedDateSheet } from "@/components/received/expected-date-sheet";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Amount, useFormatAmount } from "@/components/wallets/shared";
@@ -12,13 +19,15 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 export interface TodayView {
+  cycleId: string;
+  today: IsoDate;
   expectedNextOn: IsoDate;
   transferDue: boolean;
   summary: Pick<
     CycleSummary,
     "available" | "reserved" | "poolNow" | "spentToday" | "spentThisWeekBeforeToday"
   >;
-  today: TodayBudget;
+  budget: TodayBudget;
 }
 
 const statusStyle: Record<TodayBudget["status"], string> = {
@@ -37,24 +46,54 @@ const asDate = (day: IsoDate) => new Date(`${day}T12:00:00Z`);
  */
 export function TodayScreen({ view }: { view: TodayView }) {
   const t = useTranslations("Today");
+  const r = useTranslations("Received");
   const format = useFormatter();
   const formatAmount = useFormatAmount();
   const [open, setOpen] = useState(false);
-  const { today, summary } = view;
+  const [notYet, setNotYet] = useState(false);
+  const { budget: today, summary } = view;
   const expected = format.dateTime(asDate(view.expectedNextOn), {
     weekday: "long",
     day: "numeric",
     month: "long",
   });
 
+  // From the expected date, the question replaces the number (ADR 006 §5).
   if (view.transferDue) {
     return (
       <section
-        className="flex flex-col gap-2 rounded-xl border p-6 text-center"
+        aria-labelledby="transfer-due"
+        className="flex flex-col items-center gap-3 rounded-xl border p-6 text-center"
         data-testid="transfer-due"
       >
-        <p className="text-lg font-semibold">{t("transferDue", { date: expected })}</p>
-        <p className="text-sm text-muted-foreground">{t("transferDueHint")}</p>
+        <h2 id="transfer-due" className="text-lg font-semibold">
+          {t("arrivedTitle")}
+        </h2>
+        <p className="text-sm text-muted-foreground">{t("arrivedText", { date: expected })}</p>
+        <div className="flex w-full flex-col gap-2">
+          <Button asChild size="lg">
+            <Link href="/received?kind=month">{t("arrivedYes")}</Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              setNotYet(true);
+            }}
+          >
+            {t("arrivedNotYet")}
+          </Button>
+        </div>
+        {notYet && (
+          <ExpectedDateSheet
+            cycleId={view.cycleId}
+            initial={lateTransferDefault(view.today)}
+            {...lateDateRange(view.today)}
+            onClose={() => {
+              setNotYet(false);
+            }}
+          />
+        )}
       </section>
     );
   }
@@ -136,6 +175,13 @@ export function TodayScreen({ view }: { view: TodayView }) {
         </section>
       )}
 
+      <Button asChild variant="outline" className="self-center">
+        <Link href="/received">
+          <WalletIcon aria-hidden />
+          {r("open")}
+        </Link>
+      </Button>
+
       <p className="text-center text-sm text-muted-foreground">
         {t("daysLeft", { days: today.daysLeft })} · {t("expected", { date: expected })}
       </p>
@@ -186,7 +232,7 @@ function Breakdown({
   view: TodayView;
 }) {
   const t = useTranslations("Today.breakdown");
-  const { summary, today } = view;
+  const { summary, budget: today } = view;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

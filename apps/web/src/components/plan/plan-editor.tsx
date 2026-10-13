@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CycleSummaryInput,
   envelopeLimits,
   fixedCostLimits,
   formatTypedTND,
@@ -9,7 +10,7 @@ import {
   type PlanPreview,
   previewPlan,
 } from "@mizania/core";
-import type { PlanCategory, PlanEditor as PlanEditorData } from "@mizania/db/plan";
+import type { Plan, PlanCategory, PlanEditor as PlanEditorData } from "@mizania/db/plan";
 import { LockIcon, PiggyBankIcon, PlusIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { type ReactNode, useMemo, useState, useTransition } from "react";
@@ -23,7 +24,7 @@ import { Amount, useFormatAmount } from "@/components/wallets/shared";
 import { useOnline } from "@/hooks/use-online";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import type { WalletActionError } from "@/lib/wallet-action";
+import type { WalletActionError, WalletActionResult } from "@/lib/wallet-action";
 
 // The month plan editor: fixed costs, envelopes and one savings line, with a
 // live preview of today's amount. Changes stay in a draft until "Save my
@@ -43,20 +44,80 @@ type PlanError = (typeof planErrors)[number];
 const planError = (error: WalletActionError): PlanError =>
   planErrors.find((e) => e === error) ?? "server";
 
+/** This month's plan editor: saves with savePlanAction. */
 export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/" | "/plan" }) {
-  const t = useTranslations("PlanEdit");
-  const locale = useLocale();
   const router = useRouter();
+  const initial = useMemo(
+    () =>
+      data.input.planItems.map(({ id, kind, categoryId, amountMillimes }) => ({
+        id,
+        kind,
+        categoryId,
+        amountMillimes,
+      })),
+    [data],
+  );
+  return (
+    <PlanDraftEditor
+      input={data.input}
+      weeklyMode={data.weeklyMode}
+      weekAllowance={data.weekAllowance}
+      initial={initial}
+      plan={data.plan}
+      categories={data.categories}
+      groceries={data.groceries}
+      cancelHref={backTo}
+      onSave={(items) => savePlanAction({ cycleId: data.cycleId, items })}
+      onSaved={() => {
+        router.push(backTo);
+        router.refresh();
+      }}
+    />
+  );
+}
+
+/**
+ * Editing a plan in a draft, with today's amount as it would be. Used for
+ * this month's plan, and for a new month's plan before it starts (`plan`
+ * null: nothing is paid or spent yet, so nothing is limited).
+ */
+export function PlanDraftEditor({
+  input,
+  weeklyMode,
+  weekAllowance,
+  initial,
+  plan,
+  categories,
+  groceries,
+  newMonth = false,
+  cancelHref,
+  onCancel,
+  onSave,
+  onSaved,
+}: {
+  /** What today's amount is computed from (previewPlan's summary). */
+  input: CycleSummaryInput;
+  weeklyMode: boolean;
+  weekAllowance: number | undefined;
+  /** The plan the draft starts from (the "was" amounts). */
+  initial: readonly PlanDraftItem[];
+  /** What's paid and spent of this month's plan, for the limits. */
+  plan: Pick<Plan, "fixedCosts" | "envelopes"> | null;
+  categories: PlanCategory[];
+  groceries: { categoryId: string; suggested: number } | null;
+  /** A new month: no amount before to compare, and it saves without a change. */
+  newMonth?: boolean;
+  cancelHref?: "/" | "/plan";
+  onCancel?: () => void;
+  onSave: (items: PlanDraftItem[]) => Promise<WalletActionResult>;
+  onSaved: () => void;
+}) {
+  const t = useTranslations("PlanEdit");
+  const r = useTranslations("Received");
+  const locale = useLocale();
   const online = useOnline();
   const formatAmount = useFormatAmount();
-  const [draft, setDraft] = useState<PlanDraftItem[]>(() =>
-    data.input.planItems.map(({ id, kind, categoryId, amountMillimes }) => ({
-      id,
-      kind,
-      categoryId,
-      amountMillimes,
-    })),
-  );
+  const [draft, setDraft] = useState<PlanDraftItem[]>(() => [...initial]);
   const [editing, setEditing] = useState<Editing | null>(null);
   const [picking, setPicking] = useState<"fixed" | "envelope" | null>(null);
   const [pending, startTransition] = useTransition();
@@ -65,29 +126,21 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
   // New envelopes cover spending from when the plan is saved: after
   // everything logged so far.
   const preview = useMemo(() => {
-    const saveAt = data.input.transactions.reduce((latest, t) => Math.max(latest, t.at), 0) + 1;
+    const saveAt = input.transactions.reduce((latest, t) => Math.max(latest, t.at), 0) + 1;
     return (items: readonly PlanDraftItem[]) =>
-      previewPlan({
-        summary: data.input,
-        weeklyMode: data.weeklyMode,
-        weekAllowance: data.weekAllowance,
-        draft: items,
-        now: saveAt,
-      });
-  }, [data]);
+      previewPlan({ summary: input, weeklyMode, weekAllowance, draft: items, now: saveAt });
+  }, [input, weeklyMode, weekAllowance]);
   const current = useMemo(() => preview(draft), [preview, draft]);
-  const before = new Map(data.input.planItems.map((i) => [i.id, i]));
+  const before = new Map(initial.map((i) => [i.id, i]));
   const changed =
     draft.length !== before.size ||
     draft.some((i) => before.get(i.id)?.amountMillimes !== i.amountMillimes);
 
   const categoryOf = (item: { categoryId: string | null }) =>
-    data.categories.find((c) => c.id === item.categoryId);
-  const fixedStatus = (item: PlanDraftItem) => data.plan.fixedCosts.find((c) => c.id === item.id);
+    categories.find((c) => c.id === item.categoryId);
+  const fixedStatus = (item: PlanDraftItem) => plan?.fixedCosts.find((c) => c.id === item.id);
   const envelopeStatus = (item: PlanDraftItem) =>
-    before.has(item.id)
-      ? data.plan.envelopes.find((e) => e.categoryId === item.categoryId)
-      : undefined;
+    before.has(item.id) ? plan?.envelopes.find((e) => e.categoryId === item.categoryId) : undefined;
 
   function nameOf(item: PlanDraftItem): string {
     if (item.kind === "savings") return t("savings");
@@ -135,9 +188,9 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
   function save() {
     setError(null);
     startTransition(async () => {
-      let result: Awaited<ReturnType<typeof savePlanAction>>;
+      let result: WalletActionResult;
       try {
-        result = await savePlanAction({ cycleId: data.cycleId, items: draft });
+        result = await onSave(draft);
       } catch {
         result = { ok: false, error: "server" };
       }
@@ -145,19 +198,18 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
         setError(planError(result.error));
         return;
       }
-      router.push(backTo);
-      router.refresh();
+      onSaved();
     });
   }
 
   const inDraft = (category: PlanCategory) => draft.some((i) => i.categoryId === category.id);
-  const groceries = data.groceries;
   const groceriesCategory = groceries
-    ? data.categories.find((c) => c.id === groceries.categoryId)
+    ? categories.find((c) => c.id === groceries.categoryId)
     : undefined;
   const suggestGroceries =
     groceries && groceriesCategory && !inDraft(groceriesCategory) ? groceries : null;
   const savings = draft.find((i) => i.kind === "savings");
+  const saveLabel = newMonth ? r(pending ? "starting" : "start") : t(pending ? "saving" : "save");
 
   const row = (item: PlanDraftItem) => {
     const limits = limitsOf(item);
@@ -224,7 +276,7 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="sticky top-0 z-10 -mx-4 border-b bg-background/95 px-4 py-3 backdrop-blur">
-        <PreviewSummary preview={current} testId="plan-preview" />
+        <PreviewSummary preview={current} testId="plan-preview" compare={!newMonth} />
       </div>
 
       {section(
@@ -297,16 +349,22 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
           </p>
         )}
         <div className="flex gap-2">
-          <Button asChild variant="outline" size="lg" className="flex-1">
-            <Link href={backTo}>{t("cancel")}</Link>
-          </Button>
+          {cancelHref ? (
+            <Button asChild variant="outline" size="lg" className="flex-1">
+              <Link href={cancelHref}>{t("cancel")}</Link>
+            </Button>
+          ) : (
+            <Button variant="outline" size="lg" className="flex-1" onClick={onCancel}>
+              {r("back")}
+            </Button>
+          )}
           <Button
             size="lg"
             className="flex-1"
-            disabled={!changed || pending || !online}
+            disabled={(!newMonth && !changed) || pending || !online}
             onClick={save}
           >
-            {pending ? t("saving") : t("save")}
+            {saveLabel}
           </Button>
         </div>
       </div>
@@ -314,7 +372,7 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
       {picking && (
         <PickSheet
           title={picking === "fixed" ? t("pickFixed") : t("pickEnvelope")}
-          categories={data.categories.filter((c) => c.group === picking && !inDraft(c))}
+          categories={categories.filter((c) => c.group === picking && !inDraft(c))}
           onPick={(category) => {
             startAdding(picking, category);
           }}
@@ -331,6 +389,7 @@ export function PlanEditor({ data, backTo }: { data: PlanEditorData; backTo: "/"
           item={editing.item}
           limits={limitsOf(editing.item)}
           adding={editing.adding}
+          compare={!newMonth}
           previewFor={(amount) =>
             amount === null
               ? current
@@ -367,11 +426,20 @@ function AddButton({ label, onClick }: { label: string; onClick: () => void }) {
 }
 
 /** Today's amount with the draft (the current one struck through when it changes). */
-function PreviewSummary({ preview, testId }: { preview: PlanPreview; testId: string }) {
+function PreviewSummary({
+  preview,
+  testId,
+  compare = true,
+}: {
+  preview: PlanPreview;
+  testId: string;
+  /** Show the amount before the change, struck through. */
+  compare?: boolean;
+}) {
   const t = useTranslations("PlanEdit");
   const formatAmount = useFormatAmount();
   const { before, after, fromNextWeek } = preview;
-  const moved = after.today.allowance !== before.today.allowance;
+  const moved = compare && after.today.allowance !== before.today.allowance;
 
   return (
     <div className="flex flex-col gap-1" data-testid={testId} aria-live="polite">
@@ -462,6 +530,7 @@ function AmountSheet({
   item,
   limits,
   adding,
+  compare,
   previewFor,
   onDone,
   onRemove,
@@ -471,6 +540,7 @@ function AmountSheet({
   item: PlanDraftItem;
   limits: PlanItemLimits;
   adding: boolean;
+  compare: boolean;
   previewFor: (amount: number | null) => PlanPreview;
   onDone: (amount: number) => void;
   onRemove: () => void;
@@ -500,7 +570,11 @@ function AmountSheet({
         <p className="text-center text-sm text-muted-foreground">{t("amountLabel")}</p>
         <AmountDisplay entry={entry} testId="plan-amount" />
         <div className="rounded-lg bg-muted/50 px-3 py-2">
-          <PreviewSummary preview={previewFor(valid ? amount : null)} testId="sheet-preview" />
+          <PreviewSummary
+            preview={previewFor(valid ? amount : null)}
+            testId="sheet-preview"
+            compare={compare}
+          />
         </div>
         {limits.min > 0 && (
           <p

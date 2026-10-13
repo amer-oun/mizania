@@ -31,6 +31,10 @@
     "daysLeft": "{days, plural, =1 {1 day} other {# days}} until your next transfer",
     "expected": "Expected on {date}",
     "week": "This week: {amount} left · {days, plural, =1 {1 day} other {# days}}",
+    "arrivedTitle": "Did your money arrive?",
+    "arrivedText": "It was expected on {date}.",
+    "arrivedYes": "Yes, it arrived",
+    "arrivedNotYet": "Not yet",
     "transferDue": "Your transfer was expected on {date}.",
     "transferDueHint": "Soon you'll record it here. Until then, today's amount is paused.",
     "noCycle": "No month in progress. Soon you'll start one here when your money arrives.",
@@ -162,6 +166,65 @@
     "errors": {
       "invalid": "This change isn't possible any more. Reload the page and try again.",
       "not-found": "Your month has changed. Reload the page and try again.",
+      "signed-out": "You were signed out. Please sign in again.",
+      "server": "Couldn't save. Check your connection and try again."
+    }
+  },
+  "Received": {
+    "open": "I received money",
+    "title": "I received money",
+    "amountLabel": "How much did you receive?",
+    "wallet": "Into",
+    "kindLabel": "What is this money?",
+    "kindMonth": "My monthly money",
+    "kindMonthHint": "Starts a new month",
+    "kindExtra": "Extra money",
+    "kindExtraHint": "Added to this month",
+    "sourceLabel": "From",
+    "sources": {
+      "parents": "Parents",
+      "bourse": "Bourse",
+      "job": "Job",
+      "other": "Other"
+    },
+    "next": "Next",
+    "save": "Add the money",
+    "saving": "Adding…",
+    "reviewTitle": "Your new month",
+    "reviewReceived": "{amount} received",
+    "expectedLabel": "Next money expected on",
+    "leftover": "Left from last month: {amount}",
+    "leftoverHint": "It's already in your wallets and stays yours this month.",
+    "unpaid": "Not paid last month: {name}, {amount}. If you still owe it, raise this month's amount.",
+    "start": "Start my new month",
+    "starting": "Starting…",
+    "back": "Back",
+    "added": "{amount} added",
+    "undo": "Undo",
+    "undone": "Money removed",
+    "offline": "You're offline. Connect to the internet to save.",
+    "noCycle": "No month in progress.",
+    "errors": {
+      "invalid": "Check what you entered.",
+      "not-found": "Your month or wallet has changed. Reload the page and try again.",
+      "wallet-archived": "This money is in an archived wallet. Restore it first.",
+      "signed-out": "You were signed out. Please sign in again.",
+      "server": "Couldn't save. Check your connection and try again."
+    }
+  },
+  "ExpectedDate": {
+    "title": "When do you expect your money?",
+    "label": "Expected on",
+    "save": "Save",
+    "saving": "Saving…",
+    "close": "Close",
+    "change": "Change",
+    "changeLabel": "Change the date your money is expected",
+    "expectedOn": "Money expected on {date}",
+    "errors": {
+      "invalid": "Check what you entered.",
+      "not-found": "Your month or wallet has changed. Reload the page and try again.",
+      "wallet-archived": "This money is in an archived wallet. Restore it first.",
       "signed-out": "You were signed out. Please sign in again.",
       "server": "Couldn't save. Check your connection and try again."
     }
