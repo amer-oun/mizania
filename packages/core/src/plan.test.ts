@@ -260,6 +260,20 @@ describe("previewPlan", () => {
     expect(smaller.fromNextWeek).toBe(true);
   });
 
+  it("weekly mode, over budget: fixing the plan gives money this week", () => {
+    const tooMuch = { ...rent, amountMillimes: 450_000 };
+    const over = { ...data, planItems: [tooMuch] };
+    // While over budget, the week was stored at 0.
+    const fixed = preview(asDraft([rent]), { weeklyMode: true, weekAllowance: 0 }, over);
+    expect(fixed.before.today.allowance).toBe(0);
+    expect(fixed.after.today.week?.allowance).toBe(91_304);
+    expect(fixed.after.today.allowance).toBe(18_260);
+    expect(fixed.fromNextWeek).toBe(false);
+    // Not stored yet: the week rebuilt while over budget is 0 too.
+    const unstored = preview(asDraft([rent]), { weeklyMode: true }, over);
+    expect(unstored.after.today.allowance).toBe(18_260);
+  });
+
   it("over budget: says how much the plan needs beyond the money", () => {
     const savings: PlanDraftItem = {
       id: "save",
@@ -279,6 +293,12 @@ describe("weekAfterPlanChange", () => {
     expect(weekAfterPlanChange(91_304, after)).toBe(72_130);
     expect(weekAfterPlanChange(50_000, after)).toBe(50_000);
     expect(() => weekAfterPlanChange(0.5, after)).toThrow(RangeError);
+  });
+
+  it("rebuilds a week stored at 0 with the new plan, even upward", () => {
+    expect(weekAfterPlanChange(0, after)).toBe(72_130);
+    const stillOver = { ...after, poolNow: -10_000 };
+    expect(weekAfterPlanChange(0, stillOver)).toBe(0);
   });
 });
 
@@ -437,13 +457,13 @@ describe("plan change properties", () => {
     );
   });
 
-  it("weekly mode: never raises this week's amount, or undoes an overspent week", () => {
+  it("weekly mode, a week above 0: never raised, and an overspent week stays overspent", () => {
     fc.assert(
       fc.property(
         randomPlan,
         randomHistory,
         randomChange,
-        fc.option(fc.integer({ min: 0, max: 300_000 }), { nil: undefined }),
+        fc.option(fc.integer({ min: 1, max: 300_000 }), { nil: undefined }),
         (plan, history, change, stored) => {
           const { input, saveAt } = setup(plan, history);
           const { summary, draft } = draftOf(plan, input, change);
@@ -456,7 +476,9 @@ describe("plan change properties", () => {
           });
           const beforeWeek = before.today.week ?? fail();
           const afterWeek = after.today.week ?? fail();
-          if (stored !== undefined) expect(afterWeek.allowance).toBeLessThanOrEqual(stored);
+          // Not stored yet: the week rebuilt now must be above 0 too.
+          fc.pre(beforeWeek.allowance > 0);
+          expect(afterWeek.allowance).toBeLessThanOrEqual(beforeWeek.allowance);
           // Spent more this week than its amount: still overspent after any change.
           const spentThisWeek = summary.spentThisWeekBeforeToday + summary.spentToday;
           if (spentThisWeek > beforeWeek.allowance) {
@@ -464,6 +486,31 @@ describe("plan change properties", () => {
           }
         },
       ),
+    );
+  });
+
+  it("weekly mode, a week at 0: rebuilt with the new plan, as if it weren't stored", () => {
+    fc.assert(
+      fc.property(randomPlan, randomHistory, randomChange, (plan, history, change) => {
+        const { input, saveAt } = setup(plan, history);
+        const { draft } = draftOf(plan, input, change);
+        const { after } = previewPlan({
+          summary: input,
+          weeklyMode: true,
+          weekAllowance: 0,
+          draft,
+          now: saveAt,
+        });
+        const next = cycleSummary({ ...input, planItems: applyPlanDraft(plan, draft, saveAt) });
+        const rebuilt = todayBudget({
+          ...cycle,
+          poolNow: next.poolNow,
+          spentToday: next.spentToday,
+          spentThisWeekBeforeToday: next.spentThisWeekBeforeToday,
+          weeklyMode: true,
+        });
+        expect(after.today).toEqual(rebuilt);
+      }),
     );
   });
 

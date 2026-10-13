@@ -158,13 +158,19 @@ export function applyPlanDraft(
  * Weekly mode: this week's stored amount after a plan change. It keeps the
  * lower of the stored amount and the amount rebuilt with the new plan, so a
  * bigger plan lowers it at once and a smaller one shows from next week.
+ *
+ * One exception: a week stored at 0 (the plan needed more than the money)
+ * is rebuilt with the new plan, even upward, so fixing an over-budget plan
+ * gives money this week. A week stored above 0 is never raised, so a plan
+ * change can't undo an overspent week.
  */
 export function weekAfterPlanChange(
   stored: number,
   after: Omit<TodayBudgetInput, "weeklyMode" | "weekAllowance">,
 ): number {
   assertMillimes(stored);
-  return Math.min(stored, weekStartAllowance(after).allowance);
+  const rebuilt = weekStartAllowance(after).allowance;
+  return stored === 0 ? rebuilt : Math.min(stored, rebuilt);
 }
 
 export interface PlanPreviewInput {
@@ -188,17 +194,16 @@ export interface PlanPreview {
   before: PlanNumbers;
   after: PlanNumbers;
   /**
-   * Weekly mode: the change frees daily money, which this week's amount
-   * doesn't take: it shows from next week.
+   * Weekly mode: the change frees daily money that this week's amount
+   * doesn't take (it's kept below the rebuilt one): it shows from next week.
    */
   fromNextWeek: boolean;
 }
 
 /**
  * Today's amount with the current plan and with the draft, as saving it
- * would make it. In weekly mode the week keeps the lower of its amount now
- * (stored, or rebuilt when it isn't stored yet) and the one rebuilt with
- * the draft.
+ * would make it. In weekly mode the week's amount now (stored, or rebuilt
+ * when it isn't stored yet) changes as weekAfterPlanChange says.
  */
 export function previewPlan(input: PlanPreviewInput): PlanPreview {
   const { summary: data, weeklyMode, weekAllowance } = input;
@@ -228,13 +233,12 @@ export function previewPlan(input: PlanPreviewInput): PlanPreview {
   const now = budgetOf(data.planItems);
   const next = budgetOf(applyPlanDraft(data.planItems, input.draft, input.now));
   const before = numbers(now, weekAllowance);
-  const after = numbers(
-    next,
-    weeklyMode
-      ? weekAfterPlanChange(weekAllowance ?? weekStartAllowance(now.budget).allowance, next.budget)
-      : undefined,
-  );
-  return { before, after, fromNextWeek: weeklyMode && after.poolNow > before.poolNow };
+  const week = weeklyMode
+    ? weekAfterPlanChange(weekAllowance ?? weekStartAllowance(now.budget).allowance, next.budget)
+    : undefined;
+  const after = numbers(next, week);
+  const kept = week !== undefined && week < weekStartAllowance(next.budget).allowance;
+  return { before, after, fromNextWeek: kept && after.poolNow > before.poolNow };
 }
 
 const SUGGESTION_STEP = 5_000; // 5 DT
