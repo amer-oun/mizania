@@ -316,7 +316,7 @@ Decisions (accepted 2026-10-09):
 11. Warnings are worded kindly now; the link to "ask for money" comes with that feature in Phase 8.
 12. "This month by category" compares with the same point last month (day 12 with day 12).
 13. Tabs: Today, Plan, Wallets, with "+" on Today.
-14. Editing the plan never rewrites past days (added 2026-10-09): amounts can't go below what's used, paid or overspent items are locked, a used envelope is closed instead of removed, and a new envelope covers spending from when it's added. In weekly mode a saved change keeps this week's amount or lowers it, never raises it (ADR 006 §7).
+14. Editing the plan never rewrites past days (added 2026-10-09): amounts can't go below what's used, paid or overspent items are locked, a used envelope is closed instead of removed, and a new envelope covers spending from when it's added. In weekly mode a saved change keeps this week's amount or lowers it, never raises it, except a week stored at 0 while over budget, which is rebuilt so fixing the plan gives money this week (ADR 006 §7).
 
 ### Pilot (2 weeks)
 

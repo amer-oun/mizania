@@ -42,14 +42,14 @@ Not counted: transfers between wallets, envelope spending within the envelope, f
 
 **Why the overspent parts count as spending:** ADR 003 promises that today's amount stays the same all day. If 10 DT over an envelope only lowered `poolNow`, this morning's money (`poolNow + spentToday`) would drop mid-day. Counting it as spent today lowers "left" instead and rolls into tomorrow.
 
-**Good news shows at once:** whatever raises the daily money (income, a bill cheaper than planned, a smaller plan) goes straight into `poolNow`. Today's amount never goes down because of spending; only a plan change you confirm can lower it, and a plan change never raises this week's amount (§7).
+**Good news shows at once:** whatever raises the daily money (income, a bill cheaper than planned, a smaller plan) goes straight into `poolNow`. Today's amount never goes down because of spending; only a plan change you confirm can lower it, and a plan change never raises this week's amount (§7). The one exception is a week stored at 0 while over budget, which a plan change rebuilds (§7).
 
 ### 4. Week snapshot (fixes ADR 003's known limitation)
 
 - Table `week_snapshots (id, user_id, cycle_id, week_index, starts_on, ends_on, allowance_millimes, created_at)`, unique on `(cycle_id, week_index)`, with the same-user foreign key as transactions.
 - **Stored lazily:** the first time the budget is computed on a day of a week without a snapshot, its allowance is ADR 003's fair share of `poolNow + spentToday + spentThisWeekBeforeToday` at that moment. The insert ignores a duplicate and reads the row back, so two tabs or devices agree. "I received money" stores week 1 right away.
 - **Used:** `todayBudget` takes an optional `weekAllowance`. What's left of the week this morning is `min(weekAllowance − spent earlier this week, this morning's money)`: a plan change mid-week can't make the week promise money that no longer exists, so "never more than exists" still holds.
-- **Not raised by** mid-week plan edits or extra income: their effect shows from next week. That's the point of the snapshot. A saved plan change can only **lower** it: the week keeps `min(stored amount, amount rebuilt with the new plan)` (§7).
+- **Not raised by** mid-week plan edits or extra income: their effect shows from next week. That's the point of the snapshot. A saved plan change can only **lower** it: the week keeps `min(stored amount, amount rebuilt with the new plan)`, except a week stored at 0, which is rebuilt (§7).
 - **Deleted and stored again** (current and later weeks of the cycle) when the expected date moves or a new cycle starts.
 
 ### 5. Late transfers
@@ -83,14 +83,14 @@ The student edits fixed costs, envelopes and one savings line in a draft, with a
 
 **Weekly mode:** saving stores this week's amount again as `min(stored, rebuilt with the new plan)` (when no week is stored yet, the amount rebuilt with the old plan counts as stored). A bigger plan (an envelope added, a cost raised, savings added) lowers today's amount at once; a smaller one shows from next week, and the preview says so. With past days never rewritten, a plan change can't undo an overspent week. In normal mode a smaller plan raises today's amount at once (good news, §3).
 
-A consequence: a student who is over budget in weekly mode had this week stored at 0. Fixing the plan ("Adjust my plan") ends the over-budget state, but today's amount stays at 0 until next week.
+**Exception, a week stored at 0** (added 2026-10-13): while the plan needs more than the money, this week is stored at 0. A saved plan change then rebuilds the week with the new plan, even upward, so a student who fixes an over-budget plan ("Adjust my plan") gets money this week instead of waiting for next week. A week stored above 0 keeps the rule, so a plan edit still can't undo an overspent week.
 
 The plan suggests a groceries envelope while it has none (`suggestGroceries`): with groceries logged this cycle, the same pace until the next transfer, rounded up to 5 DT; without, 20% of this morning's daily money, rounded down to 5 DT. From the second month, "I received money" suggests last month's plan instead.
 
 ## Consequences
 
 - The home screen, check-in, warnings and the later offline client compute the same numbers from the same rows.
-- Property tests in core cover: every millime of spending is classified once, transfers change nothing, and paying a fixed cost at its planned amount leaves the daily money unchanged; a plan change within the limits never changes any day's daily spending, never raises this week's amount or undoes an overspent week, and a bigger plan never raises today's amount.
+- Property tests in core cover: every millime of spending is classified once, transfers change nothing, and paying a fixed cost at its planned amount leaves the daily money unchanged; a plan change within the limits never changes any day's daily spending, never raises a week stored above 0 or undoes an overspent one, rebuilds a week stored at 0 with the new plan, and a bigger plan never raises today's amount.
 - Integration tests cover the snapshot being stored once under concurrent requests.
 - Today's amount never drops during the day because of spending. Only a plan change the student confirms, after seeing the preview, can lower it.
 - A week's amount is stable even when the plan changes, at the price of plan changes showing only from next week in weekly mode.
