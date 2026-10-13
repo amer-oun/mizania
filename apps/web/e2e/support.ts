@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
+import path from "node:path";
 
-import { nextTransferDate, todayBudget, todayInTunis } from "@mizania/core";
+import { addDays, nextTransferDate, todayBudget, todayInTunis } from "@mizania/core";
+import { createDb } from "@mizania/db/client";
 import { type APIRequestContext, expect, type Page, test as base } from "@playwright/test";
 
 import ar from "../messages/ar.json" with { type: "json" };
@@ -187,6 +189,30 @@ export function expected(reserved: number, spentToday = 0) {
     weeklyMode: true,
   });
   return { available, poolNow: available - reserved, budget };
+}
+
+/**
+ * Test only: moves the signed-in student's month back by `days` (it started
+ * `days` ago), with the money expected on `expectedOn`, so a late transfer
+ * can be tested without waiting. Stored weeks are dropped, to be stored
+ * again with the new dates. Changes the database directly.
+ */
+export async function backdateMonth(page: Page, days: number, expectedOn: string) {
+  if (!process.env.DATABASE_URL) process.loadEnvFile(path.resolve(process.cwd(), "../../.env"));
+  const session = await page.request.get("/api/auth/get-session");
+  const { user } = (await session.json()) as { user: { id: string } };
+  const { client: sql } = createDb(process.env.DATABASE_URL ?? "", { max: 1 });
+  try {
+    const startedOn = addDays(todayInTunis(), -days);
+    await sql`
+      update cycles set started_on = ${startedOn}, expected_next_on = ${expectedOn}
+      where user_id = ${user.id} and status = 'active'`;
+    await sql`
+      delete from week_snapshots
+      where cycle_id in (select id from cycles where user_id = ${user.id})`;
+  } finally {
+    await sql.end();
+  }
 }
 
 // Subjects from packages/auth/src/email/messages.ts.
