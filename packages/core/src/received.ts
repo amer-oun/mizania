@@ -47,8 +47,25 @@ export function lateTransferDefault(today: IsoDate): IsoDate {
  * most 62 days from today.
  */
 export function canExpectOn(on: IsoDate, today: IsoDate, startedOn: IsoDate): boolean {
-  const fromToday = daysBetween(today, on);
-  return fromToday >= 0 && fromToday <= MAX_EXPECTED_DAYS && daysBetween(startedOn, on) >= 1;
+  const { min, max } = expectedDateRange(today, startedOn);
+  return daysBetween(min, on) >= 0 && daysBetween(on, max) >= 0;
+}
+
+/** The dates canExpectOn accepts, for a date picker. */
+export function expectedDateRange(
+  today: IsoDate,
+  startedOn: IsoDate,
+): { min: IsoDate; max: IsoDate } {
+  const dayAfterStart = addDays(startedOn, 1);
+  return {
+    min: daysBetween(today, dayAfterStart) > 0 ? dayAfterStart : today,
+    max: addDays(today, MAX_EXPECTED_DAYS),
+  };
+}
+
+/** "Not yet": from tomorrow (today would ask again at once). */
+export function lateDateRange(today: IsoDate): { min: IsoDate; max: IsoDate } {
+  return { min: addDays(today, 1), max: addDays(today, MAX_EXPECTED_DAYS) };
 }
 
 /**

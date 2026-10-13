@@ -65,9 +65,11 @@ export {
 export {
   canExpectOn,
   copyPlan,
+  expectedDateRange,
   type IncomeSource,
   incomeSources,
   isLikelyNewMonth,
+  lateDateRange,
   lateTransferDefault,
   newMonthInput,
   nextMonthExpectedOn,

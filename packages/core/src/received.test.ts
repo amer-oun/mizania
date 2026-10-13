@@ -6,7 +6,9 @@ import { previewPlan } from "./plan";
 import {
   canExpectOn,
   copyPlan,
+  expectedDateRange,
   isLikelyNewMonth,
+  lateDateRange,
   lateTransferDefault,
   newMonthInput,
   nextMonthExpectedOn,
@@ -46,6 +48,18 @@ describe("expected dates", () => {
     // A month that started today: from tomorrow.
     expect(canExpectOn("2026-10-20", "2026-10-20", "2026-10-20")).toBe(false);
     expect(canExpectOn("2026-10-21", "2026-10-20", "2026-10-20")).toBe(true);
+  });
+
+  it("gives the date picker's range, and tomorrow on for 'Not yet'", () => {
+    expect(expectedDateRange("2026-10-20", "2026-10-01")).toEqual({
+      min: "2026-10-20",
+      max: "2026-12-21",
+    });
+    expect(expectedDateRange("2026-10-20", "2026-10-20")).toEqual({
+      min: "2026-10-21",
+      max: "2026-12-21",
+    });
+    expect(lateDateRange("2026-10-31")).toEqual({ min: "2026-11-01", max: "2027-01-01" });
   });
 });
 
