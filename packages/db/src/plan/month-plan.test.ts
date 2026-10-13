@@ -325,6 +325,23 @@ describe("savePlan in weekly mode", () => {
     expect(await todayOf(s.userId)).toMatchObject({ allowance: 7_000 });
   });
 
+  it("over budget: a week stored at 0 is rebuilt when the plan is fixed", async () => {
+    const s = await student(true);
+    // 400 DT of savings against 200 DT of daily money: over budget, week at 0.
+    const tooMuch = savings(400_000);
+    expect(await save(s, [...s.items, tooMuch])).toBe("saved");
+    expect(await todayOf(s.userId)).toMatchObject({ status: "over_budget" });
+    await test.db
+      .update(weekSnapshots)
+      .set({ allowanceMillimes: 0 })
+      .where(eq(weekSnapshots.cycleId, s.cycleId));
+
+    // 50 DT of savings: 150 DT × 7 / 20 = 52.500 for the week, 7.500 a day.
+    expect(await save(s, [...s.items, { ...tooMuch, amountMillimes: 50_000 }])).toBe("saved");
+    expect(await week(s.cycleId)).toEqual([52_500]);
+    expect(await todayOf(s.userId)).toMatchObject({ allowance: 7_500, status: "on_track" });
+  });
+
   it("stores the lower amount when the week wasn't stored yet", async () => {
     const s = await student(true);
     await test.db.delete(weekSnapshots).where(eq(weekSnapshots.cycleId, s.cycleId));

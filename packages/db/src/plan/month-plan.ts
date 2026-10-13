@@ -105,8 +105,9 @@ export type SavePlanResult = "saved" | "not-found" | "invalid";
  * of its kind.
  *
  * In weekly mode, this week's amount keeps the lower of what it was and what
- * the new plan gives (ADR 006 §4): a bigger plan lowers it at once, a
- * smaller one shows from next week.
+ * the new plan gives (ADR 006 §7): a bigger plan lowers it at once, a
+ * smaller one shows from next week. A week stored at 0 (over budget) is
+ * rebuilt with the new plan, even upward.
  *
  * Safe to retry: new items' IDs come from the client, so saving the same
  * plan again changes nothing.
@@ -228,7 +229,8 @@ export async function savePlan(
           ),
         );
       const allowance = weekAfterPlanChange(stored?.allowance ?? week.allowance, after);
-      // A snapshot stored meanwhile from the old plan keeps the lower amount too.
+      // A snapshot stored meanwhile from the old plan follows the same rule:
+      // the lower amount, or the new one when it was stored at 0.
       await tx
         .insert(weekSnapshots)
         .values({
@@ -242,7 +244,7 @@ export async function savePlan(
         .onConflictDoUpdate({
           target: [weekSnapshots.cycleId, weekSnapshots.weekIndex],
           set: {
-            allowanceMillimes: sql`least(${weekSnapshots.allowanceMillimes}, excluded.allowance_millimes)`,
+            allowanceMillimes: sql`case when ${weekSnapshots.allowanceMillimes} = 0 then excluded.allowance_millimes else least(${weekSnapshots.allowanceMillimes}, excluded.allowance_millimes) end`,
           },
         });
     }
