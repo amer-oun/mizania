@@ -5,8 +5,10 @@ import { ChevronRightIcon } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Amount, useFormatAmount } from "@/components/wallets/shared";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 export interface TodayView {
@@ -72,6 +74,9 @@ export function TodayScreen({ view }: { view: TodayView }) {
               {t("overBudget", { amount: formatAmount(-summary.poolNow) })}
             </h2>
             <p className="text-sm text-muted-foreground">{t("overBudgetHint")}</p>
+            <Button asChild>
+              <Link href="/plan/edit?from=today">{t("adjustPlan")}</Link>
+            </Button>
           </>
         ) : (
           <>

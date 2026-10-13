@@ -118,15 +118,23 @@ export const planItems = pgTable(
     amountMillimes: millimes().notNull(),
     dueOn: date({ mode: "string" }),
     paidAt: timestamp({ withTimezone: true }),
+    // Envelopes added mid-month cover spending only from this time, so a plan
+    // change never rewrites past days (ADR 006). Null: the whole cycle.
+    coversFrom: timestamp({ withTimezone: true }),
     ...timestamps,
   },
   (t) => [
     index("plan_items_cycle_id_idx").on(t.cycleId),
     check("plan_items_amount_positive", sql`${t.amountMillimes} > 0`),
+    // Savings is one line with no name; everything else has a category or a name.
     check(
       "plan_items_named",
-      sql`${t.categoryId} is not null or (${t.name} is not null and btrim(${t.name}) <> '')`,
+      sql`${t.kind} = 'savings' or ${t.categoryId} is not null or (${t.name} is not null and btrim(${t.name}) <> '')`,
     ),
+    // One savings line per cycle (savings goals come in V1).
+    uniqueIndex("plan_items_one_savings_per_cycle")
+      .on(t.cycleId)
+      .where(sql`${t.kind} = 'savings' and ${t.deletedAt} is null`),
   ],
 );
 
