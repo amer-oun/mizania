@@ -231,6 +231,9 @@ export const weekSnapshots = pgTable(
     startsOn: date({ mode: "string" }).notNull(),
     endsOn: date({ mode: "string" }).notNull(),
     allowanceMillimes: millimes().notNull(),
+    // The time of the numbers the amount was built from: money received after
+    // it shows from next week (waitingForNextWeek in packages/core).
+    builtAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

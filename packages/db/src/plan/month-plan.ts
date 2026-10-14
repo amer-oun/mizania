@@ -7,13 +7,13 @@ import {
   type PlanDraftItem,
   suggestGroceries,
   weekAfterPlanChange,
-  weekStartAllowance,
 } from "@mizania/core";
-import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 
 import { budgetInput, getBudget, loadCycleData } from "../budget/budget";
+import { storeWeekAgain } from "../budget/month";
 import type { Db } from "../client";
-import { categories, type CategoryNames, cycles, planItems, weekSnapshots } from "../schema";
+import { categories, type CategoryNames, cycles, planItems } from "../schema";
 import { type Plan, planOf } from "./fixed-costs";
 
 // Editing the month plan: fixed costs, envelopes and one savings line. Every
@@ -232,36 +232,7 @@ export async function savePlan(
           planItems: applyPlanDraft(data.planItems, input.items, now.getTime()),
         }),
       );
-      const week = weekStartAllowance(before);
-      const [stored] = await tx
-        .select({ allowance: weekSnapshots.allowanceMillimes })
-        .from(weekSnapshots)
-        .where(
-          and(
-            eq(weekSnapshots.userId, userId),
-            eq(weekSnapshots.cycleId, cycle.id),
-            eq(weekSnapshots.weekIndex, week.index),
-          ),
-        );
-      const allowance = weekAfterPlanChange(stored?.allowance ?? week.allowance, after);
-      // A snapshot stored meanwhile from the old plan follows the same rule:
-      // the lower amount, or the new one when it was stored at 0.
-      await tx
-        .insert(weekSnapshots)
-        .values({
-          userId,
-          cycleId: cycle.id,
-          weekIndex: week.index,
-          startsOn: week.start,
-          endsOn: week.end,
-          allowanceMillimes: allowance,
-        })
-        .onConflictDoUpdate({
-          target: [weekSnapshots.cycleId, weekSnapshots.weekIndex],
-          set: {
-            allowanceMillimes: sql`case when ${weekSnapshots.allowanceMillimes} = 0 then excluded.allowance_millimes else least(${weekSnapshots.allowanceMillimes}, excluded.allowance_millimes) end`,
-          },
-        });
+      await storeWeekAgain(tx, userId, cycle, before, after, weekAfterPlanChange, now);
     }
     return "saved";
   });

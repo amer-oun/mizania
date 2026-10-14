@@ -171,8 +171,13 @@ describe("receiveExtraMoney", () => {
     const s = await student(true);
     // 200 × 7 / 20 = 70 DT for the week, 10 a day.
     expect(await todayOf(s.userId)).toMatchObject({ allowance: 10_000 });
-    await receiveExtraMoney(test.db, s.userId, extra(s.d17, 60_000), today, now);
+    const sixty = extra(s.d17, 60_000);
+    await receiveExtraMoney(test.db, s.userId, sixty, today, now);
     expect(await weeks(s.cycleId)).toEqual([[0, 70_000]]);
+    // Not in this week's amount: it shows from next week.
+    expect((await getBudget(test.db, s.userId, today))?.waiting).toEqual([
+      { id: sixty.id, amountMillimes: 60_000 },
+    ]);
     expect(await todayOf(s.userId)).toMatchObject({ allowance: 10_000 });
 
     // Over budget: 500 DT of savings, the week at 0.
@@ -208,6 +213,8 @@ describe("receiveExtraMoney", () => {
     const bourse = extra(s.cash, 300_000);
     await receiveExtraMoney(test.db, s.userId, bourse, today, now);
     expect(await weeks(s.cycleId)).toEqual([[0, 21_000]]);
+    // The week was rebuilt with all of it: nothing waits.
+    expect((await getBudget(test.db, s.userId, today))?.waiting).toEqual([]);
     expect(await todayOf(s.userId)).toMatchObject({ allowance: 3_000, status: "on_track" });
 
     // Undone: back to the lower amount the plan allows, 0.

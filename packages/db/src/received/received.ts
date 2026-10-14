@@ -143,7 +143,7 @@ export async function receiveExtraMoney(
       incomeSource: input.source,
     });
     const after = await weekInput(tx, userId, cycle, today);
-    await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterIncome);
+    await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterIncome, now);
     return "saved";
   });
 }
@@ -186,7 +186,7 @@ export async function undoExtraMoney(
       .set({ deletedAt: now })
       .where(and(eq(transactions.id, income.id), eq(transactions.userId, userId)));
     const after = await weekInput(tx, userId, cycle, today);
-    await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterPlanChange);
+    await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterPlanChange, now);
     return "done";
   });
 }
@@ -289,6 +289,7 @@ export async function startNewMonth(
           startsOn: week.start,
           endsOn: week.end,
           allowanceMillimes: week.allowance,
+          builtAt: now,
         })
         .onConflictDoNothing({ target: [weekSnapshots.cycleId, weekSnapshots.weekIndex] });
     }
@@ -309,6 +310,7 @@ export async function moveExpectedDate(
   userId: string,
   input: { cycleId: string; expectedOn: IsoDate },
   today: IsoDate,
+  now: Date = new Date(),
 ): Promise<MoveExpectedDateResult> {
   return db.transaction(async (tx) => {
     const cycle = await lockActiveCycle(tx, userId, input.cycleId);
@@ -322,7 +324,7 @@ export async function moveExpectedDate(
       .where(and(eq(cycles.id, cycle.id), eq(cycles.userId, userId)));
     const moved = { ...cycle, expectedNextOn: input.expectedOn };
     const after = await weekInput(tx, userId, moved, today);
-    await storeWeekAgain(tx, userId, moved, before.week, after.week, weekAfterPlanChange);
+    await storeWeekAgain(tx, userId, moved, before.week, after.week, weekAfterPlanChange, now);
     return "saved";
   });
 }

@@ -71,6 +71,7 @@ export default async function TodayPage({
                   spentThisWeekBeforeToday: budget.summary.spentThisWeekBeforeToday,
                 },
                 budget: budget.today,
+                waiting: budget.waiting.map((w) => w.amountMillimes),
               }}
             />
             <div className="mt-4">
@@ -84,7 +85,13 @@ export default async function TodayPage({
         )}
         <ReceivedSnackbar
           received={
-            received?.id ? { id: received.id, amountMillimes: received.amountMillimes } : null
+            received?.id
+              ? {
+                  id: received.id,
+                  amountMillimes: received.amountMillimes,
+                  nextWeek: budget?.waiting.some((w) => w.id === received.id) ?? false,
+                }
+              : null
           }
         />
         <TodayLog

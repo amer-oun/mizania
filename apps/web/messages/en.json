@@ -59,7 +59,8 @@
     },
     "loadError": "Couldn't load today's amount.",
     "retry": "Try again",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "nextWeek": "+{amount} · shows in your daily amount from next week"
   },
   "QuickLog": {
     "title": "Add an expense",

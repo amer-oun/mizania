@@ -17,7 +17,10 @@ export type WalletActionError =
   | "already-paid"
   | "not-latest"
   | "server";
-export interface WalletActionFailure { ok: false; error: WalletActionError }
+export interface WalletActionFailure {
+  ok: false;
+  error: WalletActionError;
+}
 export type WalletActionResult = { ok: true } | WalletActionFailure;
 
 interface Schema<T> {

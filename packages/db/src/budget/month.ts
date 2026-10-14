@@ -1,6 +1,6 @@
 import type { IsoDate, TodayBudgetInput } from "@mizania/core";
 import { cycleSummary, weekStartAllowance } from "@mizania/core";
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, eq, gt, isNull, sql } from "drizzle-orm";
 
 import type { Db } from "../client";
 import { cycles, wallets, weekSnapshots } from "../schema";
@@ -57,6 +57,9 @@ export async function activeWallet(tx: Tx, userId: string, walletId: string) {
  * Weekly mode: stores this week's amount again after a change, from what
  * was stored (or rebuilt before the change when nothing was), by `rule`.
  * Later weeks of the cycle are deleted, to be stored when they come.
+ * `built_at` moves to `now` when the week takes the amount rebuilt from the
+ * numbers after the change; otherwise the week still reflects the numbers
+ * from before it.
  */
 export async function storeWeekAgain(
   tx: Tx,
@@ -65,6 +68,7 @@ export async function storeWeekAgain(
   before: WeekInput,
   after: WeekInput,
   rule: (stored: number, after: WeekInput) => number,
+  now: Date,
 ) {
   if (!cycle.weeklyMode) return;
   const current = weekStartAllowance(before);
@@ -80,6 +84,9 @@ export async function storeWeekAgain(
     );
   const week = weekStartAllowance(after);
   const allowance = rule(stored?.allowance ?? current.allowance, after);
+  const rebuilt = allowance === week.allowance;
+  // Not rebuilt and not stored yet: built from the numbers just before now.
+  const builtAt = rebuilt ? now : new Date(now.getTime() - 1);
   await tx
     .delete(weekSnapshots)
     .where(and(eq(weekSnapshots.cycleId, cycle.id), gt(weekSnapshots.weekIndex, week.index)));
@@ -92,10 +99,16 @@ export async function storeWeekAgain(
       startsOn: week.start,
       endsOn: week.end,
       allowanceMillimes: allowance,
+      builtAt,
     })
     .onConflictDoUpdate({
       target: [weekSnapshots.cycleId, weekSnapshots.weekIndex],
-      set: { startsOn: week.start, endsOn: week.end, allowanceMillimes: allowance },
+      set: {
+        startsOn: week.start,
+        endsOn: week.end,
+        allowanceMillimes: allowance,
+        builtAt: rebuilt ? now : sql`${weekSnapshots.builtAt}`,
+      },
     });
 }
 

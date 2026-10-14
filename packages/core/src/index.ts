@@ -83,6 +83,7 @@ export {
   lateTransferDefault,
   newMonthInput,
   nextMonthExpectedOn,
+  waitingForNextWeek,
   weekAfterIncome,
 } from "./received";
 export {

@@ -59,7 +59,8 @@
     },
     "loadError": "Impossible de charger le montant du jour.",
     "retry": "Réessayer",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "nextWeek": "+{amount} · compte dans ton montant du jour à partir de la semaine prochaine"
   },
   "QuickLog": {
     "title": "Ajouter une dépense",

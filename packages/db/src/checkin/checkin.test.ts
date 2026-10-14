@@ -118,6 +118,7 @@ describe("saveCheckIn", () => {
       amountMillimes: 0,
       transactionId: null,
       since: null,
+      nextWeek: false,
     });
     expect(await balance(s.userId)).toBe(350_000);
   });
@@ -218,13 +219,18 @@ describe("saveCheckIn", () => {
     const s = await student(true);
     // 200 × 7 / 20 = 70 DT for the week.
     expect((await budgetOf(s.userId))?.today).toMatchObject({ allowance: 10_000 });
-    await saveCheckIn(
+    const found = await saveCheckIn(
       test.db,
       s.userId,
       count(s.cash, 320_000, { answer: "correction", seenMillimes: 20_000 }),
       today,
       at("19:00"),
     );
+    // "+20 DT · shows in your daily amount from next week".
+    expect(found).toMatchObject({ status: "saved", nextWeek: true });
+    expect((await budgetOf(s.userId))?.waiting).toEqual([
+      { id: found.status === "saved" ? found.transactionId : "", amountMillimes: 20_000 },
+    ]);
     const weeks = await test.db.select().from(weekSnapshots);
     expect(weeks.filter((w) => w.userId === s.userId).map((w) => w.allowanceMillimes)).toEqual([
       70_000,

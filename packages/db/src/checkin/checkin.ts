@@ -8,16 +8,25 @@ import {
   type IncomeSource,
   isCheckinEvening,
   type IsoDate,
+  waitingForNextWeek,
   walletBalances,
   weekAfterIncome,
   weekAfterPlanChange,
+  weekStartAllowance,
 } from "@mizania/core";
 import { and, desc, eq, inArray, isNull, lt, or } from "drizzle-orm";
 
 import { loadCycleData } from "../budget/budget";
-import { activeWallet, lockActiveCycle, storeWeekAgain, type Tx, weekInput } from "../budget/month";
+import {
+  activeWallet,
+  type Cycle,
+  lockActiveCycle,
+  storeWeekAgain,
+  type Tx,
+  weekInput,
+} from "../budget/month";
 import type { Db } from "../client";
-import { categories, checkins, transactions, users, wallets } from "../schema";
+import { categories, checkins, transactions, users, wallets, weekSnapshots } from "../schema";
 
 // The evening check-in (ADR 004, ADR 006 decisions 5 and 6): the student
 // counts a wallet, and the difference with what the app expected is
@@ -141,6 +150,8 @@ export type SaveCheckInResult =
       amountMillimes: number;
       transactionId: string | null;
       since: Date | null;
+      /** Weekly mode: money found that shows in the daily amount from next week. */
+      nextWeek: boolean;
     }
   | { status: "needs-answer"; amountMillimes: number }
   | { status: "changed"; kind: CheckInKind; amountMillimes: number }
@@ -195,6 +206,7 @@ export async function saveCheckIn(
         amountMillimes: differenceOf(existing),
         transactionId: existing.transactionId,
         since: await previousCount(tx, userId, existing.walletId, existing.at),
+        nextWeek: await waitsForNextWeek(tx, userId, cycle, today, existing.transactionId),
       };
     }
     const wallet = await activeWallet(tx, userId, input.walletId);
@@ -249,7 +261,7 @@ export async function saveCheckIn(
     // like extra money (a week stored at 0 is rebuilt with it).
     if (record && record.type !== "expense") {
       const after = await weekInput(tx, userId, cycle, today);
-      await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterIncome);
+      await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterIncome, now);
     }
     return {
       status: "saved",
@@ -257,8 +269,36 @@ export async function saveCheckIn(
       amountMillimes: result.amount,
       transactionId,
       since,
+      nextWeek: await waitsForNextWeek(tx, userId, cycle, today, transactionId),
     };
   });
+}
+
+/**
+ * Weekly mode: whether the money recorded by `transactionId` came after this
+ * week's amount was built, so it shows from next week.
+ */
+async function waitsForNextWeek(
+  tx: Tx,
+  userId: string,
+  cycle: Cycle,
+  today: IsoDate,
+  transactionId: string | null,
+): Promise<boolean> {
+  if (!cycle.weeklyMode || transactionId === null) return false;
+  const { input, week } = await weekInput(tx, userId, cycle, today);
+  const [stored] = await tx
+    .select({ builtAt: weekSnapshots.builtAt })
+    .from(weekSnapshots)
+    .where(
+      and(
+        eq(weekSnapshots.userId, userId),
+        eq(weekSnapshots.cycleId, cycle.id),
+        eq(weekSnapshots.weekIndex, weekStartAllowance(week).index),
+      ),
+    );
+  if (!stored) return false;
+  return waitingForNextWeek(input, stored.builtAt.getTime()).some((t) => t.id === transactionId);
 }
 
 /** When `walletId` was counted before `at`, or null. */
@@ -346,7 +386,7 @@ export async function undoCheckIn(
       .where(and(eq(checkins.id, count.id), eq(checkins.userId, userId)));
     if (count.type === "income" || count.type === "adjustment") {
       const after = await weekInput(tx, userId, cycle, today);
-      await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterPlanChange);
+      await storeWeekAgain(tx, userId, cycle, before.week, after.week, weekAfterPlanChange, now);
     }
     return "done";
   });

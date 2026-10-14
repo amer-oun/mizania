@@ -2,11 +2,18 @@
 // month, extra money, and a transfer that's late. All amounts are integer
 // millimes; all dates are calendar days in Africa/Tunis.
 
-import { addDays, daysBetween, type IsoDate, nextTransferDate } from "./cycle";
+import {
+  addDays,
+  cycleWeeks,
+  daysBetween,
+  type IsoDate,
+  nextTransferDate,
+  weekIndexFor,
+} from "./cycle";
 import { type TodayBudgetInput, weekStartAllowance } from "./daily";
 import { assertMillimes } from "./money";
 import type { PlanDraftItem } from "./plan";
-import type { CycleSummaryInput, SummaryPlanItem } from "./summary";
+import { type CycleSummaryInput, isThisMonths, type SummaryPlanItem } from "./summary";
 
 /** Where money comes from (decision 10). */
 export const incomeSources = ["parents", "bourse", "job", "other"] as const;
@@ -127,4 +134,27 @@ export function weekAfterIncome(
 ): number {
   assertMillimes(stored);
   return stored === 0 ? weekStartAllowance(after).allowance : stored;
+}
+
+/**
+ * Weekly mode: money received (income) or found (a positive correction)
+ * this week after the week's amount was built at `builtAt` (milliseconds).
+ * The week's amount doesn't include it: it shows in the daily amount from
+ * next week ("+20 DT · shows in your daily amount from next week").
+ */
+export function waitingForNextWeek(
+  input: CycleSummaryInput,
+  builtAt: number,
+): { id: string | undefined; amountMillimes: number }[] {
+  const weeks = cycleWeeks(input.startedOn, input.nextTransferOn);
+  const weekStart = addDays(input.startedOn, weekIndexFor(input.today, weeks) * 7);
+  return input.transactions
+    .filter(
+      (t) =>
+        (t.type === "income" || (t.type === "adjustment" && t.amountMillimes > 0)) &&
+        t.at > builtAt &&
+        daysBetween(weekStart, t.day) >= 0 &&
+        isThisMonths(input, t),
+    )
+    .map((t) => ({ id: t.id, amountMillimes: t.amountMillimes }));
 }

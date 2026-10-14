@@ -4,7 +4,7 @@ import { type IncomeSource, incomeSources, type IsoDate } from "@mizania/core";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
-import { checkInAction,type CheckInActionResult } from "@/app/actions/checkin";
+import { checkInAction, type CheckInActionResult } from "@/app/actions/checkin";
 import { AmountDisplay, Keypad, useAmountEntry } from "@/components/amount/amount-entry";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -19,7 +19,7 @@ type Step =
   | { name: "match" }
   | { name: "spent"; amountMillimes: number; since: string | null }
   | { name: "more"; amountMillimes: number; receiving: boolean }
-  | { name: "added"; amountMillimes: number }
+  | { name: "added"; amountMillimes: number; nextWeek: boolean }
   | { name: "changed" };
 
 const countErrors = [
@@ -48,6 +48,7 @@ export function CountSheet({
 }) {
   const t = useTranslations("Checkin");
   const r = useTranslations("Received");
+  const todayT = useTranslations("Today");
   const router = useRouter();
   const online = useOnline();
   const walletName = useWalletName();
@@ -86,7 +87,13 @@ export function CountSheet({
         if (result.kind === "match") setStep({ name: "match" });
         else if (result.kind === "unlogged_spending") {
           setStep({ name: "spent", amountMillimes: result.amountMillimes, since: result.since });
-        } else setStep({ name: "added", amountMillimes: result.amountMillimes });
+        } else {
+          setStep({
+            name: "added",
+            amountMillimes: result.amountMillimes,
+            nextWeek: result.nextWeek,
+          });
+        }
         return;
       }
       if (result.error === "needs-answer") {
@@ -153,9 +160,16 @@ export function CountSheet({
               </>
             )}
             {step.name === "added" && (
-              <p className="font-medium">
-                {t("added", { amount: formatAmount(step.amountMillimes), wallet: name })}
-              </p>
+              <>
+                <p className="font-medium">
+                  {t("added", { amount: formatAmount(step.amountMillimes), wallet: name })}
+                </p>
+                {step.nextWeek && (
+                  <p className="text-sm text-primary" data-testid="count-next-week">
+                    {todayT("nextWeek", { amount: formatAmount(step.amountMillimes) })}
+                  </p>
+                )}
+              </>
             )}
             {step.name === "more" && (
               <>

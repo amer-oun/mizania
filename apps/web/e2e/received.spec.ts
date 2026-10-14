@@ -36,10 +36,14 @@ for (const locale of ["ar", "fr", "en"] as const) {
 
     await expect(page).toHaveURL(new RegExp(`/${locale}\\?received=`));
     await expect(page.getByTestId("snackbar")).toContainText(money(50_000));
+    // Weekly mode: the week's amount stays; the note says when it shows.
+    const note = t.Today.nextWeek.split("·")[1]?.trim() ?? "";
+    await expect(page.getByTestId("snackbar")).toContainText(note);
     // Weekly mode: this week's amount stays; the money is in the wallets.
     await expect(page.getByTestId("today-amount")).toContainText(money(before.allowance));
     await page.getByTestId("today-amount").click();
     await expect(page.getByTestId("breakdown-wallets")).toContainText(money(180_000));
+    await expect(page.getByTestId("breakdown-next-week")).toContainText(money(50_000));
 
     if (locale === "en") {
       await page.keyboard.press("Escape");

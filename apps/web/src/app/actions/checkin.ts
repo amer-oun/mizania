@@ -27,6 +27,8 @@ export type CheckInActionResult =
       amountMillimes: number;
       /** When this wallet was last counted (ISO), or null: never. */
       since: string | null;
+      /** Weekly mode: money found that shows in the daily amount from next week. */
+      nextWeek: boolean;
     }
   /** Counted more: ask "did you receive money?" first. Nothing is saved. */
   | { ok: false; error: "needs-answer"; amountMillimes: number }
@@ -49,6 +51,7 @@ export async function checkInAction(input: unknown): Promise<CheckInActionResult
             kind: result.kind,
             amountMillimes: result.amountMillimes,
             since: result.since?.toISOString() ?? null,
+            nextWeek: result.nextWeek,
           };
         case "needs-answer":
           return { ok: false, error: "needs-answer", amountMillimes: result.amountMillimes };

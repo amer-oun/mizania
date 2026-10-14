@@ -79,6 +79,8 @@ test("fr: more cash, money received; counting again matches", async ({ page }) =
   await result.getByRole("button", { name: t.Checkin.saveIncome }).click();
   await expect(result).toContainText(money(5_000));
   await expect(result.getByRole("button", { name: t.Checkin.moreIncome })).toHaveCount(0);
+  // Weekly mode: "+5 DT · shows in your daily amount from next week".
+  await expect(result.getByTestId("count-next-week")).toContainText(money(5_000));
   await closeAndGoToday(page, "fr");
 
   // Not spending: in weekly mode the week's amount stays; the money is in the wallets.
