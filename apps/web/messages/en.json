@@ -83,7 +83,12 @@
     "unlogged": "Unlogged spending",
     "covered": "Covered by your plan",
     "partial": "{amount} from today's money",
-    "delete": "Delete {category} {amount}"
+    "delete": "Delete {category} {amount}",
+    "pickCategory": "Pick a category for this spending",
+    "pickTitle": "What was it?",
+    "sinceLast": "since your last count ({day})",
+    "sinceStart": "since you started",
+    "earlierToday": "earlier today"
   },
   "Plan": {
     "title": "Plan",
@@ -228,6 +233,54 @@
       "signed-out": "You were signed out. Please sign in again.",
       "server": "Couldn't save. Check your connection and try again."
     }
+  },
+  "Checkin": {
+    "cardTitle": "Evening check-in",
+    "cardText": "How much cash do you have right now? Count it: it takes 5 seconds.",
+    "countCash": "Count my cash",
+    "notTonight": "Not tonight",
+    "checkAll": "Check all wallets",
+    "doneLine": "Cash counted at {time}",
+    "resultMatch": "matches",
+    "resultSpent": "{amount} unlogged",
+    "resultMore": "+{amount}",
+    "undo": "Undo",
+    "countAgain": "Count again",
+    "undone": "Count undone",
+    "title": "Count {wallet}",
+    "countedLabel": "How much is in it right now?",
+    "done": "Done",
+    "saving": "Saving…",
+    "close": "Close",
+    "match": "All good: {wallet} matches what you logged.",
+    "spent": "{amount} spent without logging {since}.",
+    "spentHint": "It's added as unlogged spending today. You can pick a category in today's list.",
+    "more": "You have {amount} more than expected. Did you receive money?",
+    "moreIncome": "Yes, I received money",
+    "moreCorrection": "No, I miscounted earlier",
+    "sourceLabel": "From",
+    "saveIncome": "Add the money",
+    "added": "+{amount} added to {wallet}.",
+    "changed": "Your numbers changed meanwhile. Count again.",
+    "pageTitle": "Count my wallets",
+    "pageHint": "Count each wallet and type what's really in it. The difference with what you logged is recorded.",
+    "lastCount": "Counted {when}",
+    "neverCounted": "Not counted yet",
+    "count": "Count",
+    "countLabel": "Count {wallet}",
+    "offline": "You're offline. Connect to the internet to save.",
+    "noCycle": "No month in progress.",
+    "errors": {
+      "invalid": "Check what you entered.",
+      "not-found": "This wallet has changed. Reload the page and try again.",
+      "not-latest": "Only the latest count of a wallet can be undone.",
+      "wallet-archived": "This wallet is archived. Restore it first.",
+      "signed-out": "You were signed out. Please sign in again.",
+      "server": "Couldn't save. Check your connection and try again."
+    },
+    "sinceLast": "since your last count ({day})",
+    "sinceStart": "since you started",
+    "earlierToday": "earlier today"
   },
   "LanguageSwitcher": {
     "label": "Language",
@@ -417,7 +470,8 @@
       "invalid": "Check what you entered.",
       "signed-out": "You've been signed out. Sign in again.",
       "server": "Couldn't save. Check your connection and try again.",
-      "already-paid": "This is already paid. Undo the payment first to change it."
+      "already-paid": "This is already paid. Undo the payment first to change it.",
+      "not-latest": "Only the latest count of a wallet can be undone."
     },
     "transferTitle": "Transfer between wallets",
     "transferSubtitle": "For example, cash taken out at an ATM.",
@@ -431,6 +485,7 @@
     "back": "Back to wallets",
     "loading": "Loading…",
     "loadError": "Couldn't load your wallets.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "countCash": "Count my cash"
   }
 }

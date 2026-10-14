@@ -1,10 +1,12 @@
 import { todayInTunis } from "@mizania/core";
 import { getBudget } from "@mizania/db/budget";
+import { getCheckinState } from "@mizania/db/checkin";
 import { getCategories, getQuickLogOptions } from "@mizania/db/expenses";
 import { getWalletsOverview } from "@mizania/db/wallets";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
+import { CheckinCard } from "@/components/checkin/checkin-card";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { TodayLog } from "@/components/quick-log/today-log";
 import { ReceivedSnackbar } from "@/components/received/received-snackbar";
@@ -25,11 +27,12 @@ export default async function TodayPage({
   const locale = await getLocale();
   const db = getDb();
   const day = todayInTunis();
-  const [budget, quickLog, categories, { wallets }] = await Promise.all([
+  const [budget, quickLog, categories, { wallets }, checkin] = await Promise.all([
     getBudget(db, user.id, day),
     getQuickLogOptions(db, user.id),
     getCategories(db, user.id),
     getWalletsOverview(db, user.id),
+    getCheckinState(db, user.id, day),
   ]);
   // ?received=<id>: extra money was just added; offer to undo it.
   const receivedId = (await searchParams).received;
@@ -53,22 +56,27 @@ export default async function TodayPage({
       {/* Room at the bottom so the "+" button never covers the last row. */}
       <main className="flex flex-1 flex-col pt-2 pb-24">
         {budget ? (
-          <TodayScreen
-            view={{
-              cycleId: budget.cycle.id,
-              today: day,
-              expectedNextOn: budget.cycle.expectedNextOn,
-              transferDue: budget.transferDue,
-              summary: {
-                available: budget.summary.available,
-                reserved: budget.summary.reserved,
-                poolNow: budget.summary.poolNow,
-                spentToday: budget.summary.spentToday,
-                spentThisWeekBeforeToday: budget.summary.spentThisWeekBeforeToday,
-              },
-              budget: budget.today,
-            }}
-          />
+          <>
+            <TodayScreen
+              view={{
+                cycleId: budget.cycle.id,
+                today: day,
+                expectedNextOn: budget.cycle.expectedNextOn,
+                transferDue: budget.transferDue,
+                summary: {
+                  available: budget.summary.available,
+                  reserved: budget.summary.reserved,
+                  poolNow: budget.summary.poolNow,
+                  spentToday: budget.summary.spentToday,
+                  spentThisWeekBeforeToday: budget.summary.spentThisWeekBeforeToday,
+                },
+                budget: budget.today,
+              }}
+            />
+            <div className="mt-4">
+              <CheckinCard state={checkin} today={day} />
+            </div>
+          </>
         ) : (
           <p className="text-center text-muted-foreground" data-testid="no-cycle">
             {today("noCycle")}
@@ -81,7 +89,7 @@ export default async function TodayPage({
         />
         <TodayLog
           options={quickLog}
-          list={budget && { expenses: budget.todayExpenses, categories, wallets }}
+          list={budget && { expenses: budget.todayExpenses, categories, wallets, today: day }}
         />
       </main>
     </div>
