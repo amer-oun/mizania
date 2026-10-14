@@ -58,9 +58,23 @@ export {
   type PlanPreview,
   type PlanPreviewInput,
   previewPlan,
+  spentInCategory,
   suggestGroceries,
   weekAfterPlanChange,
 } from "./plan";
+export {
+  canExpectOn,
+  copyPlan,
+  expectedDateRange,
+  type IncomeSource,
+  incomeSources,
+  isLikelyNewMonth,
+  lateDateRange,
+  lateTransferDefault,
+  newMonthInput,
+  nextMonthExpectedOn,
+  weekAfterIncome,
+} from "./received";
 export {
   type CycleSummary,
   cycleSummary,

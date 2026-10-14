@@ -19,6 +19,18 @@ export {
 } from "./month-plan";
 export { type OnboardingInput, onboardingInputSchema, toOnboardingAnswers } from "./onboarding";
 export {
+  type IncomeIdInput,
+  incomeIdSchema,
+  incomeSourceSchema,
+  isoDateSchema,
+  type MoveExpectedDateInput,
+  moveExpectedDateSchema,
+  type ReceiveExtraInput,
+  receiveExtraSchema,
+  type StartNewMonthInput,
+  startNewMonthSchema,
+} from "./received";
+export {
   type AddWalletInput,
   addWalletSchema,
   type ArchiveWalletInput,

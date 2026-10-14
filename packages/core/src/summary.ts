@@ -38,6 +38,8 @@ export interface SummaryTransaction extends BalanceTransaction {
   categoryId?: string | null | undefined;
   /** A fixed-cost payment: the plan item it pays. */
   planItemId?: string | null | undefined;
+  /** The month it was logged in, when known. */
+  cycleId?: string | null | undefined;
   /** The calendar day it happened, in Africa/Tunis. */
   day: IsoDate;
   /** When it happened (milliseconds), to order a day's transactions. */
@@ -45,6 +47,12 @@ export interface SummaryTransaction extends BalanceTransaction {
 }
 
 export interface CycleSummaryInput {
+  /**
+   * This month's ID. Transactions logged in another month aren't this
+   * month's spending, even on its first day (a new month that starts the
+   * day the money arrives). Without it, months are told apart by date only.
+   */
+  cycleId?: string | undefined;
   today: IsoDate;
   startedOn: IsoDate;
   nextTransferOn: IsoDate;
@@ -100,6 +108,19 @@ export interface EnvelopeStatus {
   spent: number;
   /** Still set aside: never below 0 (overspending is daily money). */
   left: number;
+}
+
+/**
+ * Whether `t` is spending of the month in `input`: on one of its days, and
+ * not logged in another month.
+ */
+export function isThisMonths(input: CycleSummaryInput, t: SummaryTransaction): boolean {
+  const month = t.cycleId ?? null;
+  return (
+    daysBetween(input.startedOn, t.day) >= 0 &&
+    daysBetween(t.day, input.today) >= 0 &&
+    (input.cycleId === undefined || month === null || month === input.cycleId)
+  );
 }
 
 function checkPlanItem(item: SummaryPlanItem): void {
@@ -205,7 +226,7 @@ export function cycleSummary(input: CycleSummaryInput): CycleSummary {
   const spending = new Map<IsoDate, number>();
   const dailyParts = new Map<string, number>();
   const inCycle = input.transactions
-    .filter((t) => daysBetween(startedOn, t.day) >= 0 && daysBetween(t.day, today) >= 0)
+    .filter((t) => isThisMonths(input, t))
     .sort((a, b) => a.at - b.at);
   for (const t of inCycle) {
     let daily = 0;

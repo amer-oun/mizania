@@ -20,8 +20,9 @@ export default async function PlanPage() {
   const { user } = await requireSession();
   const t = await getTranslations("Plan");
   const db = getDb();
+  const today = todayInTunis();
   const [plan, { wallets, defaultWalletId }] = await Promise.all([
-    getPlan(db, user.id, todayInTunis()),
+    getPlan(db, user.id, today),
     getQuickLogOptions(db, user.id),
   ]);
 
@@ -40,7 +41,12 @@ export default async function PlanPage() {
       </header>
       <main className="flex flex-col pb-6">
         {plan ? (
-          <PlanWithActions plan={plan} wallets={wallets} defaultWalletId={defaultWalletId} />
+          <PlanWithActions
+            plan={plan}
+            today={today}
+            wallets={wallets}
+            defaultWalletId={defaultWalletId}
+          />
         ) : (
           <p className="text-muted-foreground">{t("noCycle")}</p>
         )}

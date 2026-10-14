@@ -7,24 +7,35 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { signOut } from "@/app/actions/auth";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { TodayLog } from "@/components/quick-log/today-log";
+import { ReceivedSnackbar } from "@/components/received/received-snackbar";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
 import { getDb } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 
 // The home screen: how much the student can spend today.
-export default async function TodayPage() {
+export default async function TodayPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { user } = await requireSession();
   const t = await getTranslations("Home");
   const today = await getTranslations("Today");
   const locale = await getLocale();
   const db = getDb();
+  const day = todayInTunis();
   const [budget, quickLog, categories, { wallets }] = await Promise.all([
-    getBudget(db, user.id, todayInTunis()),
+    getBudget(db, user.id, day),
     getQuickLogOptions(db, user.id),
     getCategories(db, user.id),
     getWalletsOverview(db, user.id),
   ]);
+  // ?received=<id>: extra money was just added; offer to undo it.
+  const receivedId = (await searchParams).received;
+  const received = budget?.input.transactions.find(
+    (t) => t.type === "income" && t.id !== undefined && t.id === receivedId,
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-[env(safe-area-inset-top)]">
@@ -44,6 +55,8 @@ export default async function TodayPage() {
         {budget ? (
           <TodayScreen
             view={{
+              cycleId: budget.cycle.id,
+              today: day,
               expectedNextOn: budget.cycle.expectedNextOn,
               transferDue: budget.transferDue,
               summary: {
@@ -53,7 +66,7 @@ export default async function TodayPage() {
                 spentToday: budget.summary.spentToday,
                 spentThisWeekBeforeToday: budget.summary.spentThisWeekBeforeToday,
               },
-              today: budget.today,
+              budget: budget.today,
             }}
           />
         ) : (
@@ -61,6 +74,11 @@ export default async function TodayPage() {
             {today("noCycle")}
           </p>
         )}
+        <ReceivedSnackbar
+          received={
+            received?.id ? { id: received.id, amountMillimes: received.amountMillimes } : null
+          }
+        />
         <TodayLog
           options={quickLog}
           list={budget && { expenses: budget.todayExpenses, categories, wallets }}

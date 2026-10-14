@@ -154,6 +154,9 @@ export const transactionSource = pgEnum("transaction_source", [
   "manual",
 ]);
 
+/** Where income comes from (ADR 006 §6). */
+export const incomeSource = pgEnum("income_source", ["parents", "bourse", "job", "other"]);
+
 export const transactions = pgTable(
   "transactions",
   {
@@ -173,6 +176,8 @@ export const transactions = pgTable(
     occurredAt: timestamp({ withTimezone: true }).notNull(),
     note: text(),
     source: transactionSource().notNull(),
+    // Income only: where the money came from.
+    incomeSource: incomeSource(),
     ...timestamps,
   },
   (t) => [
@@ -205,6 +210,7 @@ export const transactions = pgTable(
       sql`(${t.type} = 'transfer' and ${t.toWalletId} is not null and ${t.toWalletId} <> ${t.walletId})
         or (${t.type} <> 'transfer' and ${t.toWalletId} is null)`,
     ),
+    check("transactions_income_source", sql`${t.incomeSource} is null or ${t.type} = 'income'`),
   ],
 );
 

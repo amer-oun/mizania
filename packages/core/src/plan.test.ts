@@ -10,6 +10,7 @@ import {
   fixedCostLimits,
   type PlanDraftItem,
   previewPlan,
+  spentInCategory,
   suggestGroceries,
   weekAfterPlanChange,
 } from "./plan";
@@ -303,6 +304,24 @@ describe("weekAfterPlanChange", () => {
 });
 
 describe("suggestGroceries", () => {
+  it("in a new month without groceries yet: last month's, up to 5 DT", () => {
+    expect(suggestGroceries(data, "groceries", 71_500)).toBe(75_000);
+    // Groceries already logged this month win.
+    const logged = { ...data, transactions: [income, groceries("2026-10-02", 10_000)] };
+    expect(suggestGroceries(logged, "groceries", 71_500)).toBe(25_000);
+  });
+
+  it("counts only this month's groceries when months are told apart by ID", () => {
+    const mine = { ...groceries("2026-10-10", 4_000), cycleId: "now" };
+    const last = { ...groceries("2026-10-10", 9_000), cycleId: "last" };
+    const unknown = groceries("2026-10-10", 1_000);
+    const input = { ...data, cycleId: "now", transactions: [income, mine, last, unknown] };
+    expect(spentInCategory(input, "groceries")).toBe(5_000);
+    expect(spentInCategory({ ...data, transactions: input.transactions }, "groceries")).toBe(
+      14_000,
+    );
+  });
+
   it("without groceries logged: 20% of this morning's daily money, down to 5 DT", () => {
     // 300 DT × 20% = 60 DT.
     expect(suggestGroceries(data, "groceries")).toBe(60_000);

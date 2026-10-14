@@ -1,5 +1,6 @@
 "use client";
 
+import { expectedDateRange, type IsoDate } from "@mizania/core";
 import type { QuickLogOptions } from "@mizania/db/expenses";
 import type { Plan, PlanFixedCost } from "@mizania/db/plan";
 import { useTranslations } from "next-intl";
@@ -10,6 +11,7 @@ import {
   payFixedCostAction,
   undoFixedCostPaymentAction,
 } from "@/app/actions/fixed-costs";
+import { ExpectedDateSheet } from "@/components/received/expected-date-sheet";
 import { Button } from "@/components/ui/button";
 import { Snackbar, type SnackbarMessage } from "@/components/ui/snackbar";
 import { useFormatAmount, useWalletAction } from "@/components/wallets/shared";
@@ -21,10 +23,12 @@ import { PlanScreen, usePlanItemName } from "./plan-screen";
 /** The Plan screen with Pay and Undo on each fixed cost. */
 export function PlanWithActions({
   plan,
+  today,
   wallets,
   defaultWalletId,
 }: {
   plan: Plan;
+  today: IsoDate;
   wallets: QuickLogOptions["wallets"];
   defaultWalletId: string | null;
 }) {
@@ -37,6 +41,9 @@ export function PlanWithActions({
   // One ID per payment: a retry after a lost response doesn't save it twice.
   const [paymentId, setPaymentId] = useState(() => crypto.randomUUID());
   const [message, setMessage] = useState<SnackbarMessage | null>(null);
+  const [changingDate, setChangingDate] = useState(false);
+  const d = useTranslations("ExpectedDate");
+  const dates = expectedDateRange(today, plan.cycle.startedOn);
   const messages = useRef(0);
   const hide = useCallback(() => {
     setMessage(null);
@@ -80,6 +87,19 @@ export function PlanWithActions({
       )}
       <PlanScreen
         plan={plan}
+        dateAction={
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={d("changeLabel")}
+            disabled={!online}
+            onClick={() => {
+              setChangingDate(true);
+            }}
+          >
+            {d("change")}
+          </Button>
+        }
         actions={(cost) =>
           cost.paid ? (
             <Button
@@ -137,6 +157,17 @@ export function PlanWithActions({
                 show(t("markedPaid", { name: nameOf(cost) }), cost);
               },
             );
+          }}
+        />
+      )}
+      {changingDate && (
+        <ExpectedDateSheet
+          cycleId={plan.cycle.id}
+          // A date already passed (the money is late) starts at the earliest allowed.
+          initial={plan.cycle.expectedNextOn < dates.min ? dates.min : plan.cycle.expectedNextOn}
+          {...dates}
+          onClose={() => {
+            setChangingDate(false);
           }}
         />
       )}

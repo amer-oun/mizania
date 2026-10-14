@@ -56,9 +56,12 @@ function FixedCostState({ cost }: { cost: PlanFixedCost }) {
 export function PlanScreen({
   plan,
   actions,
+  dateAction,
 }: {
   plan: Plan;
   actions?: (cost: PlanFixedCost) => ReactNode;
+  /** Next to the dates: change when the money is expected. */
+  dateAction?: ReactNode;
 }) {
   const t = useTranslations("Plan");
   const format = useFormatter();
@@ -68,9 +71,12 @@ export function PlanScreen({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">
-        {t("period", { start: day(plan.cycle.startedOn), end: day(plan.cycle.expectedNextOn) })}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground" data-testid="plan-period">
+          {t("period", { start: day(plan.cycle.startedOn), end: day(plan.cycle.expectedNextOn) })}
+        </p>
+        {dateAction}
+      </div>
 
       <section aria-labelledby="plan-fixed" className="flex flex-col gap-2">
         <h2 id="plan-fixed" className="text-sm font-medium text-muted-foreground">

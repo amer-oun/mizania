@@ -50,14 +50,17 @@ Not counted: transfers between wallets, envelope spending within the envelope, f
 - **Stored lazily:** the first time the budget is computed on a day of a week without a snapshot, its allowance is ADR 003's fair share of `poolNow + spentToday + spentThisWeekBeforeToday` at that moment. The insert ignores a duplicate and reads the row back, so two tabs or devices agree. "I received money" stores week 1 right away.
 - **Used:** `todayBudget` takes an optional `weekAllowance`. What's left of the week this morning is `min(weekAllowance − spent earlier this week, this morning's money)`: a plan change mid-week can't make the week promise money that no longer exists, so "never more than exists" still holds.
 - **Not raised by** mid-week plan edits or extra income: their effect shows from next week. That's the point of the snapshot. A saved plan change can only **lower** it: the week keeps `min(stored amount, amount rebuilt with the new plan)`, except a week stored at 0, which is rebuilt (§7).
-- **Deleted and stored again** (current and later weeks of the cycle) when the expected date moves or a new cycle starts.
+- **Extra money** (added 2026-10-13) leaves a week stored above 0 as it is. A week stored at 0 (the plan needed more than the money) is rebuilt with the money, the same exception as a plan change, so a student who was over budget gets money this week. Undoing extra money follows the plan-change rule.
+- **When the expected date moves,** this week is stored again with the new dates by the plan-change rule (the lower amount, or rebuilt when it was at 0), and later weeks are deleted, to be stored when they come. A new month stores its first week at once.
 
 ### 5. Late transfers
 
 From the expected date, the home screen asks "Did the money arrive?":
 
 - **Yes** opens "I received money".
-- **Not yet** asks for a new expected date (default: 2 days later), moves `expected_next_on`, and stores the week snapshots again.
+- **Not yet** asks for a new expected date (default: 2 days later, from tomorrow on), moves `expected_next_on`, and stores this week again (§4).
+
+Meanwhile the question replaces today's amount; "+", today's list and the Plan tab still work. The Plan tab can also change the expected date at any time (from today, up to 62 days ahead), for example when parents send it on another day.
 
 Without this, ADR 003's `daysLeft` of 1 after the expected date would show all the remaining money as today's amount. Reminders and notifications stay in Phase 6.
 
@@ -66,7 +69,13 @@ Without this, ADR 003's `daysLeft` of 1 after the expected date would show all t
 "I received money" always asks whether this is the monthly transfer or extra money, defaulting to "new month" within 5 days of the expected date.
 
 - **New month:** closes the active cycle (`actual_end_on` = today), starts a new one and copies the last cycle's plan as suggestions. Leftover money simply stays in the wallets and becomes part of the new month's money.
-- **Extra money** (a bourse, a job): an income in the current cycle.
+  - The student reviews it first: the next expected date (the usual arrival day, at least 20 days away), what's left, last month's unpaid fixed costs ("if you still owe it, raise this month's amount"), and the copied plan in the plan editor with a preview of the new month's daily amount. Fixed costs, envelopes and savings are copied at their planned amounts, nothing paid or spent; without a groceries envelope, the suggestion uses last month's groceries spending.
+  - Last month's unpaid fixed costs and envelope remainders simply stop being set aside.
+  - Spending logged that morning, before the money arrived, stays in the last month: a month's spending leaves out transactions logged in another cycle (`cycle_id`), even on its first day.
+  - There's no undo; the review is the confirmation.
+- **Extra money** (a bourse, a job): an income in the current cycle, with Undo.
+
+Both ask where the money is from (parents preselected), so a monthly bourse is recorded as one.
 
 The income's source (parents, bourse, job, other) is a nullable `income_source` column on `transactions`, set only for income. There is no separate `incomes` table: balances come from transactions, and a second table would be a second source of truth.
 
@@ -90,6 +99,7 @@ The plan suggests a groceries envelope while it has none (`suggestGroceries`): w
 ## Consequences
 
 - The home screen, check-in, warnings and the later offline client compute the same numbers from the same rows.
+- Property tests in core cover, for extra money: a week above 0 stays as it is and an overspent week stays overspent; a week at 0 is rebuilt as if it weren't stored.
 - Property tests in core cover: every millime of spending is classified once, transfers change nothing, and paying a fixed cost at its planned amount leaves the daily money unchanged; a plan change within the limits never changes any day's daily spending, never raises a week stored above 0 or undoes an overspent one, rebuilds a week stored at 0 with the new plan, and a bigger plan never raises today's amount.
 - Integration tests cover the snapshot being stored once under concurrent requests.
 - Today's amount never drops during the day because of spending. Only a plan change the student confirms, after seeing the preview, can lower it.

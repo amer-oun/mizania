@@ -239,6 +239,25 @@ describe("cycleSummary", () => {
     ]);
   });
 
+  it("leaves out what was logged in another month, even on this month's first day", () => {
+    const summary = cycleSummary({
+      ...input,
+      cycleId: "now",
+      startedOn: "2026-10-10",
+      planItems: [],
+      transactions: [
+        tx("2026-10-01", { type: "adjustment", walletId: "cash", amountMillimes: 50_000 }),
+        // Rent of last month, paid this morning before the money arrived.
+        expense("2026-10-10", "cash", 20_000, { cycleId: "last", planItemId: "old-rent" }),
+        expense("2026-10-10", "cash", 1_000, { cycleId: "now", categoryId: "coffee" }),
+        expense("2026-10-10", "cash", 500, { cycleId: null, categoryId: "coffee" }),
+      ],
+    });
+    // Balances count everything; only this month's spending is today's.
+    expect(summary.available).toBe(28_500);
+    expect(summary.spentToday).toBe(1_500);
+  });
+
   it("counts a payment for an unknown plan item, or without a category, as daily money", () => {
     const summary = cycleSummary({
       ...input,
