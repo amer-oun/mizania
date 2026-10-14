@@ -1,7 +1,17 @@
 // Pure business logic. No I/O, no framework imports: this runs in the
 // browser (offline) and on the server.
 
-export { checkIn, type CheckInKind, type CheckInResult, expectedBalance } from "./checkin";
+export {
+  checkIn,
+  type CheckInAnswer,
+  type CheckInKind,
+  type CheckInRecord,
+  checkInRecord,
+  type CheckInResult,
+  expectedBalance,
+  isCheckinEvening,
+  timeInTunis,
+} from "./checkin";
 export { APP_TIME_ZONE, MILLIMES_PER_DINAR } from "./constants";
 export {
   addDays,
