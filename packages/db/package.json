@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./checkin": "./src/checkin/checkin.ts",
     "./budget": "./src/budget/budget.ts",
     "./client": "./src/client.ts",
     "./expenses": "./src/expenses/expenses.ts",

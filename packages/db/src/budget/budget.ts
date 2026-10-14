@@ -13,6 +13,7 @@ import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import type { Db } from "../client";
 import {
   categories,
+  checkins,
   cycles,
   planItems,
   type Transaction,
@@ -35,6 +36,11 @@ export interface TodayExpense {
   source: Transaction["source"];
   /** How much of it came out of the daily money (ADR 006). */
   dailyPart: number;
+  /**
+   * Unlogged spending found by a check-in: when the wallet was last counted
+   * before (null: never, "since you started"). Null for other expenses.
+   */
+  unlogged: { since: Date | null } | null;
 }
 
 export interface Budget {
@@ -187,7 +193,28 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
       occurredAt: t.occurredAt,
       source: t.source,
       dailyPart: summary.dailyParts.get(t.id) ?? 0,
+      unlogged: null as { since: Date | null } | null,
     }));
+  const found = todayExpenses.filter((e) => e.source === "checkin").map((e) => e.id);
+  if (found.length > 0) {
+    // Each count that found unlogged spending, and the count before it.
+    const counts = await db
+      .select({
+        transactionId: checkins.transactionId,
+        walletId: checkins.walletId,
+        at: checkins.createdAt,
+      })
+      .from(checkins)
+      .where(and(eq(checkins.userId, userId), isNull(checkins.deletedAt)))
+      .orderBy(asc(checkins.createdAt));
+    for (const expense of todayExpenses) {
+      const index = counts.findIndex((c) => c.transactionId === expense.id);
+      const count = counts[index];
+      if (!count) continue;
+      const before = counts.slice(0, index).filter((c) => c.walletId === count.walletId);
+      expense.unlogged = { since: before.at(-1)?.at ?? null };
+    }
+  }
 
   return {
     cycle,
