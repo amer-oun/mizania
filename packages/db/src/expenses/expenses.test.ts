@@ -116,6 +116,7 @@ describe("logExpense", () => {
         occurredAt: now,
         source: "quick",
         dailyPart: 2_500,
+        unlogged: null,
       },
     ]);
   });

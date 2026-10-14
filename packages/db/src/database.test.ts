@@ -27,6 +27,7 @@ describe("migrations", () => {
     expect(rows.map((r) => r.table_name).sort()).toEqual([
       "accounts",
       "categories",
+      "checkins",
       "cycles",
       "plan_items",
       "rate_limits",
