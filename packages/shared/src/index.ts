@@ -1,5 +1,13 @@
 // Zod schemas, types and constants shared by web, api and worker.
 export {
+  type CategorizeUnloggedInput,
+  categorizeUnloggedSchema,
+  type CheckInIdInput,
+  checkInIdSchema,
+  type CheckInInput,
+  checkInSchema,
+} from "./checkin";
+export {
   type ExpenseIdInput,
   expenseIdSchema,
   type LogExpenseInput,
