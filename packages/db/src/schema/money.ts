@@ -251,3 +251,50 @@ export type Cycle = typeof cycles.$inferSelect;
 export type PlanItem = typeof planItems.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
 export type WeekSnapshot = typeof weekSnapshots.$inferSelect;
+
+export const checkinKind = pgEnum("checkin_kind", [
+  "match",
+  "unlogged_spending",
+  "unlogged_income",
+]);
+
+/**
+ * Evening check-ins (ADR 004): what was expected in a wallet, what the
+ * student counted, and the transaction that brought the wallet to it (none
+ * for a match).
+ */
+export const checkins = pgTable(
+  "checkins",
+  {
+    // From the client: a retry saves it once.
+    id: uuid().primaryKey(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    cycleId: uuid().notNull(),
+    walletId: uuid().notNull(),
+    // The calendar day, in Africa/Tunis.
+    day: date({ mode: "string" }).notNull(),
+    expectedMillimes: millimes().notNull(),
+    countedMillimes: millimes().notNull(),
+    kind: checkinKind().notNull(),
+    transactionId: uuid().references(() => transactions.id),
+    ...timestamps,
+  },
+  (t) => [
+    index("checkins_user_id_idx").on(t.userId),
+    index("checkins_wallet_id_idx").on(t.walletId),
+    foreignKey({
+      name: "checkins_wallet_same_user_fk",
+      columns: [t.walletId, t.userId],
+      foreignColumns: [wallets.id, wallets.userId],
+    }),
+    foreignKey({
+      name: "checkins_cycle_same_user_fk",
+      columns: [t.cycleId, t.userId],
+      foreignColumns: [cycles.id, cycles.userId],
+    }),
+    check("checkins_counted_not_negative", sql`${t.countedMillimes} >= 0`),
+    check("checkins_transaction", sql`(${t.kind} = 'match') = (${t.transactionId} is null)`),
+  ],
+);
