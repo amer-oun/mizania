@@ -298,7 +298,7 @@ How the numbers come from the data (daily money, reserved, week snapshots, late 
 - [x] **Mark fixed costs as paid:** with the amount actually paid and the wallet. _Done when:_ paying rent doesn't move today's amount; paying a bill 5 DT over plan lowers "left today" by 5.
 - [x] **Month plan:** fixed costs, envelopes and one savings line, with a live preview of the daily amount. _Done when:_ a groceries envelope lowers today's amount, and groceries spending stays out of it until the envelope is empty.
 - [x] **"I received money" + late transfer:** new month or extra money; the new month's plan is suggested from the previous cycle; "Did the money arrive? / Not yet → new date". _Done when:_ a new month is ready in under a minute, and a passed expected date shows the question instead of a huge number.
-- [ ] **Evening check-in:** cash, from 18:00 (or the user's check-in time). _Done when:_ after counting, the cash wallet matches and the difference shows as unlogged spending.
+- [x] **Evening check-in:** cash, from 18:00 (or the user's check-in time). _Done when:_ after counting, the cash wallet matches and the difference shows as unlogged spending.
 - [ ] **This month by category vs last month,** and run-out warnings worded kindly. _Done when:_ categories match what you spent, and a fast pace shows when you'll run out and how much less per day fixes it.
 - **Done when:** you use it yourself for a full week and the daily number feels right.
 

@@ -48,6 +48,16 @@ The suggested cut is "your pace − what you can afford per day". Rounding the p
 
 One or two days aren't a pace. A big shopping day or a birthday dinner would look like normal spending and trigger an alarming warning on the first evening. Three days smooth out one unusual day; the window grows to 7 for a steadier pace.
 
+### 6. How the check-in works in the app (added 2026-10-14)
+
+- **Expected** is the wallet's balance computed from its transactions when the count is saved (balances are derived, ADR 006), so "last confirmed balance + in − out" needs no separate stored balance.
+- **The card** on Today shows from 18:00, or from the student's check-in time when that's earlier, until midnight (Tunis), while the cash wallet hasn't been counted that day. "Not tonight" hides it until the next day, on that phone only. Once counted, one line remains: "Cash counted at 21:14 · matches", with Undo and Count again.
+- **Cash only** on the card; "Check all wallets" (`/checkin`) counts every wallet, and the Wallets tab's "Count my cash" opens it at any time of day.
+- **The expected amount isn't shown before counting,** so the count stays honest.
+- **Less:** one expense, source `checkin`, no category, worded "8 DT spent without logging since your last count (Monday)", or "since you started" when the wallet was never counted. The student can pick a category later in today's list; it's never deleted there (undo the check-in instead).
+- **More:** nothing is saved until she answers "I received money" (an income, with its source) or "I miscounted earlier" (a positive correction). An answer to a difference that changed meanwhile is refused, and she counts again.
+- **Each check-in is stored** in `checkins` (expected, counted, kind, the transaction it recorded). Two in a day are fine: the second compares with the balance after the first. Only a wallet's latest check-in can be undone, with its transaction.
+
 ## Consequences
 
 - Balances stay accurate with one number a day, which is what keeps the daily amount right.
