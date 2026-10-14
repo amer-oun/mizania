@@ -19,16 +19,20 @@ const errorKey = (error: string) => errorKeys.find((e) => e === error) ?? "serve
 export function ReceivedSnackbar({
   received,
 }: {
-  received: { id: string; amountMillimes: number } | null;
+  /** `nextWeek`: weekly mode, and this week's amount doesn't include it. */
+  received: { id: string; amountMillimes: number; nextWeek: boolean } | null;
 }) {
   const t = useTranslations("Received");
+  const today = useTranslations("Today");
   const router = useRouter();
   const formatAmount = useFormatAmount();
   const [shown, setShown] = useState<{ id: string; text: string; undo: boolean } | null>(
     () =>
       received && {
         id: received.id,
-        text: t("added", { amount: formatAmount(received.amountMillimes) }),
+        text: received.nextWeek
+          ? today("nextWeek", { amount: formatAmount(received.amountMillimes) })
+          : t("added", { amount: formatAmount(received.amountMillimes) }),
         undo: true,
       },
   );

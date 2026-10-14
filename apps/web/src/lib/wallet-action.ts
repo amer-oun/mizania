@@ -15,26 +15,31 @@ export type WalletActionError =
   | "last-wallet"
   | "wallet-archived"
   | "already-paid"
+  | "not-latest"
   | "server";
-export type WalletActionResult = { ok: true } | { ok: false; error: WalletActionError };
+export interface WalletActionFailure {
+  ok: false;
+  error: WalletActionError;
+}
+export type WalletActionResult = { ok: true } | WalletActionFailure;
 
 interface Schema<T> {
   safeParse(input: unknown): { success: true; data: T } | { success: false };
 }
 
 export const ok: WalletActionResult = { ok: true };
-export const fail = (error: WalletActionError): WalletActionResult => ({ ok: false, error });
+export const fail = (error: WalletActionError): WalletActionFailure => ({ ok: false, error });
 
 /**
  * Checks the session and the input, then runs `change` for the signed-in
  * user. The user ID always comes from the session, never from the input.
  */
-export async function runWalletAction<T>(
+export async function runWalletAction<T, R extends { ok: boolean } = WalletActionResult>(
   name: string,
   schema: Schema<T>,
   input: unknown,
-  change: (db: Db, userId: string, data: T) => Promise<WalletActionResult>,
-): Promise<WalletActionResult> {
+  change: (db: Db, userId: string, data: T) => Promise<R>,
+): Promise<R | WalletActionFailure> {
   const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return fail("signed-out");
 

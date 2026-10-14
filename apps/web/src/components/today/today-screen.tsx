@@ -28,6 +28,8 @@ export interface TodayView {
     "available" | "reserved" | "poolNow" | "spentToday" | "spentThisWeekBeforeToday"
   >;
   budget: TodayBudget;
+  /** Weekly mode: money this week's amount doesn't include yet (from next week). */
+  waiting: number[];
 }
 
 const statusStyle: Record<TodayBudget["status"], string> = {
@@ -232,6 +234,8 @@ function Breakdown({
   view: TodayView;
 }) {
   const t = useTranslations("Today.breakdown");
+  const nextWeek = useTranslations("Today");
+  const formatAmount = useFormatAmount();
   const { summary, budget: today } = view;
 
   return (
@@ -290,6 +294,11 @@ function Breakdown({
           <Row label={t("left")} millimes={today.left} testId="breakdown-left" />
         </dl>
         <DialogDescription>{today.week ? t("weekly") : t("normal")}</DialogDescription>
+        {view.waiting.map((amount, index) => (
+          <p key={index} className="text-sm text-primary" data-testid="breakdown-next-week">
+            {nextWeek("nextWeek", { amount: formatAmount(amount) })}
+          </p>
+        ))}
       </DialogContent>
     </Dialog>
   );

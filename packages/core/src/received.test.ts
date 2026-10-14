@@ -12,6 +12,7 @@ import {
   lateTransferDefault,
   newMonthInput,
   nextMonthExpectedOn,
+  waitingForNextWeek,
   weekAfterIncome,
 } from "./received";
 import type { CycleSummaryInput, SummaryPlanItem } from "./summary";
@@ -193,5 +194,43 @@ describe("weekAfterIncome properties", () => {
         );
       }),
     );
+  });
+});
+
+describe("waitingForNextWeek", () => {
+  // Week 2 is Oct 8–14; its amount was built on Oct 9 at noon.
+  const builtAt = Date.parse("2026-10-09T12:00:00Z");
+  const later = builtAt + 1;
+  const money = (
+    id: string,
+    type: "income" | "adjustment" | "expense",
+    amountMillimes: number,
+    day: string,
+    at: number,
+    cycleId = "now",
+  ) => ({ id, type, walletId: "card", amountMillimes, day, at, cycleId });
+  const input: CycleSummaryInput = {
+    ...cycle,
+    cycleId: "now",
+    wallets: [{ id: "card", archived: false }],
+    planItems: [],
+    transactions: [
+      money("start", "adjustment", 500_000, "2026-10-01", 1),
+      money("before", "income", 30_000, "2026-10-09", builtAt - 1),
+      money("bourse", "income", 20_000, "2026-10-10", later),
+      money("found", "adjustment", 5_000, "2026-10-10", later),
+      money("gone", "adjustment", -2_000, "2026-10-10", later),
+      money("coffee", "expense", 1_000, "2026-10-10", later),
+      money("other", "income", 9_000, "2026-10-10", later, "last"),
+    ],
+  };
+
+  it("lists money received or found this week after the week's amount was built", () => {
+    expect(waitingForNextWeek(input, builtAt)).toEqual([
+      { id: "bourse", amountMillimes: 20_000 },
+      { id: "found", amountMillimes: 5_000 },
+    ]);
+    // Built after it: the week's amount includes it.
+    expect(waitingForNextWeek(input, later)).toEqual([]);
   });
 });

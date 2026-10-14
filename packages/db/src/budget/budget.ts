@@ -6,6 +6,7 @@ import {
   isTransferDue,
   type TodayBudget,
   todayBudget,
+  waitingForNextWeek,
   weekStartAllowance,
 } from "@mizania/core";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
@@ -13,6 +14,7 @@ import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import type { Db } from "../client";
 import {
   categories,
+  checkins,
   cycles,
   planItems,
   type Transaction,
@@ -35,6 +37,11 @@ export interface TodayExpense {
   source: Transaction["source"];
   /** How much of it came out of the daily money (ADR 006). */
   dailyPart: number;
+  /**
+   * Unlogged spending found by a check-in: when the wallet was last counted
+   * before (null: never, "since you started"). Null for other expenses.
+   */
+  unlogged: { since: Date | null } | null;
 }
 
 export interface Budget {
@@ -47,6 +54,11 @@ export interface Budget {
   today: TodayBudget;
   /** Today's expenses, newest first. */
   todayExpenses: TodayExpense[];
+  /**
+   * Weekly mode: money received or found this week after the week's amount
+   * was built. It shows in the daily amount from next week.
+   */
+  waiting: { id: string | undefined; amountMillimes: number }[];
 }
 
 /** The database or a transaction: anything that can select. */
@@ -171,9 +183,17 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
   const { input: summaryInput, rows } = await loadCycleData(db, userId, cycle, today);
   const summary = cycleSummary(summaryInput);
   const input = budgetInput(summaryInput, summary);
-  const weekAllowance = cycle.weeklyMode
-    ? await storedWeekAllowance(db, userId, cycle.id, weekStartAllowance(input))
+  const week = cycle.weeklyMode
+    ? await storedWeek(
+        db,
+        userId,
+        cycle.id,
+        weekStartAllowance(input),
+        // Built from every transaction so far: the newest one's time.
+        new Date(summaryInput.transactions.reduce((latest, t) => Math.max(latest, t.at), 0)),
+      )
     : undefined;
+  const weekAllowance = week?.allowance;
 
   const todayExpenses = rows
     // Spending logged in the last month this morning isn't this month's.
@@ -187,7 +207,28 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
       occurredAt: t.occurredAt,
       source: t.source,
       dailyPart: summary.dailyParts.get(t.id) ?? 0,
+      unlogged: null as { since: Date | null } | null,
     }));
+  const found = todayExpenses.filter((e) => e.source === "checkin").map((e) => e.id);
+  if (found.length > 0) {
+    // Each count that found unlogged spending, and the count before it.
+    const counts = await db
+      .select({
+        transactionId: checkins.transactionId,
+        walletId: checkins.walletId,
+        at: checkins.createdAt,
+      })
+      .from(checkins)
+      .where(and(eq(checkins.userId, userId), isNull(checkins.deletedAt)))
+      .orderBy(asc(checkins.createdAt));
+    for (const expense of todayExpenses) {
+      const index = counts.findIndex((c) => c.transactionId === expense.id);
+      const count = counts[index];
+      if (!count) continue;
+      const before = counts.slice(0, index).filter((c) => c.walletId === count.walletId);
+      expense.unlogged = { since: before.at(-1)?.at ?? null };
+    }
+  }
 
   return {
     cycle,
@@ -196,6 +237,7 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
     summary,
     today: todayBudget({ ...input, weeklyMode: cycle.weeklyMode, weekAllowance }),
     todayExpenses,
+    waiting: week ? waitingForNextWeek(summaryInput, week.builtAt.getTime()) : [],
   };
 }
 
@@ -203,12 +245,13 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
  * This week's stored amount. The first call of the week stores `week`; a
  * concurrent or later call keeps the first one.
  */
-async function storedWeekAllowance(
+async function storedWeek(
   db: Db,
   userId: string,
   cycleId: string,
   week: ReturnType<typeof weekStartAllowance>,
-): Promise<number> {
+  builtAt: Date,
+): Promise<{ allowance: number; builtAt: Date }> {
   await db
     .insert(weekSnapshots)
     .values({
@@ -218,10 +261,11 @@ async function storedWeekAllowance(
       startsOn: week.start,
       endsOn: week.end,
       allowanceMillimes: week.allowance,
+      builtAt,
     })
     .onConflictDoNothing({ target: [weekSnapshots.cycleId, weekSnapshots.weekIndex] });
   const [stored] = await db
-    .select({ allowance: weekSnapshots.allowanceMillimes })
+    .select({ allowance: weekSnapshots.allowanceMillimes, builtAt: weekSnapshots.builtAt })
     .from(weekSnapshots)
     .where(
       and(
@@ -231,5 +275,5 @@ async function storedWeekAllowance(
       ),
     );
   if (!stored) throw new Error("getBudget: week snapshot not stored");
-  return stored.allowance;
+  return stored;
 }

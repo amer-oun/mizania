@@ -7,6 +7,7 @@ import {
   ArrowLeftRightIcon,
   ArrowUpIcon,
   BanknoteIcon,
+  CalculatorIcon,
   EllipsisVerticalIcon,
   PencilIcon,
   PlusIcon,
@@ -90,6 +91,15 @@ export function WalletsScreen({
           {t("add")}
         </Button>
       </div>
+
+      {cash && (
+        <Button asChild variant="ghost" className="-mt-3 self-center">
+          <Link href={{ pathname: "/checkin", query: { wallet: cash.id } }}>
+            <CalculatorIcon />
+            {t("countCash")}
+          </Link>
+        </Button>
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-destructive">

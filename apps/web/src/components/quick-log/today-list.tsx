@@ -1,12 +1,17 @@
 "use client";
 
+import type { IsoDate } from "@mizania/core";
 import type { TodayExpense } from "@mizania/db/budget";
 import type { CategoryOption } from "@mizania/db/expenses";
-import { Trash2Icon } from "lucide-react";
+import { TagIcon, Trash2Icon } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
+import { categorizeUnloggedAction } from "@/app/actions/checkin";
 import { deleteExpenseAction, restoreExpenseAction } from "@/app/actions/expenses";
+import { useSincePhrase } from "@/components/checkin/since";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Amount,
   useFormatAmount,
@@ -24,12 +29,14 @@ export function TodayList({
   expenses,
   categories,
   wallets,
+  today,
   show,
 }: {
   expenses: readonly TodayExpense[];
   categories: readonly CategoryOption[];
   /** All wallets, archived ones too, to name each expense's wallet. */
   wallets: readonly WalletView[];
+  today: IsoDate;
   show: ShowMessage;
 }) {
   const t = useTranslations("TodayList");
@@ -40,6 +47,9 @@ export function TodayList({
   const walletName = useWalletName();
   const online = useOnline();
   const { pending, error, run } = useWalletAction();
+  const sincePhrase = useSincePhrase();
+  // Unlogged spending whose category is being picked.
+  const [picking, setPicking] = useState<TodayExpense | null>(null);
   const categoryOf = new Map(categories.map((c) => [c.id, c]));
   const walletOf = new Map(wallets.map((w) => [w.id, w]));
 
@@ -95,6 +105,12 @@ export function TodayList({
                   <span className="truncate text-sm font-medium">
                     {category ? category.names[locale] : t("unlogged")}
                   </span>
+                  {expense.unlogged && (
+                    <span className="text-xs text-muted-foreground" data-testid="unlogged-since">
+                      {category && `${t("unlogged")} `}
+                      {sincePhrase(expense.unlogged.since, today)}
+                    </span>
+                  )}
                   <span className="truncate text-xs text-muted-foreground">
                     {wallet ? walletName(wallet) : ""} ·{" "}
                     {format.dateTime(expense.occurredAt, { hour: "2-digit", minute: "2-digit" })}
@@ -108,6 +124,19 @@ export function TodayList({
                   )}
                 </div>
                 <Amount millimes={expense.amountMillimes} className="text-sm font-semibold" />
+                {expense.unlogged && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("pickCategory")}
+                    disabled={pending || !online}
+                    onClick={() => {
+                      setPicking(expense);
+                    }}
+                  >
+                    <TagIcon />
+                  </Button>
+                )}
                 {deletable && (
                   <Button
                     variant="ghost"
@@ -128,6 +157,46 @@ export function TodayList({
             );
           })}
         </ul>
+      )}
+      {picking && (
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPicking(null);
+          }}
+        >
+          <DialogContent closeLabel={q("close")} className="gap-3" data-testid="pick-category">
+            <DialogTitle>{t("pickTitle")}</DialogTitle>
+            <div className="flex flex-wrap gap-2">
+              {categories
+                .filter((c) => c.group === "daily" || c.group === "envelope")
+                .map((c) => (
+                  <Button
+                    key={c.id}
+                    variant="outline"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => {
+                      const expense = picking;
+                      run(
+                        () =>
+                          categorizeUnloggedAction({
+                            transactionId: expense.id,
+                            categoryId: c.id,
+                          }),
+                        () => {
+                          setPicking(null);
+                        },
+                      );
+                    }}
+                  >
+                    <CategoryIcon name={c.icon} />
+                    {c.names[locale]}
+                  </Button>
+                ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </section>
   );

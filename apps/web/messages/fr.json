@@ -59,7 +59,8 @@
     },
     "loadError": "Impossible de charger le montant du jour.",
     "retry": "Réessayer",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "nextWeek": "+{amount} · compte dans ton montant du jour à partir de la semaine prochaine"
   },
   "QuickLog": {
     "title": "Ajouter une dépense",
@@ -83,7 +84,12 @@
     "unlogged": "Dépense non notée",
     "covered": "Couvert par ton plan",
     "partial": "{amount} sur l'argent du jour",
-    "delete": "Supprimer {category} {amount}"
+    "delete": "Supprimer {category} {amount}",
+    "pickCategory": "Choisir une catégorie pour cette dépense",
+    "pickTitle": "C'était quoi ?",
+    "sinceLast": "depuis ton dernier comptage ({day})",
+    "sinceStart": "depuis que tu as commencé",
+    "earlierToday": "plus tôt aujourd'hui"
   },
   "Plan": {
     "title": "Plan",
@@ -228,6 +234,54 @@
       "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
       "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
     }
+  },
+  "Checkin": {
+    "cardTitle": "Le point du soir",
+    "cardText": "Combien de liquide as-tu maintenant ? Compte-le : ça prend 5 secondes.",
+    "countCash": "Compter mon liquide",
+    "notTonight": "Pas ce soir",
+    "checkAll": "Vérifier tous les portefeuilles",
+    "doneLine": "Liquide compté à {time}",
+    "resultMatch": "c'est juste",
+    "resultSpent": "{amount} non notés",
+    "resultMore": "+{amount}",
+    "undo": "Annuler",
+    "countAgain": "Recompter",
+    "undone": "Comptage annulé",
+    "title": "Compter : {wallet}",
+    "countedLabel": "Combien y a-t-il dedans maintenant ?",
+    "done": "Valider",
+    "saving": "Enregistrement…",
+    "close": "Fermer",
+    "match": "Tout est bon : {wallet} correspond à ce que tu as noté.",
+    "spent": "{amount} dépensés sans les noter {since}.",
+    "spentHint": "C'est ajouté comme dépense non notée aujourd'hui. Tu peux choisir une catégorie dans la liste du jour.",
+    "more": "Tu as {amount} de plus que prévu. Tu as reçu de l'argent ?",
+    "moreIncome": "Oui, j'ai reçu de l'argent",
+    "moreCorrection": "Non, je m'étais trompé avant",
+    "sourceLabel": "De",
+    "saveIncome": "Ajouter l'argent",
+    "added": "+{amount} ajoutés à {wallet}.",
+    "changed": "Tes chiffres ont changé entre-temps. Recompte.",
+    "pageTitle": "Compter mes portefeuilles",
+    "pageHint": "Compte chaque portefeuille et tape ce qu'il y a vraiment dedans. La différence avec ce que tu as noté est enregistrée.",
+    "lastCount": "Compté {when}",
+    "neverCounted": "Pas encore compté",
+    "count": "Compter",
+    "countLabel": "Compter : {wallet}",
+    "offline": "Tu es hors ligne. Connecte-toi à Internet pour enregistrer.",
+    "noCycle": "Aucun mois en cours.",
+    "errors": {
+      "invalid": "Vérifie ce que tu as saisi.",
+      "not-found": "Ce portefeuille a changé. Actualise la page et réessaie.",
+      "not-latest": "Seul le dernier comptage d'un portefeuille peut être annulé.",
+      "wallet-archived": "Ce portefeuille est archivé. Restaure-le d'abord.",
+      "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
+      "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie."
+    },
+    "sinceLast": "depuis ton dernier comptage ({day})",
+    "sinceStart": "depuis que tu as commencé",
+    "earlierToday": "plus tôt aujourd'hui"
   },
   "LanguageSwitcher": {
     "label": "Langue",
@@ -417,7 +471,8 @@
       "invalid": "Vérifie ce que tu as saisi.",
       "signed-out": "Tu as été déconnecté. Reconnecte-toi.",
       "server": "Impossible d'enregistrer. Vérifie ta connexion et réessaie.",
-      "already-paid": "C'est déjà payé. Annule d'abord le paiement pour le modifier."
+      "already-paid": "C'est déjà payé. Annule d'abord le paiement pour le modifier.",
+      "not-latest": "Seul le dernier comptage d'un portefeuille peut être annulé."
     },
     "transferTitle": "Transfert entre portefeuilles",
     "transferSubtitle": "Par exemple, du cash retiré au distributeur.",
@@ -431,6 +486,7 @@
     "back": "Retour aux portefeuilles",
     "loading": "Chargement…",
     "loadError": "Impossible de charger tes portefeuilles.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "countCash": "Compter mon liquide"
   }
 }
