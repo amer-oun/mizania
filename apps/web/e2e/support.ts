@@ -215,6 +215,47 @@ export async function backdateMonth(page: Page, days: number, expectedOn: string
   }
 }
 
+/**
+ * Test only: card spending `daysAgo` days back (at noon in Tunis), in this
+ * month or, with `lastMonth`, in a closed month before it that ran from
+ * `lastMonth.startedDaysAgo` until this month started (`endedDaysAgo`).
+ * Changes the database directly; use after backdateMonth.
+ */
+export async function addSpending(
+  page: Page,
+  rows: { daysAgo: number; millimes: number; category: string; lastMonth?: boolean }[],
+  lastMonth?: { startedDaysAgo: number; endedDaysAgo: number },
+) {
+  if (!process.env.DATABASE_URL) process.loadEnvFile(path.resolve(process.cwd(), "../../.env"));
+  const session = await page.request.get("/api/auth/get-session");
+  const { user } = (await session.json()) as { user: { id: string } };
+  const { client: sql } = createDb(process.env.DATABASE_URL ?? "", { max: 1 });
+  const day = (daysAgo: number) => addDays(todayInTunis(), -daysAgo);
+  try {
+    const [active] = await sql<{ id: string; weekly_mode: boolean }[]>`
+      select id, weekly_mode from cycles where user_id = ${user.id} and status = 'active'`;
+    const [card] = await sql<{ id: string }[]>`
+      select id from wallets where user_id = ${user.id} and type = 'card'`;
+    if (!active || !card) throw new Error("addSpending: no active month or card");
+    const lastId = randomUUID();
+    if (lastMonth) {
+      await sql`
+        insert into cycles (id, user_id, started_on, expected_next_on, actual_end_on, status, weekly_mode)
+        values (${lastId}, ${user.id}, ${day(lastMonth.startedDaysAgo)}, ${day(lastMonth.endedDaysAgo)},
+          ${day(lastMonth.endedDaysAgo)}, 'closed', ${active.weekly_mode})`;
+    }
+    for (const row of rows) {
+      await sql`
+        insert into transactions (user_id, cycle_id, wallet_id, category_id, type, amount_millimes, occurred_at, source)
+        values (${user.id}, ${row.lastMonth ? lastId : active.id}, ${card.id},
+          (select id from categories where user_id is null and key = ${row.category}),
+          'expense', ${row.millimes}, ${`${day(row.daysAgo)}T11:00:00Z`}, 'quick')`;
+    }
+  } finally {
+    await sql.end();
+  }
+}
+
 // Subjects from packages/auth/src/email/messages.ts.
 export const verifySubject = {
   ar: "أكّد الإيميل متاعك في ميزانية",
