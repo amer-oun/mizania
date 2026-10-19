@@ -132,6 +132,31 @@ describe("getBudget", () => {
     expect((await getBudget(test.db, userId, "2026-10-31"))?.transferDue).toBe(true);
   });
 
+  it("warns from 3 finished days when this month's pace runs out early", async () => {
+    const { userId, cash } = await student(false);
+    // 12 DT a day on Oct 1–3, and 50 DT today (not finished: not in the pace).
+    for (const day of ["01", "02", "03"])
+      await spend(userId, cash, 12_000, `2026-10-${day}T10:00:00Z`);
+    expect((await getBudget(test.db, userId, "2026-10-03"))?.warning).toBeNull();
+    await spend(userId, cash, 50_000, "2026-10-04T10:00:00Z");
+
+    // 214 DT left: at 12 DT a day it lasts 17 of the 27 days. 214 / 27 = 7.925 DT
+    // a day fits: 4.075 DT less a day, under half the pace.
+    expect((await getBudget(test.db, userId, "2026-10-04"))?.warning).toEqual({
+      tone: "normal",
+      runsOutOn: "2026-10-21",
+      daysShort: 10,
+      cutPerDay: 4_075,
+    });
+  });
+
+  it("doesn't warn when the pace lasts until the transfer", async () => {
+    const { userId, cash } = await student(false);
+    for (const day of ["01", "02", "03"])
+      await spend(userId, cash, 5_000, `2026-10-${day}T10:00:00Z`);
+    expect((await getBudget(test.db, userId, "2026-10-04"))?.warning).toBeNull();
+  });
+
   it("returns null without an active cycle", async () => {
     const [user] = await test.db
       .insert(users)

@@ -1,7 +1,7 @@
 import { todayInTunis } from "@mizania/core";
 import { getQuickLogOptions } from "@mizania/db/expenses";
 import { getPlan } from "@mizania/db/plan";
-import { PencilIcon } from "lucide-react";
+import { ChartPieIcon, PencilIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -41,12 +41,20 @@ export default async function PlanPage() {
       </header>
       <main className="flex flex-col pb-6">
         {plan ? (
-          <PlanWithActions
-            plan={plan}
-            today={today}
-            wallets={wallets}
-            defaultWalletId={defaultWalletId}
-          />
+          <>
+            <PlanWithActions
+              plan={plan}
+              today={today}
+              wallets={wallets}
+              defaultWalletId={defaultWalletId}
+            />
+            <Button asChild variant="ghost" className="mt-4 self-center">
+              <Link href="/month" data-testid="month-link">
+                <ChartPieIcon aria-hidden />
+                {t("monthLink")}
+              </Link>
+            </Button>
+          </>
         ) : (
           <p className="text-muted-foreground">{t("noCycle")}</p>
         )}

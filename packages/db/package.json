@@ -10,6 +10,7 @@
     "./budget": "./src/budget/budget.ts",
     "./client": "./src/client.ts",
     "./expenses": "./src/expenses/expenses.ts",
+    "./insights": "./src/insights/insights.ts",
     "./onboarding": "./src/onboarding/save-onboarding.ts",
     "./plan": "./src/plan/index.ts",
     "./received": "./src/received/received.ts",

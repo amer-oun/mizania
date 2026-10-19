@@ -114,7 +114,10 @@ export interface EnvelopeStatus {
  * Whether `t` is spending of the month in `input`: on one of its days, and
  * not logged in another month.
  */
-export function isThisMonths(input: CycleSummaryInput, t: SummaryTransaction): boolean {
+export function isThisMonths(
+  input: Pick<CycleSummaryInput, "cycleId" | "startedOn" | "today">,
+  t: SummaryTransaction,
+): boolean {
   const month = t.cycleId ?? null;
   return (
     daysBetween(input.startedOn, t.day) >= 0 &&

@@ -2,7 +2,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { addDays, daysLeft } from "./cycle";
-import { runOutForecast } from "./warnings";
+import { runOutForecast, runOutWarning } from "./warnings";
 
 // "At this pace you'll run out on Oct 23, 8 days early.
 //  Spending 7.500 DT less per day fixes it."
@@ -157,6 +157,90 @@ describe("runOutForecast", () => {
           const paceRoundedUp = Math.ceil(last7.reduce((a, b) => a + b, 0) / last7.length);
           const newPace = paceRoundedUp - result.cutPerDay;
           expect(newPace * daysLeft(t, "2026-10-31")).toBeLessThanOrEqual(p);
+        }
+      }),
+    );
+  });
+});
+
+describe("runOutWarning", () => {
+  it("says when the money runs out and the cut that fixes it", () => {
+    // 150 DT at 12 DT a day lasts 12 days: out on Oct 27, 4 days short.
+    // 150 / 16 = 9.375 DT a day fits, so 2.625 DT less a day: under half the pace.
+    expect(runOutWarning({ ...base, poolNow: 150_000, recentDailySpending: week(12_000) })).toEqual(
+      { tone: "normal", runsOutOn: "2026-10-27", daysShort: 4, cutPerDay: 2_625 },
+    );
+  });
+
+  it("gives a daily target when the cut is half the pace or more", () => {
+    // 120 DT at 15 DT a day: 7.5 DT a day fits, a cut of exactly half the pace.
+    expect(runOutWarning({ ...base, poolNow: 120_000, recentDailySpending: week(15_000) })).toEqual(
+      { tone: "big", aimPerDay: 7_000, pace: 15_000 },
+    );
+    // Pace 10.600 DT, about 11; 80 / 16 = 5 DT a day fits.
+    expect(
+      runOutWarning({ ...base, poolNow: 80_000, recentDailySpending: [10_000, 11_000, 10_800] }),
+    ).toEqual({ tone: "big", aimPerDay: 5_000, pace: 11_000 });
+  });
+
+  it("says money is tight when under 1 DT a day fits", () => {
+    // 9 DT for 16 days: 0.562 DT a day.
+    expect(runOutWarning({ ...base, poolNow: 9_000, recentDailySpending: week(10_000) })).toEqual({
+      tone: "tight",
+      left: 9_000,
+      days: 16,
+    });
+    // 16 DT for 16 days is 1 DT a day: not tight.
+    expect(
+      runOutWarning({ ...base, poolNow: 16_000, recentDailySpending: week(10_000) }),
+    ).toMatchObject({ tone: "big", aimPerDay: 1_000 });
+  });
+
+  it("is null when there's nothing to warn about", () => {
+    expect(runOutWarning({ ...base, poolNow: 200_000, recentDailySpending: week(10_000) })).toBe(
+      null,
+    );
+    expect(runOutWarning({ ...base, poolNow: 1_000, recentDailySpending: [50_000] })).toBe(null);
+    expect(runOutWarning({ ...base, poolNow: 0, recentDailySpending: week(10_000) })).toBe(null);
+  });
+
+  const today = fc.integer({ min: 0, max: 29 }).map((n) => addDays("2026-10-01", n));
+  const pool = fc.integer({ min: -50_000, max: 5_000_000 });
+  const spending = fc.array(fc.integer({ min: 0, max: 200_000 }), { minLength: 0, maxLength: 10 });
+
+  it("warns exactly when the forecast does, and each tone keeps its promise", () => {
+    fc.assert(
+      fc.property(today, pool, spending, (t, p, s) => {
+        const input = {
+          today: t,
+          nextTransferOn: "2026-10-31",
+          poolNow: p,
+          recentDailySpending: s,
+        };
+        const forecast = runOutForecast(input);
+        const warning = runOutWarning(input);
+        expect(warning !== null).toBe(forecast.status === "warning");
+        if (warning === null || forecast.status !== "warning") return;
+        const days = daysLeft(t, "2026-10-31");
+        const fits = Math.floor(p / days);
+        const pace = fits + forecast.cutPerDay;
+        if (warning.tone === "tight") {
+          expect(fits).toBeLessThan(1_000);
+          expect(warning).toEqual({ tone: "tight", left: p, days });
+        } else if (warning.tone === "big") {
+          expect(fits).toBeGreaterThanOrEqual(1_000);
+          expect(forecast.cutPerDay * 2).toBeGreaterThanOrEqual(pace);
+          // The target is whole dinars and fits: following it lasts until the transfer.
+          expect(warning.aimPerDay % 1_000).toBe(0);
+          expect(warning.aimPerDay).toBeGreaterThan(fits - 1_000);
+          expect(warning.aimPerDay * days).toBeLessThanOrEqual(p);
+          expect(Math.abs(warning.pace - pace)).toBeLessThanOrEqual(500);
+          expect(warning.pace).toBeGreaterThan(warning.aimPerDay);
+        } else {
+          expect(fits).toBeGreaterThanOrEqual(1_000);
+          expect(forecast.cutPerDay * 2).toBeLessThan(pace);
+          const { runsOutOn, daysShort, cutPerDay } = forecast;
+          expect(warning).toEqual({ tone: "normal", runsOutOn, daysShort, cutPerDay });
         }
       }),
     );

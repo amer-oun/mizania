@@ -71,3 +71,40 @@ export function runOutForecast(input: RunOutInput): RunOutForecast {
     cutPerDay: pace - affordablePerDay,
   };
 }
+
+/** What fits a day under this is "tight" (1 DT). */
+const TIGHT_PER_DAY = 1_000;
+
+/**
+ * A run-out warning, worded kindly (PLAN.md decision 11), or null when
+ * there's nothing to warn about (see runOutForecast):
+ * - "normal": when the money runs out, and the cut per day that fixes it;
+ * - "big" (the cut is half the pace or more): a daily target to aim for,
+ *   in whole dinars, next to the pace, rounded to the nearest dinar;
+ * - "tight" (under 1 DT a day fits): the money left and the days to cover.
+ */
+export type RunOutWarning =
+  | { tone: "normal"; runsOutOn: IsoDate; daysShort: number; cutPerDay: number }
+  | { tone: "big"; aimPerDay: number; pace: number }
+  | { tone: "tight"; left: number; days: number };
+
+export function runOutWarning(input: RunOutInput): RunOutWarning | null {
+  const forecast = runOutForecast(input);
+  if (forecast.status !== "warning") return null;
+
+  const days = daysLeft(input.today, input.nextTransferOn);
+  const affordablePerDay = floorDiv(input.poolNow, days);
+  if (affordablePerDay < TIGHT_PER_DAY) return { tone: "tight", left: input.poolNow, days };
+
+  const pace = affordablePerDay + forecast.cutPerDay;
+  if (forecast.cutPerDay * 2 >= pace) {
+    const roundedPace = floorDiv(pace + 500, 1_000) * 1_000;
+    return {
+      tone: "big",
+      aimPerDay: affordablePerDay - (affordablePerDay % 1_000),
+      pace: roundedPace,
+    };
+  }
+  const { runsOutOn, daysShort, cutPerDay } = forecast;
+  return { tone: "normal", runsOutOn, daysShort, cutPerDay };
+}

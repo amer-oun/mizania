@@ -4,6 +4,8 @@ import {
   type CycleSummaryInput,
   type IsoDate,
   isTransferDue,
+  type RunOutWarning,
+  runOutWarning,
   type TodayBudget,
   todayBudget,
   waitingForNextWeek,
@@ -59,6 +61,11 @@ export interface Budget {
    * was built. It shows in the daily amount from next week.
    */
   waiting: { id: string | undefined; amountMillimes: number }[];
+  /**
+   * At the pace of this month's finished days (today excluded), the daily
+   * money runs out before the next transfer (ADR 004). Null otherwise.
+   */
+  warning: RunOutWarning | null;
 }
 
 /** The database or a transaction: anything that can select. */
@@ -238,6 +245,13 @@ export async function getBudget(db: Db, userId: string, today: IsoDate): Promise
     today: todayBudget({ ...input, weeklyMode: cycle.weeklyMode, weekAllowance }),
     todayExpenses,
     waiting: week ? waitingForNextWeek(summaryInput, week.builtAt.getTime()) : [],
+    warning: runOutWarning({
+      today,
+      nextTransferOn: cycle.expectedNextOn,
+      poolNow: summary.poolNow,
+      // Finished days: this month's days before today.
+      recentDailySpending: summary.spendingByDay.slice(0, -1).map((d) => d.amount),
+    }),
   };
 }
 
