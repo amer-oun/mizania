@@ -378,6 +378,7 @@ The app is online-only until Phase 4: pilot testers need a connection to log and
 - [ ] Sentry in all apps
 - [ ] Translate PWA manifest description
 - [ ] Place the language switcher properly on wide screens.
+- [ ] Update CI actions: pnpm/action-setup uses deprecated Node 20; check the ubuntu-latest move.
 
 ### Phase 10: Launch (1 week)
 
