@@ -5,9 +5,10 @@ import {
   type IsoDate,
   lateDateRange,
   lateTransferDefault,
+  type RunOutWarning,
   type TodayBudget,
 } from "@mizania/core";
-import { ChevronRightIcon, WalletIcon } from "lucide-react";
+import { ChevronRightIcon, HourglassIcon, WalletIcon } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
 
@@ -30,6 +31,8 @@ export interface TodayView {
   budget: TodayBudget;
   /** Weekly mode: money this week's amount doesn't include yet (from next week). */
   waiting: number[];
+  /** The money runs out early at this month's pace (ADR 004); null otherwise. */
+  warning: RunOutWarning | null;
 }
 
 const statusStyle: Record<TodayBudget["status"], string> = {
@@ -157,6 +160,10 @@ export function TodayScreen({ view }: { view: TodayView }) {
         </span>
       </section>
 
+      {view.warning && today.status !== "over_budget" && (
+        <RunOutCard warning={view.warning} expectedNextOn={view.expectedNextOn} />
+      )}
+
       {today.week && today.week.left >= 0 && today.status !== "over_budget" && (
         <section className="flex flex-col gap-2 rounded-xl border p-4" data-testid="week">
           <p className="text-sm">
@@ -190,6 +197,53 @@ export function TodayScreen({ view }: { view: TodayView }) {
 
       <Breakdown open={open} onOpenChange={setOpen} view={view} />
     </div>
+  );
+}
+
+/**
+ * "At this pace…" (PLAN.md decision 11): amber, never red, and worded by
+ * the tone core picked. The link to "ask for money" comes in Phase 8.
+ */
+function RunOutCard({
+  warning,
+  expectedNextOn,
+}: {
+  warning: RunOutWarning;
+  expectedNextOn: IsoDate;
+}) {
+  const t = useTranslations("Today.runOut");
+  const format = useFormatter();
+  const formatAmount = useFormatAmount();
+  const date = (day: IsoDate) =>
+    format.dateTime(asDate(day), { weekday: "long", day: "numeric", month: "long" });
+
+  let text: string;
+  if (warning.tone === "normal") {
+    text = t("normal", {
+      date: date(warning.runsOutOn),
+      days: warning.daysShort,
+      amount: formatAmount(warning.cutPerDay),
+    });
+  } else if (warning.tone === "big") {
+    text = t("big", {
+      date: date(expectedNextOn),
+      aim: formatAmount(warning.aimPerDay),
+      pace: formatAmount(warning.pace),
+    });
+  } else {
+    text = t("tight", { amount: formatAmount(warning.left), days: warning.days });
+  }
+
+  return (
+    <section
+      aria-label={t("label")}
+      className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200"
+      data-testid="run-out"
+      data-tone={warning.tone}
+    >
+      <HourglassIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
+      <p>{text}</p>
+    </section>
   );
 }
 

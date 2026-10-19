@@ -3,6 +3,7 @@ import { getBudget } from "@mizania/db/budget";
 import { getCheckinState } from "@mizania/db/checkin";
 import { getCategories, getQuickLogOptions } from "@mizania/db/expenses";
 import { getWalletsOverview } from "@mizania/db/wallets";
+import { ChartPieIcon } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/actions/auth";
@@ -12,6 +13,7 @@ import { TodayLog } from "@/components/quick-log/today-log";
 import { ReceivedSnackbar } from "@/components/received/received-snackbar";
 import { TodayScreen } from "@/components/today/today-screen";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { getDb } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 
@@ -72,6 +74,7 @@ export default async function TodayPage({
                 },
                 budget: budget.today,
                 waiting: budget.waiting.map((w) => w.amountMillimes),
+                warning: budget.warning,
               }}
             />
             <div className="mt-4">
@@ -98,6 +101,14 @@ export default async function TodayPage({
           options={quickLog}
           list={budget && { expenses: budget.todayExpenses, categories, wallets, today: day }}
         />
+        {budget && (
+          <Button asChild variant="ghost" className="mt-2 self-center">
+            <Link href="/month" data-testid="month-link">
+              <ChartPieIcon aria-hidden />
+              {today("monthLink")}
+            </Link>
+          </Button>
+        )}
       </main>
     </div>
   );

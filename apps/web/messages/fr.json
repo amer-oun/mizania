@@ -60,7 +60,14 @@
     "loadError": "Impossible de charger le montant du jour.",
     "retry": "Réessayer",
     "loading": "Chargement…",
-    "nextWeek": "+{amount} · compte dans ton montant du jour à partir de la semaine prochaine"
+    "nextWeek": "+{amount} · compte dans ton montant du jour à partir de la semaine prochaine",
+    "runOut": {
+      "label": "À ce rythme",
+      "normal": "À ce rythme, ton argent sera fini le {date}, {days, plural, =1 {1 jour} other {# jours}} avant ton prochain virement. Dépenser {amount} de moins par jour suffit.",
+      "big": "Pour tenir jusqu'à ton prochain virement le {date}, vise environ {aim} par jour (tu dépenses environ {pace} en ce moment). Chaque jour en dessous aide.",
+      "tight": "L'argent est serré : {amount} pour {days, plural, =1 {le dernier jour} other {les # jours}} avant ton virement. Chaque dinar que tu ne dépenses pas aide."
+    },
+    "monthLink": "Ce mois par catégorie"
   },
   "QuickLog": {
     "title": "Ajouter une dépense",
@@ -110,7 +117,29 @@
     "noCycle": "Aucun mois en cours.",
     "change": "Modifier mon plan",
     "savingsTitle": "Épargne",
-    "savingsLine": "Mis de côté"
+    "savingsLine": "Mis de côté",
+    "monthLink": "Ce mois par catégorie"
+  },
+  "Month": {
+    "title": "Ce mois par catégorie",
+    "back": "Retour",
+    "total": "Dépensé ce mois",
+    "day": "Jour {day} du mois",
+    "compare": "Le mois dernier au jour {day} : {amount}",
+    "compareWhole": "Tout le mois dernier : {amount} (il avait moins de jours)",
+    "lastMonth": "Mois dernier {amount}",
+    "more": "+{amount}",
+    "less": "−{amount}",
+    "same": "pareil",
+    "firstMonth": "Le mois prochain, tu verras la comparaison avec ce mois.",
+    "everyDay": "Au quotidien",
+    "fixed": "Dépenses fixes",
+    "unlogged": "Dépense non notée",
+    "empty": "Rien dépensé ce mois pour l'instant.",
+    "loading": "Chargement…",
+    "loadError": "Impossible de charger ce mois.",
+    "retry": "Réessayer",
+    "noCycle": "Aucun mois commencé."
   },
   "PayFixed": {
     "pay": "Payer",

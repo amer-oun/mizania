@@ -60,7 +60,14 @@
     "loadError": "Couldn't load today's amount.",
     "retry": "Try again",
     "loading": "Loading…",
-    "nextWeek": "+{amount} · shows in your daily amount from next week"
+    "nextWeek": "+{amount} · shows in your daily amount from next week",
+    "runOut": {
+      "label": "At this pace",
+      "normal": "At this pace, your money runs out on {date}, {days, plural, =1 {1 day} other {# days}} before your next transfer. Spending {amount} less a day fixes it.",
+      "big": "To make it to your next transfer on {date}, aim for about {aim} a day (you've been spending about {pace}). Every day under that helps.",
+      "tight": "Money is tight: {amount} for {days, plural, =1 {the last day} other {the # days}} until your transfer. Every dinar you don't spend helps."
+    },
+    "monthLink": "This month by category"
   },
   "QuickLog": {
     "title": "Add an expense",
@@ -110,7 +117,29 @@
     "noCycle": "No month in progress.",
     "change": "Change my plan",
     "savingsTitle": "Savings",
-    "savingsLine": "Set aside"
+    "savingsLine": "Set aside",
+    "monthLink": "This month by category"
+  },
+  "Month": {
+    "title": "This month by category",
+    "back": "Back",
+    "total": "Spent this month",
+    "day": "Day {day} of this month",
+    "compare": "Last month by day {day}: {amount}",
+    "compareWhole": "All of last month: {amount} (it had fewer days)",
+    "lastMonth": "Last month {amount}",
+    "more": "+{amount}",
+    "less": "−{amount}",
+    "same": "same",
+    "firstMonth": "Next month you'll see how this month compares.",
+    "everyDay": "Every day",
+    "fixed": "Fixed costs",
+    "unlogged": "Unlogged spending",
+    "empty": "Nothing spent yet this month.",
+    "loading": "Loading…",
+    "loadError": "We couldn't load this month.",
+    "retry": "Try again",
+    "noCycle": "No month started yet."
   },
   "PayFixed": {
     "pay": "Pay",
