@@ -37,6 +37,12 @@ export {
   weekStartAllowance,
 } from "./daily";
 export {
+  type CategorySpending,
+  type MonthByCategory,
+  monthByCategory,
+  type MonthByCategoryInput,
+} from "./insights";
+export {
   assertMillimes,
   formatTND,
   formatTypedTND,
@@ -105,4 +111,10 @@ export {
   type TransactionType,
   walletBalances,
 } from "./wallets";
-export { type RunOutForecast, runOutForecast, type RunOutInput } from "./warnings";
+export {
+  type RunOutForecast,
+  runOutForecast,
+  type RunOutInput,
+  type RunOutWarning,
+  runOutWarning,
+} from "./warnings";
