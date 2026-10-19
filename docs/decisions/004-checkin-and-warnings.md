@@ -58,9 +58,21 @@ One or two days aren't a pace. A big shopping day or a birthday dinner would loo
 - **More:** nothing is saved until she answers "I received money" (an income, with its source) or "I miscounted earlier" (a positive correction). An answer to a difference that changed meanwhile is refused, and she counts again.
 - **Each check-in is stored** in `checkins` (expected, counted, kind, the transaction it recorded). Two in a day are fine: the second compares with the balance after the first. Only a wallet's latest check-in can be undone, with its transaction.
 
+### 7. How the warning shows and is worded (added 2026-10-19)
+
+- **Where:** on Today, an amber card (never red) under the amount. It's hidden before 3 finished days, when the pace is safe, while Today asks "Did your money arrive?", and when over budget or out of daily money (the over-budget screen already says it).
+- **Finished days** are this month's days before today: today isn't over, and a morning without spending would look like a cheap day. Last month's days never count; a new month waits 3 days again.
+- **The pace uses daily-money spending only** (ADR 006 §3), the same numbers as today's amount: unlogged spending from a check-in counts on the day of the count; spending covered by an envelope or a fixed cost doesn't (that money was set aside), only the part beyond it; negative corrections count.
+- **Three wordings,** picked by `runOutWarning` in core so the thresholds are tested in one place:
+  - _normal:_ "At this pace, your money runs out on Thursday 23 October, 6 days before your next transfer. Spending 2 DT less a day fixes it."
+  - _big,_ when the cut is half the pace or more: a target instead of a cut. "To make it to your next transfer on …, aim for about 6 DT a day (you've been spending about 11). Every day under that helps." The target is what fits a day, rounded down to whole dinars (so following it still lasts); the pace is rounded to the nearest dinar.
+  - _tight,_ when under 1 DT a day fits: "Money is tight: 4 DT for the 9 days until your transfer. Every dinar you don't spend helps."
+- No exclamation marks and no "too much" in any language. The link to "ask for money" comes in Phase 8 (PLAN.md decision 11).
+- **This month by category** (`/month`, linked from Today and the Plan tab) counts everything spent instead, plan or not, since it answers a different question: what went where. It compares with last month up to the same day number (decision 12), or all of last month when it was shorter; the difference is shown without colour.
+
 ## Consequences
 
 - Balances stay accurate with one number a day, which is what keeps the daily amount right.
 - Warnings are early, specific and actionable ("spend 7.500 DT less per day"), never "cut 0".
 - All divisions use exact integer helpers (`integer-math.ts`), shared with the daily module; they were checked against exact BigInt maths.
-- How warnings are worded and linked to "ask for money" is a Phase 3 UI task (PLAN.md).
+- How warnings are worded is §7; linking big warnings to "ask for money" is Phase 8 (PLAN.md).
